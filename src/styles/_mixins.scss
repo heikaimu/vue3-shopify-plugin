@@ -1,0 +1,70 @@
+// fixed定位
+@mixin pos-fixed($zIndex:0) {
+    position: fixed;
+    left    : 0;
+    top     : 0;
+    right   : 0;
+    bottom  : 0;
+    z-index : $zIndex;
+}
+
+// absolute定位
+@mixin pos-absolute($zIndex:0) {
+    position: absolute;
+    left    : 0;
+    top     : 0;
+    right   : 0;
+    bottom  : 0;
+    z-index : $zIndex;
+}
+
+@mixin flex-row-center() {
+    display        : flex;
+    justify-content: center;
+    align-items    : center;
+    overflow       : hidden;
+}
+
+@mixin flex-row-sb() {
+    display        : flex;
+    justify-content: space-between;
+    align-items    : center;
+    overflow       : hidden;
+}
+
+@mixin flex-row-sa() {
+    display        : flex;
+    justify-content: space-around;
+    align-items    : center;
+    overflow       : hidden;
+}
+
+@mixin flex-col-center() {
+    display        : flex;
+    flex-direction : column;
+    justify-content: center;
+    align-items    : center;
+    overflow       : hidden;
+}
+
+@mixin flex-col-sb() {
+    display        : flex;
+    flex-direction : column;
+    justify-content: space-between;
+    align-items    : center;
+    overflow       : hidden;
+}
+
+@mixin flex-col-sa() {
+    display        : flex;
+    flex-direction : column;
+    justify-content: space-around;
+    align-items    : center;
+    overflow       : hidden;
+}
+
+@mixin card-shadow($color:#000000) {
+    box-shadow: 0 2px 1px -1px rgba($color: $color, $alpha: 0.2),
+        0 1px 1px rgba($color: $color, $alpha: 0.14),
+        0 1px 3px rgba($color: $color, $alpha: 0.12),
+}
