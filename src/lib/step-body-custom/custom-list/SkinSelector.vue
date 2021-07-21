@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-20 10:41:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-20 11:06:26
+ * @LastEditTime: 2021-07-21 13:03:33
 -->
 <template>
   <div class="color-selector-wrapper">
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import BaseIcon from "../../components/BaseIcon.vue";
+import BaseIcon from "../../../components/BaseIcon.vue";
 
 export default {
   components: {

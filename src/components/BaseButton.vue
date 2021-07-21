@@ -21,6 +21,10 @@ export default {
       type: String,
       default: "normal",
     },
+    full: {
+      type: Boolean,
+      default: false
+    }
   },
 };
 </script>

@@ -267,7 +267,7 @@ abab@^1.0.3:
 
 abab@^2.0.3:
   version "2.0.5"
-  resolved "https://registry.npm.taobao.org/abab/download/abab-2.0.5.tgz#c0b678fb32d60fc1219c784d6a826fe385aeb79a"
+  resolved "https://registry.nlark.com/abab/download/abab-2.0.5.tgz#c0b678fb32d60fc1219c784d6a826fe385aeb79a"
   integrity sha1-wLZ4+zLWD8EhnHhNaoJv44Wut5o=
 
 acorn-globals@^3.1.0:
@@ -416,7 +416,7 @@ buffer-from@^1.0.0:
   resolved "https://registry.nlark.com/buffer-from/download/buffer-from-1.1.1.tgz#32713bc028f75c02fdb710d7c7bcec1f2c6070ef"
   integrity sha1-MnE7wCj3XAL9txDXx7zsHyxgcO8=
 
-canvas@^1.6.12, canvas@^1.6.13:
+canvas@^1.6.13:
   version "1.6.13"
   resolved "https://registry.nlark.com/canvas/download/canvas-1.6.13.tgz?cache=0&sync_timestamp=1621240304296&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fcanvas%2Fdownload%2Fcanvas-1.6.13.tgz#8cb4e9abbea9e615a377890ffac50277a1167c73"
   integrity sha1-jLTpq76p5hWjd4kP+sUCd6EWfHM=
@@ -624,16 +624,7 @@ fabric-customise-controls@^2.0.6-beta:
   dependencies:
     fabric "^2.7.0"
 
-fabric@2.4.3:
-  version "2.4.3"
-  resolved "https://registry.nlark.com/fabric/download/fabric-2.4.3.tgz#6db49d36b481943adee1d4021faf08e09866669a"
-  integrity sha1-bbSdNrSBlDre4dQCH68I4JhmZpo=
-  optionalDependencies:
-    canvas "^1.6.12"
-    jsdom "^9.12.0"
-    xmldom "0.1.x"
-
-fabric@^2.7.0:
+fabric@2.7.0, fabric@^2.7.0:
   version "2.7.0"
   resolved "https://registry.nlark.com/fabric/download/fabric-2.7.0.tgz#c3b4913dc7ee6b49afab90776332cf846689257c"
   integrity sha1-w7SRPcfua0mvq5B3YzLPhGaJJXw=
@@ -752,7 +743,7 @@ glob-parent@~5.1.2:
 
 glob@^7.1.6:
   version "7.1.7"
-  resolved "https://registry.nlark.com/glob/download/glob-7.1.7.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fglob%2Fdownload%2Fglob-7.1.7.tgz#3b193e9233f01d42d0b3f78294bbeeb418f94a90"
+  resolved "https://registry.nlark.com/glob/download/glob-7.1.7.tgz#3b193e9233f01d42d0b3f78294bbeeb418f94a90"
   integrity sha1-Oxk+kjPwHULQs/eClLvutBj5SpA=
   dependencies:
     fs.realpath "^1.0.0"
@@ -1112,7 +1103,7 @@ oauth-sign@~0.9.0:
 
 once@^1.3.0:
   version "1.4.0"
-  resolved "https://registry.npm.taobao.org/once/download/once-1.4.0.tgz#583b1aa775961d4b113ac17d9c50baef9dd76bd1"
+  resolved "https://registry.nlark.com/once/download/once-1.4.0.tgz#583b1aa775961d4b113ac17d9c50baef9dd76bd1"
   integrity sha1-WDsap3WWHUsROsF9nFC6753Xa9E=
   dependencies:
     wrappy "1"
@@ -1500,7 +1491,7 @@ uri-js@^4.2.2:
 
 util-deprecate@^1.0.2:
   version "1.0.2"
-  resolved "https://registry.npm.taobao.org/util-deprecate/download/util-deprecate-1.0.2.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Futil-deprecate%2Fdownload%2Futil-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
+  resolved "https://registry.npm.taobao.org/util-deprecate/download/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
 
 uuid@^3.3.2:

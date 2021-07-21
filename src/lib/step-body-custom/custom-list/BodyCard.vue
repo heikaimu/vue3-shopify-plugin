@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-20 17:53:13
+ * @LastEditTime: 2021-07-21 15:11:09
 -->
 <template>
   <div class="body-card">
@@ -29,15 +29,32 @@
     <div class="body-card__box" v-else>
       <img class="body-card__img" :src="bodyURL" alt="" />
     </div>
+    <!-- 标签 -->
+    <p class="body-card__edit-tag" :class="{ disabled: loading }">
+      Tap &amp; Edit
+    </p>
+    <!-- loading -->
+    <div class="body-card__loading" v-if="loading">
+      <div class="loading-icon">
+        <base-icon icon="loading" :size="30" color="#ffffff"></base-icon>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, computed, onMounted } from "vue";
+import { reactive, toRefs, watch, onMounted } from "vue";
 
-import Minime from "../../utils/minime";
+import BaseIcon from "../../../components/BaseIcon.vue";
+
+import Minime from "../../../utils/minime";
+import { loadImages } from "../../../utils/image";
 
 export default {
+  components: {
+    BaseIcon,
+  },
+
   props: {
     data: {
       type: Object,
@@ -57,7 +74,9 @@ export default {
     const { data, skin, avatar } = props;
 
     const state = reactive({
+      // 身体图片
       bodyURL: "",
+      // 头部样式
       avatarStyle: {
         width: 0,
         height: 0,
@@ -65,7 +84,9 @@ export default {
         left: 0,
         transform: `rotate(0deg)`,
       },
+      // 帽子图片
       hatURL: "",
+      // 帽子样式
       hatStyle: {
         width: 0,
         height: 0,
@@ -73,15 +94,38 @@ export default {
         left: 0,
         transform: `rotate(0deg)`,
       },
+      // 加载中
+      loading: false,
     });
 
     onMounted(() => {
+      renderImage(props.skin);
+    });
+
+    watch(
+      () => props.skin,
+      (val) => {
+        renderImage(val);
+      }
+    );
+
+    // 渲染卡片
+    function renderImage(skin) {
       if (data.type === "normal") {
         const currentSkinImage = data.images.find(
           (item) => item.color === skin
         );
-        state.bodyURL = currentSkinImage ? currentSkinImage.url : "";
-      } else {
+        if (currentSkinImage) {
+          state.loading = true;
+          loadImages([currentSkinImage.url]).then((images) => {
+            setTimeout(() => {
+              state.loading = false;
+              state.bodyURL = images[0].src;
+            }, 500);
+          });
+        }
+      } else if (data.type === "hood") {
+        state.loading = true;
         const minime = new Minime("", {
           width: 500,
           height: 660,
@@ -93,11 +137,12 @@ export default {
           success: function (canvas) {
             setTimeout(() => {
               state.bodyURL = canvas.toDataURL();
+              state.loading = false;
             }, 300);
           },
         });
       }
-    });
+    }
 
     // 背景图加载完成
     function bgLoad(e) {
@@ -187,6 +232,8 @@ export default {
 
 .body-card {
   width: 100%;
+  position: relative;
+  cursor: pointer;
 }
 .body-card__box {
   width: 100%;
@@ -207,5 +254,46 @@ export default {
   display: block;
   position: absolute;
   transform-origin: bottom;
+}
+.body-card__edit-tag {
+  @include flex-row-center;
+  width: 100px;
+  height: 30px;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: 600;
+  background-color: $theme-color;
+  color: #ffffff;
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translate3d(-50%, 0, 0) scale(0.8);
+  box-shadow: 0 1px 18px rgb(255 83 58 / 12%),
+    0 3px 5px -1px rgb(255 83 58 / 20%), 0 6px 10px rgb(255 83 58 / 14%);
+  font-family: var(--text-family);
+  filter: grayscale(0);
+  opacity: 1;
+  &.disabled {
+    filter: grayscale(1);
+    opacity: 0.3;
+  }
+}
+.body-card__loading {
+  @include pos-absolute;
+  @include flex-row-center;
+  border-radius: 10px;
+  background-color: rgba($color: #000000, $alpha: 0.6);
+  .loading-icon {
+    animation: rotate 1s linear infinite;
+  }
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(1turn);
+    }
+  }
 }
 </style>

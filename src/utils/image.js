@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 16:48:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-16 16:52:16
+ * @LastEditTime: 2021-07-21 12:21:50
  */
 
 /**
@@ -299,7 +299,7 @@ function cropImage(image, x, y, width, height) {
 
 /**
  * 加载图片
- * @param {Array} images - 图片链接数组
+ * @param {Array[String]} images - 图片链接数组
  */
 function loadImages(images) {
   const loadImage = url => {

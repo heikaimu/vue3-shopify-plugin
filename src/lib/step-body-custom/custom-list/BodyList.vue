@@ -4,11 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-21 10:51:13
+ * @LastEditTime: 2021-07-21 15:06:52
 -->
 <template>
   <div class="body-wrapper" ref="bodyWrapper">
-    {{ list.length }}
     <base-row :gutter="10">
       <base-col
         :span="12"
@@ -16,7 +15,12 @@
         :key="item.id"
         class="body-card-row"
       >
-        <body-card :data="item" :skin="skin" :avatar="avatar"></body-card>
+        <body-card
+          :data="item"
+          :skin="skin"
+          :avatar="avatar"
+          @click="handleClick(item)"
+        ></body-card>
       </base-col>
     </base-row>
   </div>
@@ -25,8 +29,8 @@
 <script>
 import { reactive, toRefs, ref, onMounted, watch, nextTick } from "vue";
 
-import BaseRow from "../../components/BaseRow.vue";
-import BaseCol from "../../components/BaseCol.vue";
+import BaseRow from "../../../components/BaseRow.vue";
+import BaseCol from "../../../components/BaseCol.vue";
 import BodyCard from "./BodyCard.vue";
 import BScroll from "better-scroll";
 
@@ -52,7 +56,11 @@ export default {
     },
   },
 
-  setup(props) {
+  emits: {
+    select: null,
+  },
+
+  setup(props, context) {
     const state = reactive({
       // scroll
       scroll: null,
@@ -62,30 +70,36 @@ export default {
       pageNumber: 1,
     });
 
-    const bodyWrapper = ref(null);
-
     onMounted(() => {
       if (!state.scroll) {
-        // 实力化滚动插件
-        state.scroll = new BScroll(bodyWrapper.value, {
-          probeType: 1,
-          mouseWheel: true,
-          click: true,
-        });
-
-        // 监听滚动到底部事件
-        state.scroll.on("scrollEnd", () => {
-          if (state.scroll.y <= state.scroll.maxScrollY + 50) {
-            console.log("到底了");
-          }
-        });
+        initScroll();
       }
     });
+
+    // 实力化滚动插件
+    const bodyWrapper = ref(null);
+    function initScroll() {
+      state.scroll = new BScroll(bodyWrapper.value, {
+        probeType: 1,
+        mouseWheel: true,
+        click: true,
+      });
+
+      // 监听滚动到底部事件
+      state.scroll.on("scrollEnd", () => {
+        if (state.scroll.y <= state.scroll.maxScrollY + 150) {
+          state.pageNumber += 1;
+          addPageList();
+        }
+      });
+    }
 
     // 添加一页对应页码的数据
     function addPageList() {
       const startIndex = (state.pageNumber - 1) * state.pageSize;
-      const currentPageList = props.list.splice()
+      const endIndex = state.pageNumber * state.pageSize;
+      const currentPageList = props.list.slice(startIndex, endIndex);
+      state.pageList.push(...currentPageList);
     }
 
     // 当传入的列表发生变化的时候，重制列表数据
@@ -94,6 +108,7 @@ export default {
       () => {
         state.pageList = [];
         state.pageNumber = 1;
+        state.scroll.scrollTo(0, 0);
         addPageList();
       },
       {
@@ -114,9 +129,18 @@ export default {
       }
     );
 
+    // 点击卡片
+    function handleClick(item) {
+      context.emit("select", {
+        ...item,
+        skin: props.skin
+      });
+    }
+
     return {
       ...toRefs(state),
       bodyWrapper,
+      handleClick,
     };
   },
 };
@@ -138,7 +162,7 @@ export default {
   }
 
   .body-card-row {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
   }
 }
 </style>

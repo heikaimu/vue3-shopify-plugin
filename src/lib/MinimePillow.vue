@@ -19,6 +19,7 @@
         v-else-if="currentStep === 'bodyCustom'"
         :avatar="avatar"
         :config="config"
+        @setStep="setStep"
       />
     </div>
   </div>

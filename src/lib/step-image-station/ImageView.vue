@@ -50,16 +50,14 @@
       </div>
     </div>
     <div class="image-view__bottom">
-      <ul class="button-list">
-        <li class="button-item">
+      <base-row :gutter="10">
+        <base-col :span="12">
           <base-button plain @click="handleBack">Cancel</base-button>
-        </li>
-        <li class="button-item">
-          <base-button type="primary" @click="handleAIAvatar"
-            >CONFIRM</base-button
-          >
-        </li>
-      </ul>
+        </base-col>
+        <base-col :span="12">
+          <base-button type="primary" @click="handleAIAvatar">CONFIRM</base-button>
+        </base-col>
+      </base-row>
     </div>
 
     <loading-avatar :visible="loadingVisible" :state="loadingState" />
@@ -73,6 +71,8 @@ import BaseHeader from "../../components/BaseHeader.vue";
 import BaseButton from "../../components/BaseButton.vue";
 import BaseNotice from "../../components/BaseNotice.vue";
 import BaseIcon from "../../components/BaseIcon.vue";
+import BaseRow from "../../components/BaseRow.vue";
+import BaseCol from "../../components/BaseCol.vue";
 import LoadingAvatar from "./LoadingAvatar.vue";
 
 import { imageReset } from "../../utils/image";
@@ -84,6 +84,8 @@ export default {
     BaseButton,
     BaseNotice,
     BaseIcon,
+    BaseRow,
+    BaseCol,
     LoadingAvatar,
   },
 
@@ -292,6 +294,7 @@ export default {
 }
 .image-view__bottom {
   width: 100%;
+  padding: 10px;
   background-color: #e4e7ed;
 
   .button-list {

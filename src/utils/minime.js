@@ -9,6 +9,7 @@
 
 import { fabric } from 'fabric';
 import 'fabric-customise-controls';
+
 function Minime(canvasID, size) {
   this.canvasID = canvasID;
   this.size = size;
@@ -73,7 +74,8 @@ Minime.prototype.customControlsPlugin = function (params) {
         if (typeof _this.replacePhoto === 'function') {
           _this.replacePhoto();
         }
-      }
+      },
+      cursor: 'pointer'
     },
     tr: {
       action: 'scale',

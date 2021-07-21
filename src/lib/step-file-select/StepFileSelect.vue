@@ -4,11 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 13:04:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-19 16:40:23
+ * @LastEditTime: 2021-07-21 14:33:50
 -->
 <template>
   <div class="file-select">
-    <div class="file-select--top border-bottom">
+    <div class="file-select__top border-bottom">
       <base-header
         mainText="文件选择"
         subText="File Select"
@@ -16,7 +16,7 @@
       />
     </div>
 
-    <div class="file-select--medium">
+    <div class="file-select__medium">
       <ul class="file-select__list">
         <li class="file-select__item">
           <label class="file-select__card">
@@ -140,7 +140,7 @@
       <avatar-list-cache @select="selectCacheFile" />
     </div>
 
-    <div class="file-select--bottom border-top">
+    <div class="file-select__bottom">
       <base-button type="info" plain @click="closePlugin">Cancel</base-button>
     </div>
   </div>
@@ -245,10 +245,10 @@ export default {
   @include flex-col-sb;
   width: 100%;
   height: 100%;
-  .file-select--top {
+  .file-select__top {
     width: 100%;
   }
-  .file-select--medium {
+  .file-select__medium {
     width: 100%;
     padding: 20px;
     flex: 1;
@@ -311,7 +311,7 @@ export default {
       }
     }
   }
-  .file-select--bottom {
+  .file-select__bottom {
     width: 100%;
     padding: 10px;
   }
