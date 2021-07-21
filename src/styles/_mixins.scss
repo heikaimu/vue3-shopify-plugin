@@ -22,21 +22,18 @@
     display        : flex;
     justify-content: center;
     align-items    : center;
-    overflow       : hidden;
 }
 
 @mixin flex-row-sb() {
     display        : flex;
     justify-content: space-between;
     align-items    : center;
-    overflow       : hidden;
 }
 
 @mixin flex-row-sa() {
     display        : flex;
     justify-content: space-around;
     align-items    : center;
-    overflow       : hidden;
 }
 
 @mixin flex-col-center() {
@@ -44,7 +41,6 @@
     flex-direction : column;
     justify-content: center;
     align-items    : center;
-    overflow       : hidden;
 }
 
 @mixin flex-col-sb() {
@@ -52,7 +48,6 @@
     flex-direction : column;
     justify-content: space-between;
     align-items    : center;
-    overflow       : hidden;
 }
 
 @mixin flex-col-sa() {
@@ -60,7 +55,6 @@
     flex-direction : column;
     justify-content: space-around;
     align-items    : center;
-    overflow       : hidden;
 }
 
 @mixin card-shadow($color:#000000) {

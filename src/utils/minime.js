@@ -8,7 +8,7 @@
  */
 
 import { fabric } from 'fabric';
-
+import 'fabric-customise-controls';
 function Minime(canvasID, size) {
   this.canvasID = canvasID;
   this.size = size;

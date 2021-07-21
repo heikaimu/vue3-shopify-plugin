@@ -57,6 +57,8 @@ export default {
   },
 
   setup(props, context) {
+    const { rawFile } = props;
+
     const state = reactive({
       //当前展示的图片
       viewFile: "",
@@ -68,7 +70,7 @@ export default {
 
     onMounted(() => {
       // 进入组件时候，设置展示图片为原图
-      state.viewFile = props.rawFile;
+      state.viewFile = rawFile;
     });
 
     // 旋转预览图
@@ -101,8 +103,7 @@ export default {
     function setAvatar(data) {
       if (data.length === 1) {
         const avatar = data[0];
-        context.emit("setAvatar", avatar);
-        cacheAvatar(avatar);
+        saveAndUseAvatar(avatar);
       } else if (data.length > 1) {
         state.currentState = "avatar";
         state.avatarList = data;
@@ -111,8 +112,25 @@ export default {
 
     // 选择多头中的一个
     function selectAvatar(avatar) {
-      context.emit("setAvatar", avatar);
-      cacheAvatar(avatar);
+      saveAndUseAvatar(avatar);
+    }
+
+    // 保存并使用头像
+    function saveAndUseAvatar(avatar) {
+      const image = new Image();
+      image.src = avatar.url;
+      image.onload = () => {
+        const data = {
+          ...avatar,
+          width: image.width,
+          height: image.height
+        }
+        context.emit("setAvatar", data);
+        cacheAvatar({
+          ...data,
+          rawFile
+        });
+      };
     }
 
     // 缓存头像到本地
@@ -125,7 +143,6 @@ export default {
 
         avatarList.unshift(item);
         localforage.setItem("avatarList", avatarList);
-        console.log(avatarList);
       });
     }
 

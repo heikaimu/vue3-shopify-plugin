@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-16 14:28:55
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-16 17:54:26
+ * @LastEditTime: 2021-07-20 10:47:11
 -->
 <template>
   <div class="base-header">
@@ -14,6 +14,9 @@
     <div class="base-header__title center">
       <h2 class="main-text">{{ mainText }}</h2>
       <p class="sub-text">{{ subText }}</p>
+    </div>
+    <div class="slot-wrapper">
+      <slot />
     </div>
   </div>
 </template>
@@ -92,5 +95,16 @@ export default {
     color: #666666;
     line-height: 1.3;
   }
+}
+
+.slot-wrapper {
+  position: absolute;
+  left: 50px;
+  top: 0;
+  right: 10px;
+  bottom: 0;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
 }
 </style>

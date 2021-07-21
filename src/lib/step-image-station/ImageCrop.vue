@@ -16,7 +16,7 @@
         <div class="operations">
           <div class="button">
             <base-icon
-              icon="zoomDown"
+              icon="zoomUp"
               :size="16"
               color="#666666"
               @click="handleZoom(0.1)"

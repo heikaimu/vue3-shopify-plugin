@@ -4,25 +4,32 @@
       <step-file-select
         v-if="currentStep === 'fileSelect'"
         @change="changeFile"
+        @selectCache="useCacheFile"
         @setStep="setStep"
         @close="closePlugin"
       />
       <step-image-station
-        v-if="currentStep === 'imageStation'"
+        v-else-if="currentStep === 'imageStation'"
         :rawFile="rawFile"
-        @setAvatar="setAvatar"
+        @setAvatar="useAIAvatar"
         @setStep="setStep"
         @close="closePlugin"
+      />
+      <step-body-custom
+        v-else-if="currentStep === 'bodyCustom'"
+        :avatar="avatar"
+        :config="config"
       />
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs } from "vue";
+import { reactive, toRefs, provide } from "vue";
 
 import StepFileSelect from "./step-file-select/StepFileSelect.vue";
 import StepImageStation from "./step-image-station/StepImageStation.vue";
+import StepBodyCustom from "./step-body-custom/StepBodyCustom.vue";
 
 import { imageReset } from "../utils/image";
 
@@ -32,6 +39,14 @@ export default {
   components: {
     StepFileSelect,
     StepImageStation,
+    StepBodyCustom,
+  },
+
+  props: {
+    config: {
+      type: Object,
+      deafult: () => {},
+    },
   },
 
   setup() {
@@ -41,6 +56,7 @@ export default {
       avatar: {},
     });
 
+    // 选择文件
     function changeFile(file) {
       // 压缩文件
       imageReset({
@@ -50,13 +66,26 @@ export default {
         angle: 0,
       }).then((url) => {
         state.rawFile = url;
-        state.currentStep = "imageStation";
+        setStep("imageStation");
       });
     }
 
-    // 设置当前使用的头像
-    function setAvatar(avatar) {
+    // 使用缓存文件
+    function useCacheFile(item) {
+      state.rawFile = item.rawFile;
+      state.avatar = {
+        url: item.url,
+        chin: item.chin,
+        width: item.width,
+        height: item.height,
+      };
+      setStep("bodyCustom");
+    }
+
+    // 使用AI返回的头像
+    function useAIAvatar(avatar) {
       state.avatar = avatar;
+      setStep("bodyCustom");
     }
 
     // 设置步骤
@@ -72,7 +101,8 @@ export default {
     return {
       ...toRefs(state),
       changeFile,
-      setAvatar,
+      useCacheFile,
+      useAIAvatar,
       setStep,
       closePlugin,
     };
@@ -95,6 +125,16 @@ export default {
     border-radius: 10px;
     overflow: hidden;
     background-color: #ffffff;
+  }
+}
+
+@media screen and (max-width: 750px) {
+  .plugin-dialog {
+    .plugin-dialog__content {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+    }
   }
 }
 </style>
