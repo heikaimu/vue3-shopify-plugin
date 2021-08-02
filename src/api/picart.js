@@ -2,7 +2,7 @@ import axios from 'axios';
 import { dataURLtoBlob, cropImage } from '../utils/image';
 
 const getToken = async (type) => {
-  const { status, data } = await axios.post(`https://tsback.witemedia.com/api/v1/getSign?type=${type}`);
+  const { status, data } = await axios.post(`https://sc.globaladput.com/plugins/api/v1/getSign?type=${type}`);
   if (status === 200 && data.status === '0') {
     return data.data;
   }

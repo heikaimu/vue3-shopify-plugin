@@ -1,10 +1,15 @@
 <template>
-  <div class="base-button" :class="[type, size, { plain: plain }]">
+  <div
+    class="base-button"
+    :class="[type, size, { plain: plain }]"
+    :style="sizeStyle"
+  >
     <slot />
   </div>
 </template>
 
 <script>
+import { toRaw, computed } from "vue";
 export default {
   name: "BaseButton",
 
@@ -23,8 +28,37 @@ export default {
     },
     full: {
       type: Boolean,
-      default: false
+      default: false,
+    },
+    blod: {
+      type: Number,
+      default: 400
     }
+  },
+
+  setup(props) {
+    const sizeMap = {
+      normal: {
+        height: "36px",
+        borderRadius: "4px",
+        fontSize: "14px",
+        fontWeight: props.blod
+      },
+      large: {
+        height: "60px",
+        borderRadius: "6px",
+        fontSize: "18px",
+        fontWeight: props.blod
+      },
+    };
+
+    const sizeStyle = computed(() => {
+      return sizeMap[props.size];
+    });
+
+    return {
+      sizeStyle,
+    };
   },
 };
 </script>
@@ -41,10 +75,7 @@ $whiteColor: #ffffff;
 .base-button {
   box-sizing: border-box;
   width: 100%;
-  height: 36px;
-  border-radius: 4px;
   text-align: center;
-  font-size: 14px;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -60,7 +91,7 @@ $whiteColor: #ffffff;
 .base-button.plain {
   background-color: transparent;
   color: $infoColor;
-  border: 1px solid rgba($color: $infoColor, $alpha: 0.8);
+  border: 1px solid rgba($color: $infoColor, $alpha: 0.6);
 }
 
 .base-button:active {
@@ -76,7 +107,7 @@ $whiteColor: #ffffff;
 .base-button.info.plain {
   background-color: transparent;
   color: $infoColor;
-  border: 1px solid rgba($color: $infoColor, $alpha: 0.8);
+  border: 1px solid rgba($color: $infoColor, $alpha: 0.6);
 }
 
 // primary

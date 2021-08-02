@@ -1,7 +1,7 @@
 <template>
   <div class="multiple-avatar">
     <div class="multiple-avatar__top">
-      <base-header mainText="裁剪" icon="arrowLeft" @close="backToView" />
+      <base-header mainText="Choose A Source" icon="arrowLeft" @close="backToView" />
     </div>
     <div class="multiple-avatar__medium">
       <ul class="avatar-list">

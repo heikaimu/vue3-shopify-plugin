@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-21 17:21:11
+ * @LastEditTime: 2021-07-28 17:50:49
 -->
 <template>
   <div class="body-custom-wrapper">
@@ -14,13 +14,18 @@
       @back="backToFileSelect"
       @select="selectCard"
     />
-    <custom-board
-      v-if="customBoardVisible"
-      :avatar="avatar"
-      :config="currentCardConfig"
-      @back="customBoardVisible = false"
-      @selectFile="backToFileSelect"
-    ></custom-board>
+    <transition name="slide-up-fade" mode="out-in">
+      <custom-board
+        v-if="customBoardVisible"
+        :avatar="avatar"
+        :config="currentCardConfig"
+        :title="config.productTitle"
+        :price="config.productPrice"
+        @back="customBoardVisible = false"
+        @selectFile="backToFileSelect"
+        @confirm="confirmCustom"
+      ></custom-board>
+    </transition>
   </div>
 </template>
 
@@ -44,11 +49,13 @@ export default {
     config: {
       type: Object,
       deafult: () => {},
-    }
+    },
   },
 
   emits: {
+    selectBody: null,
     setStep: null,
+    confirm: null,
   },
 
   setup(props, context) {
@@ -66,12 +73,19 @@ export default {
     function selectCard(item) {
       state.customBoardVisible = true;
       state.currentCardConfig = item;
+      context.emit("selectBody", item);
+    }
+
+    // 确认定制
+    function confirmCustom(url) {
+      context.emit("confirm", url);
     }
 
     return {
       ...toRefs(state),
       selectCard,
       backToFileSelect,
+      confirmCustom,
     };
   },
 };
@@ -85,5 +99,23 @@ export default {
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+// 下方
+.slide-up-fade-enter-from,
+.slide-up-fade-leave-to {
+  transform: translate3d(0, 50px, 0);
+  opacity: 0;
+}
+.slide-up-fade-leave-from,
+.slide-up-fade-enter-to {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+.slide-up-fade-enter-active {
+  transition: all 0.3s ease-in-out;
+}
+.slide-up-fade-leave-active {
+  transition: all 0.1s ease;
 }
 </style>

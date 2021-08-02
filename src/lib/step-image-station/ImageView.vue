@@ -1,7 +1,7 @@
 <template>
   <div class="image-view">
     <div class="image-view__top">
-      <base-header mainText="Chose File" @close="handleClose" />
+      <base-header mainText="Choose Photos Source" @close="handleClose" />
     </div>
     <div class="image-view__medium">
       <div class="image-view__content">
@@ -52,15 +52,15 @@
     <div class="image-view__bottom">
       <base-row :gutter="10">
         <base-col :span="12">
-          <base-button plain @click="handleBack">Cancel</base-button>
+          <base-button plain @click="handleBack">Replace</base-button>
         </base-col>
         <base-col :span="12">
-          <base-button type="primary" @click="handleAIAvatar">CONFIRM</base-button>
+          <base-button type="primary" @click="handleAIAvatar" :blod="600">CONFIRM</base-button>
         </base-col>
       </base-row>
     </div>
 
-    <loading-avatar :visible="loadingVisible" :state="loadingState" />
+    <loading-avatar :visible="loadingVisible" :state="loadingState" :loadingPendingText="loadingPendingText"/>
   </div>
 </template>
 
@@ -117,6 +117,7 @@ export default {
       // AI
       loadingVisible: false,
       loadingState: "pending",
+      loadingPendingText: ''
     });
 
     // 裁剪
@@ -151,6 +152,7 @@ export default {
           state.loadingVisible = true;
           try {
             state.loadingState = "pending";
+            state.loadingPendingText = 'Cartoonizing';
             state.cartoonFileURL = await getCartoonURL(props.fileURL);
             state.loadingState = "success";
             context.emit("cartoonize", state.cartoonFileURL);
@@ -172,9 +174,12 @@ export default {
       state.loadingVisible = true;
       try {
         state.loadingState = "pending";
+        state.loadingPendingText = 'AI Cropping your photo';
         const avatarList = await getAIAvatar(props.fileURL);
         state.loadingState = "success";
-        context.emit("setAvatar", avatarList);
+        setTimeout(() => {
+          context.emit("setAvatar", avatarList);
+        }, 1500);
       } catch {
         state.loadingState = "error";
       } finally {
@@ -232,7 +237,7 @@ export default {
       display: block;
       width: 300px;
       height: 300px;
-      background-color: #111111;
+      background-color: #333333;
       border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 6px;
       object-fit: contain;

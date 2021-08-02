@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-21 15:06:52
+ * @LastEditTime: 2021-07-29 17:20:37
 -->
 <template>
   <div class="body-wrapper" ref="bodyWrapper">
@@ -80,13 +80,13 @@ export default {
     const bodyWrapper = ref(null);
     function initScroll() {
       state.scroll = new BScroll(bodyWrapper.value, {
-        probeType: 1,
+        probeType: 3,
         mouseWheel: true,
         click: true,
       });
 
       // 监听滚动到底部事件
-      state.scroll.on("scrollEnd", () => {
+      state.scroll.on("scroll", () => {
         if (state.scroll.y <= state.scroll.maxScrollY + 150) {
           state.pageNumber += 1;
           addPageList();

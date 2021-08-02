@@ -1,20 +1,20 @@
 // fixed定位
-@mixin pos-fixed($zIndex:0) {
+@mixin pos-fixed($top:0, $right:0, $bottom:0, $left: 0, $zIndex:0) {
     position: fixed;
-    left    : 0;
-    top     : 0;
-    right   : 0;
-    bottom  : 0;
+    top     : $top;
+    right   : $right;
+    bottom  : $bottom;
+    left    : $left;
     z-index : $zIndex;
 }
 
 // absolute定位
-@mixin pos-absolute($zIndex:0) {
+@mixin pos-absolute($top:0, $right:0, $bottom:0, $left: 0, $zIndex:0) {
     position: absolute;
-    left    : 0;
-    top     : 0;
-    right   : 0;
-    bottom  : 0;
+    top     : $top;
+    right   : $right;
+    bottom  : $bottom;
+    left    : $left;
     z-index : $zIndex;
 }
 
@@ -58,7 +58,32 @@
 }
 
 @mixin card-shadow($color:#000000) {
-    box-shadow: 0 2px 1px -1px rgba($color: $color, $alpha: 0.2),
+    box-shadow:
+        0 2px 1px -1px rgba($color: $color, $alpha: 0.2),
         0 1px 1px rgba($color: $color, $alpha: 0.14),
         0 1px 3px rgba($color: $color, $alpha: 0.12),
+}
+
+@mixin card-shadow-lg($color:#000000) {
+    box-shadow:
+        0 3px 3px -2px rgba($color: $color, $alpha: 0.2),
+        0 3px 4px rgba($color: $color, $alpha: 0.14),
+        0 1px 8px rgba($color: $color, $alpha: 0.12);
+}
+
+// 毛玻璃
+@mixin glass($color:#000000, $alpha: 0.8) {
+    background-color: rgba($color: $color, $alpha: $alpha);
+    backdrop-filter : blur(8px);
+}
+
+// 超出隐藏
+@mixin omits($num: 1) {
+    text-overflow     : -o-ellipsis-lastline;
+    overflow          : hidden;
+    text-overflow     : ellipsis;
+    display           : -webkit-box;
+    -webkit-line-clamp: $num;
+    line-clamp        : $num;
+    -webkit-box-orient: vertical;
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="cropper-view">
     <div class="cropper-view__top">
-      <base-header mainText="裁剪" icon="arrowLeft" @close="backToView" />
+      <base-header mainText="Choose Photos Source" icon="arrowLeft" @close="backToView" />
     </div>
     <div class="cropper-view__medium">
       <div class="cropper-view__content">
@@ -40,9 +40,7 @@
           </div>
         </div>
         <div class="confirm-button-wrapper">
-          <base-button type="warning" size="small" @click="handleConfirm"
-            >CONFIRM</base-button
-          >
+          <base-button type="primary" @click="handleConfirm">CONFIRM</base-button>
         </div>
       </footer>
     </div>

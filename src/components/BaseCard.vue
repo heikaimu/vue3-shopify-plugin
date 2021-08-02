@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 10:49:23
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-20 14:02:31
+ * @LastEditTime: 2021-07-27 10:41:57
 -->
 <template>
   <div class="base-card" @click.stop="handleClick">
@@ -15,7 +15,9 @@
     </div>
     <p class="base-card__title">{{ title }}</p>
     <div class="base-card__close" @click.stop="handleClose">
-      <span class="icon">x</span>
+      <span class="icon">
+        <base-icon icon="close" :size="10" color="#ffffff"></base-icon>
+      </span>
     </div>
   </div>
 </template>
@@ -23,7 +25,13 @@
 <script>
 import { computed } from "vue";
 
+import BaseIcon from "./BaseIcon.vue";
+
 export default {
+  components: {
+    BaseIcon,
+  },
+
   props: {
     src: {
       type: String,
@@ -35,8 +43,8 @@ export default {
     },
     closeable: {
       type: Boolean,
-      deafult: false
-    }
+      deafult: false,
+    },
   },
 
   emits: {
@@ -83,13 +91,9 @@ export default {
   position: relative;
   background-color: #ffffff;
   .base-card__img {
+    @include pos-absolute;
     box-sizing: border-box;
     padding: 10px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
     img {
       width: 100%;
       height: 100%;
@@ -104,10 +108,8 @@ export default {
   text-align: center;
 }
 .base-card__close {
+  @include pos-absolute(-5px, -5px, auto, auto);
   padding: 6px;
-  position: absolute;
-  right: -5px;
-  top: -5px;
 
   &:hover {
     .icon {
@@ -116,16 +118,12 @@ export default {
   }
 
   .icon {
-    display: block;
+    @include flex-row-center;
     width: 16px;
     height: 16px;
     border-radius: 50%;
     background-color: #e02433;
     opacity: 0.6;
-    font-size: 12px;
-    color: #ffffff;
-    text-align: center;
-    line-height: 14px;
     transition: 0.3s;
   }
 }

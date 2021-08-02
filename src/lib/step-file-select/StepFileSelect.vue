@@ -4,14 +4,13 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 13:04:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-21 14:33:50
+ * @LastEditTime: 2021-07-30 16:24:17
 -->
 <template>
   <div class="file-select">
     <div class="file-select__top border-bottom">
       <base-header
-        mainText="文件选择"
-        subText="File Select"
+        mainText="Choose Photos Source"
         @close="closePlugin"
       />
     </div>
@@ -26,7 +25,7 @@
               accept="image/*"
               @change="handleSelectFile"
             />
-            <span class="text">File Select</span>
+            <span class="text">Choose from your album</span>
             <svg viewBox="0 0 30 30">
               <path
                 d="M12.2908253,14.0142199 L17.66,18.2328549 L16,21 L20.5857864,16.4142136 C21.366835,15.633165 22.633165,15.633165 23.4142136,16.4142136 L26,18.9998549 L26,21 C26,22.6568542 24.6568542,24 23,24 L7,24 C5.34314575,24 4,22.6568542 4,21 L4,19 L9.75359944,14.0683433 C10.478128,13.4473189 11.5404728,13.4246572 12.2908253,14.0142199 Z"
@@ -38,7 +37,7 @@
             </svg>
           </label>
         </li>
-        <li class="file-select__item">
+        <li class="file-select__item" v-if="isMobile">
           <label class="file-select__card">
             <input
               type="file"
@@ -147,7 +146,7 @@
 </template>
 
 <script>
-import { onMounted } from "vue";
+import { onMounted, reactive, toRefs } from "vue";
 
 import BaseHeader from "../../components/BaseHeader.vue";
 import BaseButton from "../../components/BaseButton.vue";
@@ -170,11 +169,14 @@ export default {
   },
 
   setup(props, context) {
+
+    const state = reactive({
+      isMobile: false
+    })
+
     onMounted(() => {
-      localforage.getItem("avatarList").then((res) => {
-        console.log(res);
-      });
-    });
+      state.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+    })
 
     // 选择文件
     function handleSelectFile(e) {
@@ -215,7 +217,6 @@ export default {
             .then((response) => response.blob())
             .then(async (blob) => {
               const newURL = await blobToDataURL(blob);
-              console.log(newURL);
             });
         },
       };
@@ -228,6 +229,7 @@ export default {
     }
 
     return {
+      ...toRefs(state),
       handleSelectFile,
       selectCacheFile,
       handleOpenFilestack,
@@ -308,12 +310,14 @@ export default {
       .text {
         font-size: 14px;
         color: $title-color;
+        line-height: 1;
       }
     }
   }
   .file-select__bottom {
     width: 100%;
     padding: 10px;
+    background-color: #f2f2f2;
   }
 }
 </style>

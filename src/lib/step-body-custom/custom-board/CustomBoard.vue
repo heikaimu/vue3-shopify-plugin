@@ -4,40 +4,38 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-21 17:36:03
+ * @LastEditTime: 2021-07-30 17:35:43
 -->
 <template>
   <div class="custom-board">
     <div class="custom-board__top">
-      <base-header icon="arrowLeft" @close="backToList" />
+      <base-header
+        :center="false"
+        :mainText="price"
+        :subText="title"
+        icon="arrowDown"
+        @close="backToList"
+      />
     </div>
     <div class="custom-board__medium">
       <!-- fabric -->
       <div class="custom-board__canvas-box" ref="canvasBox">
         <canvas id="customBoard"></canvas>
         <!-- fabric-layer -->
-        <div class="canvas-layer">
-          <div
-            v-for="(item, index) in layerList"
-            class="layer-img"
-            :class="{ active: item.obj.active }"
-            :key="index"
-            @click="changeActiveLayer(item, index)"
-          >
-            <img :src="item.url" alt="" />
-          </div>
-        </div>
+        <canvas-layer :list="layerList" @change="changeActiveLayer" />
       </div>
       <!-- 色彩饱和度调整 -->
-      <brightness-bar />
+      <brightness-bar :url="avatar.url" @change="changeAvatar" />
     </div>
     <div class="custom-board__bottom">
       <base-row :gutter="10">
         <base-col :span="8">
-          <base-button plain>Replace</base-button>
+          <base-button plain @click="backToList">Replace</base-button>
         </base-col>
         <base-col :span="16">
-          <base-button type="primary" full>CONFIRM</base-button>
+          <base-button type="primary" full :blod="600" @click="handleConfirm"
+            >CONFIRM</base-button
+          >
         </base-col>
       </base-row>
     </div>
@@ -60,6 +58,7 @@ import BaseCol from "../../../components/BaseCol.vue";
 import BaseButton from "../../../components/BaseButton.vue";
 import BaseIcon from "../../../components/BaseIcon.vue";
 import BrightnessBar from "./BrightnessBar.vue";
+import CanvasLayer from "./CanvasLayers.vue";
 
 import Minime from "../../../utils/minime";
 
@@ -71,6 +70,7 @@ export default {
     BaseButton,
     BaseIcon,
     BrightnessBar,
+    CanvasLayer,
   },
 
   props: {
@@ -86,23 +86,34 @@ export default {
       type: String,
       deafult: "",
     },
+    title: {
+      type: String,
+      deafult: "",
+    },
+    price: {
+      type: String,
+      deafult: "",
+    },
   },
 
   emits: {
     back: null,
     selectFile: null,
+    confirm: null,
   },
 
   setup(props, context) {
     const { avatar, config, skin } = props;
-
+    console.log(props.config);
     const state = reactive({
       canvas: null,
       loading: false,
       layerList: [],
+      currentAvatarURL: "",
     });
 
     onMounted(() => {
+      state.currentAvatarURL = avatar.url;
       if (!state.canvas) instanceMinime();
     });
 
@@ -117,9 +128,12 @@ export default {
         width,
         height: Math.min(normalHeight, height),
       });
+      renderer();
+    }
 
+    function renderer() {
       state.canvas.setOption({
-        avatar: avatar.url,
+        avatar: state.currentAvatarURL,
         chin: avatar.chin,
         option: config,
         skin: skin,
@@ -136,9 +150,12 @@ export default {
     // 渲染图层
     function renderLayer() {
       const items = state.canvas.canvas.getObjects();
-      state.canvas.canvas.setActiveObject(items[0]);
+      const usingItems = items.filter(item => {
+        return item.name;
+      });
+      state.canvas.canvas.setActiveObject(usingItems[0]);
       state.canvas.canvas.renderAll();
-      state.layerList = items.map((item) => {
+      state.layerList = usingItems.map((item) => {
         return {
           obj: item,
           url: item.getSrc(),
@@ -159,6 +176,18 @@ export default {
       }
     }
 
+    // 修改头像
+    function changeAvatar(url) {
+      state.currentAvatarURL = url;
+      renderer();
+    }
+
+    // 保存数据
+    function handleConfirm() {
+      const url = state.canvas.canvas.toDataURL();
+      context.emit("confirm", url);
+    }
+
     // 返回列表
     function backToList() {
       context.emit("back");
@@ -169,6 +198,8 @@ export default {
       canvasBox,
       backToList,
       changeActiveLayer,
+      changeAvatar,
+      handleConfirm,
     };
   },
 };
@@ -179,7 +210,7 @@ export default {
 @import "src/styles/_mixins.scss";
 
 .custom-board {
-  @include pos-absolute(999);
+  @include pos-absolute(0, 0, 0, 0, 999);
   @include flex-col-sb;
   background-color: #ffffff;
 }
@@ -195,29 +226,6 @@ export default {
     @include flex-col-center;
     width: 100%;
     height: 100%;
-    .canvas-layer {
-      @include flex-row-center;
-      width: 100%;
-      height: 60px;
-      position: relative;
-      top: -20px;
-      .layer-img {
-        width: 60px;
-        height: 60px;
-        padding: 5px;
-        border-radius: 4px;
-        border: 2px solid #e7e7e7;
-        margin: 0 5px;
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-        &.active {
-          border: 2px solid $theme-color;
-        }
-      }
-    }
   }
 }
 .custom-board__bottom {
@@ -226,7 +234,7 @@ export default {
   background-color: #e4e7ed;
 }
 .custom-board__loading {
-  @include pos-absolute;
+  @include pos-absolute(0, 0, 0, 0, 9999);
   @include flex-row-center;
   border-radius: 10px;
   background-color: rgba($color: #000000, $alpha: 0.6);

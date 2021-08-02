@@ -4,12 +4,12 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-19 11:26:52
+ * @LastEditTime: 2021-07-30 15:23:32
 -->
 <template>
   <div class="avatar-cache">
     <div class="avatar-cache-header">
-      <h2 class="avatar-cache-header__title">Avatar Records（Click To Use）</h2>
+      <p class="avatar-cache-header__title">Avatar Records（Click To Use）</p>
       <span class="avatar-cache-header__clear-button" @click="handleClearAll">Clear All</span>
     </div>
     <div class="cache-list-wrapper">
@@ -80,7 +80,7 @@ export default {
       ...toRefs(state),
       selectFile,
       removeFile,
-      handleClearAll
+      handleClearAll,
     };
   },
 };
@@ -100,11 +100,14 @@ export default {
 
 .avatar-cache-header__title {
   font-size: 16px;
-  color: $title-color;
+  font-weight: 600;
+  color: $context-color;
+  margin-bottom: 0;
 }
 
 .avatar-cache-header__clear-button {
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 600;
   color: $sub-theme-color;
   cursor: pointer;
   opacity: 0.6;

@@ -12,7 +12,7 @@
       @close="closePlugin"
     />
     <image-crop
-      :fileURL="rawFile"
+      :fileURL="rawFileURL"
       v-else-if="currentState === 'crop'"
       @crop="cropViewFile"
       @back="currentState = 'view'"
@@ -44,7 +44,7 @@ export default {
 
   props: {
     // 原始文件
-    rawFile: {
+    rawFileURL: {
       type: String,
       default: "",
     },
@@ -57,7 +57,7 @@ export default {
   },
 
   setup(props, context) {
-    const { rawFile } = props;
+    const { rawFileURL } = props;
 
     const state = reactive({
       //当前展示的图片
@@ -70,7 +70,7 @@ export default {
 
     onMounted(() => {
       // 进入组件时候，设置展示图片为原图
-      state.viewFile = rawFile;
+      state.viewFile = rawFileURL;
     });
 
     // 旋转预览图
@@ -128,7 +128,7 @@ export default {
         context.emit("setAvatar", data);
         cacheAvatar({
           ...data,
-          rawFile
+          rawFileURL
         });
       };
     }

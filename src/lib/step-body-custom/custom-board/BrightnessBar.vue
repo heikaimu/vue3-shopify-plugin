@@ -4,25 +4,45 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 17:23:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-21 17:59:14
+ * @LastEditTime: 2021-07-26 09:56:08
 -->
 <template>
-  <div class="brightness-bar">
-    <div class="brightness-button brightness-open">x</div>
-    <div class="brightness-button brightness-close">1</div>
+  <div class="brightness-bar" :class="{ active: active }">
+    <div class="brightness-button open" @click="active = true">
+      <base-icon icon="brightness" color="goldenrod"></base-icon>
+    </div>
+    <div class="brightness-button close" @click="active = false">
+      <base-icon icon="arrowLeft" color="goldenrod"></base-icon>
+    </div>
     <div class="brightness-wrapper">
       <div class="item">
-        <div class="brightness-slider" _key="brightness">
-          <span class="brightness-slider-icon">x</span>
-          <span class="brightness-slider-text"></span>
-          <input type="range" min="0" max="100" step="1" data-rangeslider />
+        <div class="brightness-slider">
+          <span class="brightness-slider-icon">
+            <base-icon icon="brightness" color="goldenrod"></base-icon>
+          </span>
+          <span class="brightness-slider-text">{{ rateBrightness }}</span>
+          <el-slider
+            v-model="valueBrightness"
+            :min="0"
+            :max="100"
+            :showTooltip="false"
+            @change="handleChange"
+          ></el-slider>
         </div>
       </div>
       <div class="item">
-        <div class="brightness-slider" _key="contrast">
-          <span class="brightness-slider-icon">2</span>
-          <span class="brightness-slider-text"></span>
-          <input type="range" min="0" max="100" step="1" data-rangeslider />
+        <div class="brightness-slider">
+          <span class="brightness-slider-icon">
+            <base-icon icon="contrast" color="goldenrod"></base-icon>
+          </span>
+          <span class="brightness-slider-text">{{ rateContrast }}</span>
+          <el-slider
+            v-model="valueContrast"
+            :min="0"
+            :max="100"
+            :showTooltip="false"
+            @change="handleChange"
+          ></el-slider>
         </div>
       </div>
     </div>
@@ -30,16 +50,59 @@
 </template>
 
 <script>
-import { reactive, toRefs } from "vue";
+import { reactive, toRefs, computed } from "vue";
+
+import BaseIcon from "../../../components/BaseIcon.vue";
+import "element-plus/lib/theme-chalk/index.css";
+import { ElSlider } from "element-plus";
+
+import { colorMatrix } from "../../../utils/image";
 
 export default {
-  setup() {
+  components: {
+    BaseIcon,
+    ElSlider,
+  },
+
+  props: {
+    url: "",
+  },
+
+  emits: {
+    change: null,
+  },
+
+  setup(props, context) {
     const state = reactive({
-      count: 0,
+      active: false,
+      valueBrightness: 50,
+      valueContrast: 50,
     });
+
+    const rateBrightness = computed(() => {
+      return `${(state.valueBrightness - 50) * 2}%`;
+    });
+
+    const rateContrast = computed(() => {
+      return `${(state.valueContrast - 50) * 2}%`;
+    });
+
+    // 滑块滑动结束后执行
+    function handleChange() {
+      const params = {
+        brightness: (state.valueBrightness - 50) * 2.5,
+        contrast: (state.valueContrast - 50) / 100 + 1,
+      };
+      colorMatrix(props.url, params).then((url) => {
+        context.emit("change", url);
+      });
+    }
 
     return {
       ...toRefs(state),
+      rateBrightness,
+      rateContrast,
+      handleChange,
     };
   },
 };
@@ -50,58 +113,54 @@ export default {
 @import "src/styles/_mixins.scss";
 
 .brightness-bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 10px;
+  @include pos-absolute(auto, auto, 10px, 0, 99);
   height: 80px;
-  background-color: #f2f2f2;
+
+  &.active {
+    @include pos-absolute(auto, 0, 10px, 0, 99);
+    .brightness-button {
+      &.open {
+        opacity: 0;
+        transform: translate3d(-100px, 0, 0);
+      }
+      &.close {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+    }
+    .brightness-wrapper {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+  }
 }
 
 .brightness-button {
   @include flex-row-center;
-  width: 40px;
-  height: 72px;
+  border-radius: 10px;
   background-color: #ffffff;
   box-shadow: 0 0 15px #e7e7e7;
-  border-radius: 10px;
   transition: 0.3s;
   cursor: pointer;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-}
 
-.brightness-open {
-  width: 50px;
-  height: 50px;
-  right: auto;
-  left: -5px;
-  bottom: 11px;
-  border-radius: 0 25px 25px 0;
-  transition: 0.3s;
-  transform: translate3d(-100px, 0, 0);
-  opacity: 0;
-}
+  &.open {
+    @include pos-absolute(15px, auto, auto, 0, 99);
+    width: 50px;
+    height: 50px;
+    border-radius: 0 25px 25px 0;
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition: 0.3s;
+  }
 
-.brightness-open.active {
-  transform: translate3d(0, 0, 0);
-  opacity: 1;
-}
-
-.brightness-open svg {
-  width: 30px;
-  height: 30px;
-  fill: goldenrod;
-}
-
-.brightness-close {
-}
-
-.brightness-close svg {
-  width: 16px;
-  height: 16px;
-  fill: $theme-color;
+  &.close {
+    @include pos-absolute(auto, 10px, auto, auto, 99);
+    width: 40px;
+    height: 100%;
+    opacity: 0;
+    transform: translate3d(100px, 0, 0);
+    transition: 0.3s;
+  }
 }
 
 .brightness-open:hover {
@@ -109,69 +168,25 @@ export default {
 }
 
 .brightness-wrapper {
+  @include pos-absolute(0, 55px, 0, 10px, 98);
   border-radius: 10px;
-  box-sizing: border-box;
-  /* border             : 1px solid #e7e7e7; */
-  z-index: 3;
   background-color: #ffffff;
   box-shadow: 0 0 15px #e7e7e7;
-  /* display            : flex;
-    justify-content       : center; */
-  transform: translate3d(-400px, 0, 0);
+  transform: translate3d(-200px, 0, 0);
   opacity: 0;
-  transition: 0.3s cubic-bezier(0.42, 0, 0.58, 1.4);
-
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  right: 45px;
+  transition: 0.5s cubic-bezier(0.42, 0, 0.58, 1.4);
 }
-
-.brightness-wrapper.active {
-  transform: translate3d(0, 0, 0);
-  opacity: 1;
-}
-
-.brightness-wrapper .item {
-  /* flex           : 1;
-    display        : flex;
-    flex-direction : column;
-    justify-content: center;
-    align-items    : center; */
-}
-
-.brightness-wrapper .item .title {
-  font-size: 12px;
-  color: #333333;
-  margin-bottom: 0;
-}
-
-/* .brightness-wrapper .operation {}
-
-.brightness-wrapper .operation-menu {
-    display         : inline-block;
-    padding         : 0 15px;
-    height          : 20px;
-    border-radius   : 4px;
-    text-align      : center;
-    line-height     : 20px;
-    background-color: var(--theme-color);
-    color           : #ffffff;
-    margin          : 0 5px;
-    cursor          : pointer;
-    font-size       : 12px;
-} */
 
 .brightness-slider {
   box-sizing: border-box;
-  padding: 13px 40px;
+  padding: 2px 55px 2px 50px;
   line-height: 1;
   position: relative;
 }
 
 .brightness-slider-icon {
   position: absolute;
-  left: 8px;
+  left: 12px;
   top: 50%;
   transform: translate3d(0, -50%, 0);
 }

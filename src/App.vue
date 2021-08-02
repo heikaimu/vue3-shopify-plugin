@@ -4,16 +4,35 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-20 17:21:01
+ * @LastEditTime: 2021-07-30 09:59:44
+-->
+<!--
+ * @Description: 
+ * @Version: 2.0
+ * @Author: Yaowen Liu
+ * @Date: 2021-07-19 09:42:00
+ * @LastEditors: Yaowen Liu
+ * @LastEditTime: 2021-07-29 10:40:45
 -->
 <template>
-  <MinimePillow :config="config" />
+  <MinimePillow
+    :config="config"
+    :backgroundActiveIndex="backgroundActiveIndex"
+    :composingActiveIndex="composingActiveIndex"
+    v-if="visible"
+    @close="visible = false"
+    @complete="complete"
+  />
 </template>
 
 <script>
 import { reactive, toRefs, onMounted } from "vue";
 import MinimePillow from "./lib";
 import axios from "axios";
+
+const PLUGIN_TYPE = "PLUG_INTERCEPTION_HEAD_NEW";
+const WEBSITE = "TEST";
+import { product } from "../shopifyPageConfig";
 
 export default {
   components: {
@@ -23,46 +42,87 @@ export default {
   setup() {
     const state = reactive({
       config: {},
+      visible: false,
+      backgroundActiveIndex: 1,
+      composingActiveIndex: 1
     });
 
-    onMounted(() => {
-      axios.get("https://tsback.witemedia.com/api/v1/configure").then((res) => {
-        const item = res.data.data.find((item) => item.id === 12);
-        if (item) {
-          const config = JSON.parse(item.configure);
-          config.increment.relatedProduct = [
-            {
-              id: 2,
-              title: "Would You Like To Add A Same Design Doll Keychain?",
-              price: 9.99,
-              virtualId: 39797718581419,
-              thumbnail:
-                "https://cdn.shopifycdn.net/s/files/1/0510/1423/8379/files/dollkeychain.png?v=1620469152",
-              sideCount: 1,
-            },
-          ];
-
-          config.skin = "yellow";
-          config.productId = 14;
-          config.productPrice = 20;
-          config.productTitle =
-            "My Face Pillow, Custom Pillow, Personalized Photo Pillow Gift Pillow Toy, Hula Dress, Throw Pillow, MiniMe Pillow";
-
-          // 沙滩巾
-          // config.hasBg = true;
-          // config.bgList = bgList;
-          // config.activeBgIndex = 0;
-
-          state.config = config;
-        }
-      });
+    onMounted(async () => {
+      state.config = await getConfig();
+      console.log(state.config);
+      state.visible = true;
     });
+
+    function complete(data) {
+      console.log(data);
+    }
 
     return {
       ...toRefs(state),
+      complete,
     };
   },
 };
+
+// 获取配置参数
+function getConfig() {
+  let config = {};
+  const url = `https://sc.globaladput.com/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
+
+  return new Promise((resolve, reject) => {
+    axios.get(url).then((res) => {
+      const { status, data } = res.data;
+      if (status === "0") {
+        const configItem = data[0] || {};
+        if (!configItem) {
+          return;
+        }
+        config = JSON.parse(configItem.configure);
+        config.website = WEBSITE;
+        config.increment = getIncrement(product.type, config);
+
+        let currentItem = {};
+        for (let i = 0; i < config.miniMeData.length; i++) {
+          const group = config.miniMeData[i];
+          for (let j = 0; j < group.images.length; j++) {
+            const image = group.images[j];
+            if (String(image.id) === String(getTagID())) {
+              currentItem = image;
+            };
+          }
+        }
+        const firstGroup = config.miniMeData[0];
+        firstGroup.images.unshift(currentItem);
+
+        resolve(config);
+      }
+    });
+  });
+}
+
+// 获取当前增量
+function getIncrement(type, config) {
+  const typeItem = config.incrementMap.find(
+    (item) => item.productType === type
+  );
+  const modules = typeItem ? typeItem.modules : [];
+  const increment = config.increment;
+  const obj = {};
+  Object.keys(increment).forEach((key) => {
+    if (modules.includes(key)) {
+      obj[key] = increment[key];
+    }
+  });
+  return obj;
+}
+
+// 获取当前TagID
+function getTagID() {
+  var tags = "{{ product.tags | join:',' }}";
+  var optionResult = tags.match(/mini-me-default-\d+/);
+  var _number = optionResult && Number(optionResult[0].split("-").pop());
+  return isNaN(_number) ? "" : _number;
+}
 </script>
 
 <style>

@@ -4,77 +4,101 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-20 17:46:57
+ * @LastEditTime: 2021-07-27 16:58:31
 -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="./src/styles/normalize.css">
-    <link rel="stylesheet" href="./dist/style.css">
-    <script type="text/javascript" src="https://static.filestackapi.com/filestack-js/1.x.x/filestack.min.js"></script>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./src/styles/normalize.css">
+  <link rel="stylesheet" href="./dist/style.css">
 </head>
 
 <body>
 
-    <div id="app">
-        <minime :config="config" />
-    </div>
+  <div id="app">
+    <minime :config="config" v-if="visible" @close="visible = false" @complete="complete" />
+  </div>
 
-    <script src="https://unpkg.com/vue@next"></script>
-    <script src="./dist/my-lib.umd.js"></script>
-    <script src="./node_modules/axios/dist/axios.js"></script>
+  <script type="text/javascript" src="https://static.filestackapi.com/filestack-js/1.x.x/filestack.min.js"></script>
+  <script async src="https://sdk.amazonaws.com/js/aws-sdk-2.666.0.min.js"></script>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script src="./dist/my-lib.umd.js"></script>
+  <script src="./node_modules/axios/dist/axios.js"></script>
 
-    <script>
-        const app = Vue.createApp({
-            data() {
-                return {
-                    config: {}
-                }
-            },
+  <script>
+    const app = Vue.createApp({
+      data() {
+        return {
+          config: {},
+          visible: false,
+        }
+      },
 
-            mounted() {
-                axios.get("https://tsback.witemedia.com/api/v1/configure").then((res) => {
-                    const item = res.data.data.find((item) => item.id === 12);
-                    if (item) {
-                        const config = JSON.parse(item.configure);
-                        config.increment.relatedProduct = [
-                            {
-                                id: 2,
-                                title: "Would You Like To Add A Same Design Doll Keychain?",
-                                price: 9.99,
-                                virtualId: 39797718581419,
-                                thumbnail:
-                                    "https://cdn.shopifycdn.net/s/files/1/0510/1423/8379/files/dollkeychain.png?v=1620469152",
-                                sideCount: 1,
-                            },
-                        ];
+      mounted() {
+        axios.get("https://tsback.witemedia.com/api/v1/configure").then((res) => {
+          const item = res.data.data.find((item) => item.id === 12);
+          if (item) {
+            const config = JSON.parse(item.configure);
 
-                        config.skin = "yellow";
-                        config.productId = 14;
-                        config.productPrice = 20;
-                        config.productTitle =
-                            "My Face Pillow, Custom Pillow, Personalized Photo Pillow Gift Pillow Toy, Hula Dress, Throw Pillow, MiniMe Pillow";
+            // 面选择
+            // config.increment.slides = [
+            //   {
+            //     title: 'Double-sided print',
+            //     value: 'double',
+            //     price: '+$5.99',
+            //   },
+            //   {
+            //     title: 'One side only print',
+            //     value: 'single'
+            //   }
+            // ]
 
-                        // 沙滩巾
-                        // config.hasBg = true;
-                        // config.bgList = bgList;
-                        // config.activeBgIndex = 0;
+            // 关联产品
+            // config.increment.relatedProduct = [
+            //   {
+            //     id: 2,
+            //     title: "Would You Like To Add A Same Design Doll Keychain?",
+            //     price: 9.99,
+            //     virtualId: 39797718581419,
+            //     url: "https://cdn.shopifycdn.net/s/files/1/0510/1423/8379/files/dollkeychain.png?v=1620469152",
+            //     sideCount: 1,
+            //   },
+            // ];
 
-                        this.config = config;
-                    }
-                });
-            },
-        })
+            config.skin = "yellow";
+            config.productId = 14;
+            config.productPrice = 20;
+            config.productTitle =
+              "My Face Pillow, Custom Pillow, Personalized Photo Pillow Gift Pillow Toy, Hula Dress, Throw Pillow, MiniMe Pillow";
 
-        app.component('minime', MinimePillow)
+            // 沙滩巾
+            // config.hasBg = true;
+            // config.bgList = bgList;
+            // config.activeBgIndex = 0;
 
-        app.mount('#app')
-    </script>
+            this.config = config;
+            this.visible = true;
+          }
+        });
+      },
+
+      methods: {
+        complete(data) {
+          console.log(data)
+        }
+      },
+
+    })
+
+    app.component('minime', MinimePillow)
+
+    app.mount('#app')
+  </script>
 </body>
 
 </html>

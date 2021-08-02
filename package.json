@@ -22,11 +22,13 @@
     "axios": "^0.21.1",
     "better-scroll": "^2.4.1",
     "cropperjs": "^1.5.12",
+    "element-plus": "^1.0.2-beta.55",
     "fabric": "2.7.0",
     "fabric-customise-controls": "^2.0.6-beta",
     "filestack-js": "^3.23.1",
     "localforage": "^1.9.0",
-    "vue": "^3.0.5"
+    "swiper": "^6.8.0",
+    "vue": "^3.1.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.2.5",

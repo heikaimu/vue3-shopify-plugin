@@ -1,0 +1,484 @@
+{{ 'style.css' | asset_url | stylesheet_tag }}
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.666.0.min.js" async></script>
+<script type="text/javascript" src="https://static.filestackapi.com/filestack-js/1.x.x/filestack.min.js" async></script>
+<script src="https://unpkg.com/vue@next"></script>
+<script src="{{ 'my-lib.umd.js' | asset_url }}"></script>
+
+<!-- 提交表单 -->
+<div id="extendForm"></div>
+
+<!-- 打开按钮 -->
+<div id="customOpenButton" class="custom-open-button disabled">
+  <p class="text">CUSTOM NOW</p>
+  <div class="button__loading">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<script>
+  // 全局配置
+  const plugType = "PLUG_INTERCEPTION_HEAD_NEW";
+  const website = "M";
+  const product = {{ product | json }};
+  console.log('产品的type：', product.type);
+
+  /**************************************
+   ***************** Vue ****************
+   **************************************/
+  // 添加app节点到body上
+  $('body').append('<div id="app"></div>');
+  // 实列
+  const app = Vue.createApp({
+    data() {
+      return {
+        config: {},
+        visible: false,
+        loaded: false
+      }
+    },
+
+    watch: {
+      visible(val) {
+        if (val) {
+          $("body").css('overflow', 'hidden');
+        } else {
+          $("body").css('overflow', 'auto');
+        }
+      }
+    },
+
+    async mounted() {
+      this.setLoaded(false);
+      this.config = await getConfig();
+      this.setLoaded(true);
+      this.setInitOption(this.config.increment);
+      this.bindOpenButton();
+      this.hideDefaultButton();
+      this.getBackgroundActiveIndex();
+    },
+
+    methods: {
+      // 设置加载完成
+      setLoaded(flag) {
+        this.loaded = flag;
+        this.disabledOpenButton(flag);
+      },
+
+      // 设置初始化选项
+      setInitOption(increment) {
+        if (increment.slides) {
+          this.changeSlides('single');
+        }
+      },
+
+      // 完成
+      async complete(data) {
+        $('#extendForm').empty();
+        this.setExtendForm(data.files);
+        await this.dealIncrement(data.increment);
+        $('.product-form__cart-submit').trigger('click');
+      },
+
+      // 设置扩展表单属性
+      setExtendForm(files) {
+        const map = {
+          ai: 'Ai',
+          preview: 'Preview',
+          raw: 'Original'
+        }
+
+        for (let i in files) {
+          const value = files[i];
+          const name = map[i];
+          const $input = $(`<input type="hidden" name="properties[${name}]"></input>`);
+          $input.val(value);
+          $('#extendForm').append($input);
+          this.visible = false;
+        }
+
+        const $input = $(`<input type="hidden" name="properties[visibleKey]"></input>`);
+        $input.val('Preview');
+        $('#extendForm').append($input);
+      },
+
+      // 处理扩展信息
+      dealIncrement(data) {
+        const { slides, relatedProduct, vip, backgroundIndex, composingIndex } = data;
+        const queue = [];
+
+        if (slides) {
+          this.changeSlides(slides);
+        }
+
+        if (backgroundIndex !== -1) {
+          this.changeColor(backgroundIndex);
+        }
+
+        if (vip) {
+          queue.push(this.addVIP(vip));
+        }
+
+        if (relatedProduct) {
+          queue.push(this.addRelatedProduct(relatedProduct));
+        }
+        return new Promise((resolve) => {
+          Promise.all(queue).then(() => {
+            resolve();
+          });
+        })
+      },
+
+      // 修改单双面
+      changeSlides(slides) {
+        const $select = getSelectDom('Type');
+        const val = slides === 'double' ? "Double Side" : "Single Side";
+        $select.val(val).trigger('change');
+      },
+
+      // 修改颜色
+      changeColor(backgroundIndex) {
+        const _this = this;
+        const backgroundList = this.config.increment.backgroundList;
+        const val = backgroundList[backgroundIndex].title;
+        const $select = getSelectDom('Color');
+        $select.children('option').each(function () {
+          if ($(this).attr('value') === val) {
+            $select.val(val).trigger('change');
+            setActiveRadio('Color', val);
+          }
+        })
+      },
+
+      // 添加vip
+      async addVIP(data) {
+        // 添加主商品字段
+        const value = this.getRandomID();
+        const $input = $(`<input type="hidden" name="properties[_tempVip]"></input>`);
+        $input.val(value);
+        $('#extendForm').append($input);
+        // 加入购物车
+        await this.addToCart({
+          id: data.virtualId,
+          quantity: 1,
+          "properties[_tempVip]": value,
+          mask: 'body',
+          refresh: true,
+        })
+        return Promise.resolve();
+      },
+
+      // 添加附加商品
+      async addRelatedProduct(data) {
+        // 添加主商品字段
+        const value = this.getRandomID();
+        const $input = $(`<input type="hidden" name="properties[_related_product]"></input>`);
+        $input.val(value);
+        $('#extendForm').append($input);
+        // 加入购物车
+        const product = data[0];
+        await this.addToCart({
+          id: product.virtualId,
+          quantity: 1,
+          "properties[Preview]": product.url,
+          "properties[_related_product]": value,
+          mask: 'body',
+          refresh: true,
+        });
+        return Promise.resolve();
+      },
+
+      // 加入购物车
+      addToCart(data) {
+        return new Promise((resolve, reject) => {
+          $.ajax({
+            type: "POST",
+            url: "/cart/add.js",
+            data,
+            async: false,
+            dataType: "json",
+            context: this,
+            success: res => {
+              resolve(res)
+            },
+            error: (request, status) => {
+              reject(request, status);
+            }
+          })
+        })
+      },
+
+      // 随机ID
+      getRandomID(length = 8) {
+        return Number(Math.random().toString().substr(3, length) + Date.now()).toString(36);
+      },
+
+      // 绑定点击事件
+      bindOpenButton() {
+        $("#customOpenButton").click(() => {
+          if (this.loaded) {
+            const sku = $(".variant-sku").text();
+            const price = product.variants.find(item => item.sku === sku).price;
+            this.config.productPrice = `$${(price / 100)}`;
+            this.config.productTitle = product.title;
+            this.visible = true;
+          }
+        })
+      },
+
+      // 设置按钮可点击
+      disabledOpenButton(flag) {
+        if (flag) {
+          $("#customOpenButton").removeClass('disabled');
+        } else {
+          $("#customOpenButton").addClass('disabled');
+        }
+      },
+
+      // 隐藏默认按钮
+      hideDefaultButton() {
+        $('.product-form__item--submit').hide();
+        $('.confirm-payment-button').hide();
+        $('.product-vip-gift-box-div').hide();
+      },
+
+      // 获取激活的背景index
+      getBackgroundActiveIndex() {
+        const backgroundList = this.config.increment.backgroundList;
+        const { tags } = product;
+        const tag = tags.find(tag => tag.includes('bg-'));
+        if (tag) {
+          // 背景图
+          this.backgroundActiveIndex = backgroundList.findIndex(item => item.title === tag);
+        } else {
+          // 色块
+          const $select = getSelectDom('Color');
+          if ($select) {
+            // 已经初始化赋值了
+            if ($select.val()) {
+              this.backgroundActiveIndex = backgroundList.findIndex(item => item.title === $select.val());
+            }
+            // 监听change
+            $select.on('change', () => {
+              this.backgroundActiveIndex = backgroundList.findIndex(item => item.title === $select.val());
+            })
+          }
+        }
+      }
+
+    },
+
+    render() {
+      if (this.loaded && this.visible) {
+        return Vue.h(
+          MinimePillow,
+          {
+            config: this.config,
+            backgroundActiveIndex: this.backgroundActiveIndex,
+            onClose: () => {
+              this.visible = false;
+            },
+            onComplete: this.complete
+          }
+        )
+      }
+    }
+  })
+
+  // 挂载到app上
+  app.mount('#app');
+
+
+  /*****************************************
+   ***************** 通用方法 ***************
+   *****************************************/
+  // 获取配置参数
+  function getConfig() {
+    let config = {};
+    const url = `https://sc.globaladput.com/plugins/api/v1/configure?webSite=${website}&plugType=${plugType}`;
+
+    return new Promise((resolve, reject) => {
+      $.ajax(url, {
+        success: res => {
+          const { status, data } = res;
+          if (status === '0') {
+            const configItem = data[0] || {};
+            if (!configItem) {
+              return;
+            }
+            config = JSON.parse(configItem.configure);
+            config.website = website;
+            config.increment = getIncrement(product.type, config);
+            topCard(config);
+            resolve(config);
+          }
+        },
+        error: msg => {
+          reject(msg);
+        }
+      })
+    })
+  }
+
+  // 置顶卡片
+  function topCard(config) {
+    let currentItem = {};
+    for (let i = 0; i < config.miniMeData.length; i++) {
+      const group = config.miniMeData[i];
+      for (let j = 0; j < group.images.length; j++) {
+        const image = group.images[j];
+        if (String(image.id) === String(getTagID())) {
+          currentItem = image;
+        };
+      }
+    }
+    const firstGroup = config.miniMeData[0];
+    firstGroup.images.unshift(currentItem);
+  }
+
+  // 获取当前增量
+  function getIncrement(type, config) {
+    const typeItem = config.incrementMap.find(item => item.productType === type);
+    const modules = typeItem ? typeItem.modules : [];
+    const increment = config.increment;
+    const obj = {};
+    Object.keys(increment).forEach(key => {
+      if (modules.includes(key)) {
+        obj[key] = increment[key];
+      }
+    })
+    return obj;
+  }
+
+  // 获取当前TagID
+  function getTagID() {
+    var tags = "{{ product.tags | join:',' }}";
+    var optionResult = tags.match(/mini-me-default-\d+/);
+    var _number = optionResult && Number(optionResult[0].split("-").pop());
+    return isNaN(_number) ? "" : _number;
+  }
+
+  // 获取JQselect表单
+  function getSelectDom(name) {
+    let dom = null;
+    $('.product-form__item').each(function () {
+      const item = $(this);
+      const title = item.children('label').text().trim();
+      if (title.includes(name)) {
+        dom = item.children('select');
+      }
+    })
+    return dom;
+  }
+
+  // 设置激活选项
+  function setActiveRadio(name, value) {
+    $('.option-wrapper').each(function () {
+      const item = $(this);
+      const title = item.children('.inline-option-title').text().trim();
+      if (name === title) {
+        item.find('.inline-label').each(function () {
+          const label = $(this);
+          const radio = label.find('input[type=radio]');
+          if (radio.attr('value') === value) {
+            radio.attr('checked', 'checked');
+            label.addClass('active-label');
+          } else {
+            radio.attr('checked', '');
+            label.removeClass('active-label');
+          }
+        })
+      }
+    })
+  }
+</script>
+
+<style>
+  .custom-open-button {
+    height: 40px;
+    background: linear-gradient(90deg, #61be33, #8fce44);
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: .3s;
+    text-shadow: 1px 1px 5px #666666;
+    filter: grayscale(0);
+    margin-top: 10px;
+  }
+
+  .custom-open-button .text {
+    font-size: 18px;
+    color: #ffffff;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 0;
+    line-height: 1;
+  }
+
+  .custom-open-button.disabled {
+    filter: grayscale(1);
+  }
+
+  .custom-open-button.disabled .text {
+    display: none;
+  }
+
+  .custom-open-button.disabled .button__loading {
+    display: flex;
+  }
+
+  .button__loading {
+    height: 10px;
+    display: none;
+  }
+
+  .button__loading span {
+    display: block;
+    width: 10px;
+    height: 100%;
+    margin: 0 5px;
+    border-radius: 50%;
+    background: lightgreen;
+    animation: load 1.04s ease infinite;
+  }
+
+  @-webkit-keyframes load {
+    0% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .button__loading span:nth-child(1) {
+    -webkit-animation-delay: 0.13s;
+  }
+
+  .button__loading span:nth-child(2) {
+    -webkit-animation-delay: 0.26s;
+  }
+
+  .button__loading span:nth-child(3) {
+    -webkit-animation-delay: 0.39s;
+  }
+
+  .button__loading span:nth-child(4) {
+    -webkit-animation-delay: 0.52s;
+  }
+
+  .button__loading span:nth-child(5) {
+    -webkit-animation-delay: 0.65s;
+  }
+
+  /* 隐藏不需要的表单 */
+  .hide-option {
+    display: none !important;
+  }
+</style>

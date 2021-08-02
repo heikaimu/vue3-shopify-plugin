@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-21 14:23:56
+ * @LastEditTime: 2021-07-30 15:38:35
 -->
 <template>
   <div class="custom-list">
@@ -132,7 +132,10 @@ export default {
 
     // 卡片选择
     function selectCard(item) {
-      context.emit('select', item);
+      context.emit('select', {
+        groupName: state.currentGroupName,
+        ...item
+      });
     }
 
     // 回到头像选择
@@ -169,7 +172,7 @@ export default {
   flex: 1;
   overflow: hidden;
   .side-navigation-wrapper {
-    flex: 0 0 70px;
+    flex: 0 0 86px;
     height: 100%;
   }
   .body-list-wrapper {

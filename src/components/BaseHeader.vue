@@ -4,15 +4,15 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-16 14:28:55
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-20 10:47:11
+ * @LastEditTime: 2021-07-28 18:01:24
 -->
 <template>
   <div class="base-header">
     <div class="base-header__close" @click="$emit('close')">
       <base-icon :icon="icon" />
     </div>
-    <div class="base-header__title center">
-      <h2 class="main-text">{{ mainText }}</h2>
+    <div class="base-header__title" :class="{center:center}">
+      <p class="main-text">{{ mainText }}</p>
       <p class="sub-text">{{ subText }}</p>
     </div>
     <div class="slot-wrapper">
@@ -44,11 +44,18 @@ export default {
       type: String,
       default: "close",
     },
+    center: {
+      type: Boolean,
+      default: true
+    }
   },
 };
 </script>
 
 <style lang="scss" scoped>
+@import "src/styles/_variables.scss";
+@import "src/styles/_mixins.scss";
+
 .base-header {
   height: 50px;
   background-color: #ffffff;
@@ -57,42 +64,38 @@ export default {
 }
 
 .base-header__close {
-  position: absolute;
-  left: 10px;
-  top: 0;
-  bottom: 0;
+  @include flex-row-center;
+  @include pos-absolute(0, auto, 0, 10px);
   width: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   color: #666666;
   cursor: pointer;
   transition: 0.3s;
 }
 
 .base-header__title {
-  position: absolute;
-  left: 50px;
-  top: 0;
-  right: 50px;
-  bottom: 0;
+  @include pos-absolute(0, 0, 0, 60px);
   display: flex;
   flex-direction: column;
   justify-content: center;
 
   &.center {
+    @include pos-absolute(0, 60px, 0, 60px);
     align-items: center;
   }
 
   .main-text {
+    @include omits(1);
     font-size: 16px;
+    font-weight: 700;
     color: #333333;
     line-height: 1.3;
+    margin-bottom: 0;
   }
 
   .sub-text {
+    @include omits(1);
     font-size: 12px;
-    color: #666666;
+    color: #a1a1a1;
     line-height: 1.3;
   }
 }

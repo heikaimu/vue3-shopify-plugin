@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-21 15:11:09
+ * @LastEditTime: 2021-07-30 16:29:01
 -->
 <template>
   <div class="body-card">
@@ -236,13 +236,12 @@ export default {
   cursor: pointer;
 }
 .body-card__box {
+  @include card-shadow;
   width: 100%;
   height: 0;
   padding-bottom: 132%;
   border-radius: 10px;
   background-color: #ffffff;
-  box-shadow: 0 2px 1px -1px rgb(0 0 0 / 20%), 0 1px 1px rgb(0 0 0 / 14%),
-    0 1px 3px rgb(0 0 0 / 12%);
   position: relative;
 }
 .body-card__img {
@@ -257,6 +256,8 @@ export default {
 }
 .body-card__edit-tag {
   @include flex-row-center;
+  @include pos-absolute(auto, auto, -15px, 50%);
+  @include card-shadow-lg(#ff533a);
   width: 100px;
   height: 30px;
   border-radius: 15px;
@@ -264,12 +265,7 @@ export default {
   font-weight: 600;
   background-color: $theme-color;
   color: #ffffff;
-  position: absolute;
-  bottom: -15px;
-  left: 50%;
   transform: translate3d(-50%, 0, 0) scale(0.8);
-  box-shadow: 0 1px 18px rgb(255 83 58 / 12%),
-    0 3px 5px -1px rgb(255 83 58 / 20%), 0 6px 10px rgb(255 83 58 / 14%);
   font-family: var(--text-family);
   filter: grayscale(0);
   opacity: 1;
