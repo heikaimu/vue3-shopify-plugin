@@ -6,7 +6,7 @@ const product = {
   "published_at": "2021-07-26T04:47:37-04:00",
   "created_at": "2021-07-26T04:47:37-04:00",
   "vendor": "faceonboxerpillow",
-  "type": "Custom Body Shape Pillow",
+  "type": "Beachtowel",
   "tags": [
     "baozhen",
     "custompillow",

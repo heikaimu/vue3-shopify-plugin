@@ -399,7 +399,7 @@
 <style>
   .custom-open-button {
     height: 40px;
-    background: linear-gradient(90deg, #61be33, #8fce44);
+    background: linear-gradient(90deg, green, green);
     border-radius: 4px;
     display: flex;
     justify-content: center;
@@ -412,12 +412,13 @@
   }
 
   .custom-open-button .text {
-    font-size: 18px;
+    font-size: 16px;
     color: #ffffff;
     letter-spacing: 1px;
     display: block;
     margin-bottom: 0;
     line-height: 1;
+    font-family: 'Antique Olive';
   }
 
   .custom-open-button.disabled {
@@ -479,6 +480,12 @@
 
   /* 隐藏不需要的表单 */
   .hide-option {
+    display: none !important;
+  }
+
+  .product-form__item--submit,
+  .confirm-payment-button,
+  .product-vip-gift-box-div {
     display: none !important;
   }
 </style>

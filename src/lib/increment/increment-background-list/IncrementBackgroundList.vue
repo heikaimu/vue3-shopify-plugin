@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-30 12:52:44
+ * @LastEditTime: 2021-08-03 10:51:22
 -->
 <template>
   <div class="increment-wrapper">
@@ -15,14 +15,12 @@
       </span>
       <div class="preview-image">
         <!-- <transition name="fade" mode="out-in"> -->
-          <div
-            v-if="!loading"
-            class="img"
-            :style="{ backgroundImage: `url(${preview})` }"
-          ></div>
+          <div v-if="!loading" class="img" :style="{ backgroundImage: `url(${preview})` }"></div>
           <base-loading-dot v-else />
         <!-- </transition> -->
       </div>
+
+      <base-notice class="bg-notice">Just for preview, the background will be cropped according to the size you pick</base-notice>
 
       <!-- <swiper-composing
         :data="data.composing"
@@ -50,6 +48,7 @@ import { reactive, watch, toRefs, onMounted } from "vue";
 
 import BaseButton from "../../../components/BaseButton.vue";
 import BaseIcon from "../../../components/BaseIcon.vue";
+import BaseNotice from "../../../components/BaseNotice.vue";
 import BaseLoadingDot from "../../../components/BaseLoadingDot.vue";
 import SwiperBackground from "./SwiperBackground.vue";
 import SwiperComposing from "./SwiperComposing.vue";
@@ -61,6 +60,7 @@ export default {
   components: {
     BaseButton,
     BaseIcon,
+    BaseNotice,
     BaseLoadingDot,
     SwiperBackground,
     SwiperComposing,
@@ -215,6 +215,10 @@ export default {
         background-position: center center;
         transition: 0.3s;
       }
+    }
+
+    .bg-notice {
+      padding-bottom: 10px;
     }
 
     .custom-title {

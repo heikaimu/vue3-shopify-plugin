@@ -138,11 +138,13 @@ export default {
   @include flex-col-sb;
   width: 100%;
   flex: 1;
+  overflow: hidden;
   background-color: #f2f2f2;
 }
 .cropper-view__content {
   @include flex-col-center;
   flex: 1;
+  overflow: hidden;
   img {
     max-width: 100%;
     max-height: 100%;

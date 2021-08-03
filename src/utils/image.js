@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 16:48:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-21 12:21:50
+ * @LastEditTime: 2021-08-02 15:02:07
  */
 
 /**
@@ -51,6 +51,20 @@ function blobToDataURL(blob) {
       resolve(e.target.result);
     };
   });
+}
+
+/**
+ * 获取文件大小
+ * @param {*} url 
+ */
+function getFileSize(url) {
+  return new Promise((resolve) => {
+    fetch(url)
+      .then(response => response.blob())
+      .then(res => {
+        resolve(res.size)
+      })
+  })
 }
 
 /**
@@ -258,7 +272,7 @@ function colorMatrix(url, option) {
 /**
  * 防抖
  * @param {Function} fn - 函数
- * @param {Number} delay - 延迟
+ * @param {Number} delay - 时间间隔
  * @returns
  */
 function debounce(fn, delay) {
@@ -276,6 +290,34 @@ function debounce(fn, delay) {
       fn.apply(_this, args);
     }, delay);
   };
+}
+
+/**
+ * 节，创建并返回一个像节流阀一样的函数，当重复调用函数的时候，最多每隔delay毫秒调用一次该函数
+ * @param {Function} fn - 函数
+ * @param {Number} delay - 时间间隔
+ */
+function throttle(fn, delay, atleast) {
+  let timer = null;
+  let previous = null;
+
+  return function () {
+    let now = +new Date();
+
+    if (!previous) previous = now;
+    if (atleast && now - previous > atleast) {
+      fn();
+      // 重置上一次开始时间为本次结束时间
+      previous = now;
+      clearTimeout(timer);
+    } else {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        fn();
+        previous = null;
+      }, delay);
+    }
+  }
 }
 
 /**
@@ -369,11 +411,13 @@ export {
   getObjectUrl,
   dataURLtoBlob,
   blobToDataURL,
+  getFileSize,
   getRandomID,
   download,
   imageReset,
   colorMatrix,
   debounce,
+  throttle,
   cropImage,
   loadImages,
   combineImages

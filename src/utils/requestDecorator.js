@@ -4,7 +4,7 @@
  * @Autor: Yaowen Liu
  * @Date: 2020-07-02 14:32:25
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-05-19 14:57:06
+ * @LastEditTime: 2021-08-02 16:13:47
  */
 export default class RequestDecorator {
   constructor({
@@ -57,5 +57,9 @@ export default class RequestDecorator {
     if (this.requestQueue.length <= 0) return;
     const _resolve = this.requestQueue.shift();
     _resolve();
+  }
+  // 清除
+  clear() {
+    this.requestQueue = [];
   }
 }

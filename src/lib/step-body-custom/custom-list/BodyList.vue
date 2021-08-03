@@ -4,25 +4,27 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-29 17:20:37
+ * @LastEditTime: 2021-08-02 16:19:28
 -->
 <template>
-  <div class="body-wrapper" ref="bodyWrapper">
-    <base-row :gutter="10">
-      <base-col
-        :span="12"
-        v-for="item in pageList"
-        :key="item.id"
-        class="body-card-row"
-      >
-        <body-card
-          :data="item"
-          :skin="skin"
-          :avatar="avatar"
-          @click="handleClick(item)"
-        ></body-card>
-      </base-col>
-    </base-row>
+  <div class="body-wrapper" ref="bodyContainer">
+    <div ref="bodyContent">
+      <base-row :gutter="10">
+        <base-col
+          :span="12"
+          v-for="item in pageList"
+          :key="item.id"
+          class="body-card-row"
+        >
+          <body-card
+            :data="item"
+            :skin="skin"
+            :avatar="avatar"
+            @click="handleClick(item)"
+          ></body-card>
+        </base-col>
+      </base-row>
+    </div>
   </div>
 </template>
 
@@ -32,7 +34,8 @@ import { reactive, toRefs, ref, onMounted, watch, nextTick } from "vue";
 import BaseRow from "../../../components/BaseRow.vue";
 import BaseCol from "../../../components/BaseCol.vue";
 import BodyCard from "./BodyCard.vue";
-import BScroll from "better-scroll";
+import { clearRenderer } from "../../../utils/minimeRenderer";
+import { debounce, throttle } from "lodash";
 
 export default {
   components: {
@@ -62,36 +65,40 @@ export default {
 
   setup(props, context) {
     const state = reactive({
-      // scroll
-      scroll: null,
       // 当前页数据
       pageList: [],
       pageSize: 10,
       pageNumber: 1,
     });
 
+    // 实力化滚动插件
+    const bodyContainer = ref(null);
+    const bodyContent = ref(null);
+
     onMounted(() => {
-      if (!state.scroll) {
-        initScroll();
-      }
+      bodyContainer.value.addEventListener(
+        "scroll",
+        throttle(scrollContainer, 100)
+      );
     });
 
-    // 实力化滚动插件
-    const bodyWrapper = ref(null);
-    function initScroll() {
-      state.scroll = new BScroll(bodyWrapper.value, {
-        probeType: 3,
-        mouseWheel: true,
-        click: true,
-      });
-
-      // 监听滚动到底部事件
-      state.scroll.on("scroll", () => {
-        if (state.scroll.y <= state.scroll.maxScrollY + 150) {
+    function scrollContainer() {
+      const { height: containerHeight } = bodyContainer.value.getBoundingClientRect();
+      const { height: contentHeight } = bodyContent.value.getBoundingClientRect();
+      const isScrollToEnd = contentHeight < containerHeight + bodyContainer.value.scrollTop + 100;
+      if (isScrollToEnd) {
+        if (!isFinished()) {
           state.pageNumber += 1;
           addPageList();
+        } else {
+          console.log('到底了')
         }
-      });
+      }
+    }
+
+    function isFinished() {
+      const totalPage = Math.ceil(props.list.length / state.pageSize);
+      return state.pageNumber >= totalPage;
     }
 
     // 添加一页对应页码的数据
@@ -105,41 +112,40 @@ export default {
     // 当传入的列表发生变化的时候，重制列表数据
     watch(
       () => props.list,
-      () => {
-        state.pageList = [];
-        state.pageNumber = 1;
-        state.scroll.scrollTo(0, 0);
-        addPageList();
-      },
+      debounce(() => {
+        initList();
+      }, 300),
       {
         deep: true,
       }
     );
 
-    // 当前卡片数量发生变化的时候，更新scroll插件
-    watch(
-      () => state.pageList,
-      () => {
-        nextTick().then(() => {
-          if (state.scroll) state.scroll.refresh();
-        });
-      },
-      {
-        deep: true,
-      }
-    );
+    // 初始化列表数据
+    function initList() {
+      // 容器初始化
+      bodyContent && bodyContent.value.scrollIntoView({ block: "start", inline: "nearest" });
+
+      // 渲染器初始化
+      clearRenderer();
+      
+      // 列表初始化
+      state.pageList = [];
+      state.pageNumber = 1;
+      addPageList();
+    }
 
     // 点击卡片
     function handleClick(item) {
       context.emit("select", {
         ...item,
-        skin: props.skin
+        skin: props.skin,
       });
     }
 
     return {
       ...toRefs(state),
-      bodyWrapper,
+      bodyContainer,
+      bodyContent,
       handleClick,
     };
   },
@@ -151,9 +157,29 @@ export default {
 @import "src/styles/_mixins.scss";
 
 .body-wrapper {
-  height: 100%;
-  padding: 10px;
-  overflow: hidden;
+  @include pos-absolute(10px, 0, 10px, 0);
+  padding: 0 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /*解决ios上滑动不流畅*/
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar {
+    // 滚动条
+    // display: none;
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 2px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background: #535353;
+  }
+  &::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+    background: #ededed;
+  }
 
   .body-group__title {
     padding: 10px 0;

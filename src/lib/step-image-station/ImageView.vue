@@ -34,7 +34,7 @@
             Normal
           </p>
           <p
-            class="menu"
+            class="menu free"
             @click="handleChangeStyle('cartoon')"
             :class="{ active: imageStyle === 'cartoon' }"
           >
@@ -277,6 +277,9 @@ export default {
       .price {
         font-weight: 600;
         color: $sub-theme-color;
+      }
+      &.free {
+        text-decoration: line-through;
       }
       &:first-child {
         border-radius: 15px 0 0 15px;

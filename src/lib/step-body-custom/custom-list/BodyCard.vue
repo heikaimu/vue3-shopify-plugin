@@ -4,10 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-30 16:29:01
+ * @LastEditTime: 2021-08-02 18:16:10
 -->
 <template>
-  <div class="body-card">
+  <div class="body-card" @click="handleClick">
     <!-- normal -->
     <div class="body-card__box" v-if="data.type === 'normal'">
       <img class="body-card__img" :src="bodyURL" alt="" @load="bgLoad" />
@@ -32,6 +32,7 @@
     <!-- 标签 -->
     <p class="body-card__edit-tag" :class="{ disabled: loading }">
       Tap &amp; Edit
+      <!-- {{ size }} -->
     </p>
     <!-- loading -->
     <div class="body-card__loading" v-if="loading">
@@ -47,8 +48,8 @@ import { reactive, toRefs, watch, onMounted } from "vue";
 
 import BaseIcon from "../../../components/BaseIcon.vue";
 
-import Minime from "../../../utils/minime";
-import { loadImages } from "../../../utils/image";
+import { renderer } from "../../../utils/minimeRenderer";
+import { loadImages, getFileSize } from "../../../utils/image";
 
 export default {
   components: {
@@ -70,12 +71,17 @@ export default {
     },
   },
 
-  setup(props) {
+  emits: {
+    click: null
+  },
+
+  setup(props, context) {
     const { data, skin, avatar } = props;
 
     const state = reactive({
       // 身体图片
       bodyURL: "",
+      size: 0,
       // 头部样式
       avatarStyle: {
         width: 0,
@@ -112,36 +118,36 @@ export default {
     // 渲染卡片
     function renderImage(skin) {
       if (data.type === "normal") {
-        const currentSkinImage = data.images.find(
-          (item) => item.color === skin
-        );
-        if (currentSkinImage) {
-          state.loading = true;
-          loadImages([currentSkinImage.url]).then((images) => {
-            setTimeout(() => {
-              state.loading = false;
-              state.bodyURL = images[0].src;
-            }, 500);
-          });
-        }
+        normalImage(skin);
       } else if (data.type === "hood") {
+        combineImage(skin);
+      }
+    }
+
+    // 普通图片
+    function normalImage(skin) {
+      const currentSkinImage = data.images.find((item) => item.color === skin);
+      if (currentSkinImage) {
         state.loading = true;
-        const minime = new Minime("", {
-          width: 500,
-          height: 660,
-        });
-        minime.setOption({
-          avatar: avatar.url,
-          option: data,
-          skin: skin,
-          success: function (canvas) {
-            setTimeout(() => {
-              state.bodyURL = canvas.toDataURL();
-              state.loading = false;
-            }, 300);
-          },
+        loadImages([currentSkinImage.url]).then((images) => {
+          state.loading = false;
+          state.bodyURL = images[0].src;
         });
       }
+    }
+
+    // 带svg图片
+    function combineImage(skin) {
+      state.loading = true;
+      renderer.request({
+        avatar: avatar.url,
+        chin: avatar.chin,
+        option: data,
+        skin: skin,
+      }).then(url => {
+        state.bodyURL = url;
+        state.loading = false;
+      });
     }
 
     // 背景图加载完成
@@ -218,9 +224,17 @@ export default {
       }
     }
 
+    // 点击
+    function handleClick() {
+      if (!state.loading) {
+        context.emit('click');
+      }
+    }
+
     return {
       ...toRefs(state),
       bgLoad,
+      handleClick
     };
   },
 };

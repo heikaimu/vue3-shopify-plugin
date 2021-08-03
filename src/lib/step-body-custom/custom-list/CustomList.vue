@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-30 15:38:35
+ * @LastEditTime: 2021-08-02 13:56:47
 -->
 <template>
   <div class="custom-list">
@@ -66,7 +66,7 @@ export default {
 
   emits: {
     back: null,
-    select: null
+    select: null,
   },
 
   setup(props, context) {
@@ -132,9 +132,9 @@ export default {
 
     // 卡片选择
     function selectCard(item) {
-      context.emit('select', {
+      context.emit("select", {
         groupName: state.currentGroupName,
-        ...item
+        ...item,
       });
     }
 
@@ -149,7 +149,7 @@ export default {
       changeSkin,
       changeGroupName,
       backToFileSelect,
-      selectCard
+      selectCard,
     };
   },
 };
@@ -178,8 +178,8 @@ export default {
   .body-list-wrapper {
     flex: 1;
     height: 100%;
-    padding: 10px 0;
     background-color: #f2f2f2;
+    position: relative;
   }
 }
 </style>

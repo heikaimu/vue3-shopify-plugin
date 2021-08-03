@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-30 09:59:44
+ * @LastEditTime: 2021-08-02 14:32:41
 -->
 <!--
  * @Description: 
@@ -31,7 +31,7 @@ import MinimePillow from "./lib";
 import axios from "axios";
 
 const PLUGIN_TYPE = "PLUG_INTERCEPTION_HEAD_NEW";
-const WEBSITE = "TEST";
+const WEBSITE = "M";
 import { product } from "../shopifyPageConfig";
 
 export default {
