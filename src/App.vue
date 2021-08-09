@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-02 14:32:41
+ * @LastEditTime: 2021-08-05 18:00:31
 -->
 <!--
  * @Description: 
@@ -31,7 +31,7 @@ import MinimePillow from "./lib";
 import axios from "axios";
 
 const PLUGIN_TYPE = "PLUG_INTERCEPTION_HEAD_NEW";
-const WEBSITE = "M";
+const WEBSITE = "TEST";
 import { product } from "../shopifyPageConfig";
 
 export default {
@@ -43,13 +43,12 @@ export default {
     const state = reactive({
       config: {},
       visible: false,
-      backgroundActiveIndex: 1,
-      composingActiveIndex: 1
+      backgroundActiveIndex: 0,
+      composingActiveIndex: 0,
     });
 
     onMounted(async () => {
       state.config = await getConfig();
-      console.log(state.config);
       state.visible = true;
     });
 
@@ -79,20 +78,12 @@ function getConfig() {
         }
         config = JSON.parse(configItem.configure);
         config.website = WEBSITE;
-        config.increment = getIncrement(product.type, config);
-
-        let currentItem = {};
-        for (let i = 0; i < config.miniMeData.length; i++) {
-          const group = config.miniMeData[i];
-          for (let j = 0; j < group.images.length; j++) {
-            const image = group.images[j];
-            if (String(image.id) === String(getTagID())) {
-              currentItem = image;
-            };
-          }
+        if (config.sizeList) {
+          delete config.sizeList;
         }
-        const firstGroup = config.miniMeData[0];
-        firstGroup.images.unshift(currentItem);
+        
+        getProductConfig(config, product.type);
+        topBodyCard(config);
 
         resolve(config);
       }
@@ -101,19 +92,37 @@ function getConfig() {
 }
 
 // 获取当前增量
-function getIncrement(type, config) {
-  const typeItem = config.incrementMap.find(
-    (item) => item.productType === type
-  );
-  const modules = typeItem ? typeItem.modules : [];
-  const increment = config.increment;
-  const obj = {};
-  Object.keys(increment).forEach((key) => {
-    if (modules.includes(key)) {
-      obj[key] = increment[key];
+function getProductConfig(config, type) {
+  const currentConfig = config.productTypeConfigList.find(item => item.type === type);
+  if (currentConfig) {
+    delete config.productTypeConfigList;
+  }
+  config.currentProductTypeConfig = currentConfig;
+  
+  const backgroundData = config.currentProductTypeConfig.background.data
+  config.currentProductTypeConfig.background.data = backgroundData.map(title => {
+    return config.backgroundList.find(item => item.title === title);
+  })
+  delete config.backgroundList;
+  config.currentProductTypeConfig.background.composingList = config.composingList;
+  delete config.composingList;
+  console.log(config)
+}
+
+// 置顶当前身体
+function topBodyCard(config) {
+  let currentItem = {};
+  for (let i = 0; i < config.miniMeData.length; i++) {
+    const group = config.miniMeData[i];
+    for (let j = 0; j < group.images.length; j++) {
+      const image = group.images[j];
+      if (String(image.id) === String(getTagID())) {
+        currentItem = image;
+      }
     }
-  });
-  return obj;
+  }
+  const firstGroup = config.miniMeData[0];
+  firstGroup.images.unshift(currentItem);
 }
 
 // 获取当前TagID

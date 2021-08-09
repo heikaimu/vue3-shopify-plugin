@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-03 10:51:22
+ * @LastEditTime: 2021-08-06 14:16:54
 -->
 <template>
   <div class="increment-wrapper">
@@ -15,22 +15,41 @@
       </span>
       <div class="preview-image">
         <!-- <transition name="fade" mode="out-in"> -->
-          <div v-if="!loading" class="img" :style="{ backgroundImage: `url(${preview})` }"></div>
-          <base-loading-dot v-else />
+        <!-- <div
+          v-if="!loading"
+          class="img"
+          :style="{ backgroundImage: `url(${preview})` }"
+        ></div> -->
+        <img v-if="!loading" class="img" :src="preview" alt="" srcset="" />
+        <base-loading-dot v-else />
         <!-- </transition> -->
       </div>
 
-      <base-notice class="bg-notice">Just for preview, the background will be cropped according to the size you pick</base-notice>
+      <base-notice class="bg-notice"
+        >Just for preview, the background will be cropped according to the size
+        you pick</base-notice
+      >
 
-      <!-- <swiper-composing
-        :data="data.composing"
-        v-bind="$attrs"
+      <!-- 尺寸 -->
+      <swiper-size
+        :data="sizeList"
+        :activeIndex="sizeIndex"
+        @change="changeSizeIndex"
+      ></swiper-size>
+
+      <!-- 排版 -->
+      <swiper-composing
+        v-if="composingList.length > 1"
+        :data="composingList"
+        :activeIndex="composingIndex"
         @change="changeComposingIndex"
-      ></swiper-composing> -->
+      ></swiper-composing>
 
+      <!-- 背景 -->
       <swiper-background
-        :data="data.backgroundList"
-        v-bind="$attrs"
+        :data="backgroundList"
+        :size="currentSize"
+        :activeIndex="backgroundIndex"
         @change="changeBackgroundIndex"
       ></swiper-background>
 
@@ -44,17 +63,22 @@
 </template>
 
 <script>
-import { reactive, watch, toRefs, onMounted } from "vue";
+import { watch, toRaw } from "vue";
 
 import BaseButton from "../../../components/BaseButton.vue";
 import BaseIcon from "../../../components/BaseIcon.vue";
 import BaseNotice from "../../../components/BaseNotice.vue";
 import BaseLoadingDot from "../../../components/BaseLoadingDot.vue";
+import SwiperSize from "./SwiperSize.vue";
 import SwiperBackground from "./SwiperBackground.vue";
 import SwiperComposing from "./SwiperComposing.vue";
 
-import { CombineImage } from "../../../utils/combineImage";
-// import { combineImages } from "../../../utils/image";
+import useCombineImage from "../../../composables/useCombineImage";
+import useBackground from "../../../composables/useBackground";
+import useComposing from "../../../composables/useComposing";
+import useSize from "../../../composables/useSize";
+
+import { debounce } from "lodash";
 
 export default {
   components: {
@@ -62,6 +86,7 @@ export default {
     BaseIcon,
     BaseNotice,
     BaseLoadingDot,
+    SwiperSize,
     SwiperBackground,
     SwiperComposing,
   },
@@ -75,6 +100,18 @@ export default {
       type: String,
       default: "",
     },
+    backgroundActiveIndex: {
+      type: Number,
+      default: 0,
+    },
+    composingActiveIndex: {
+      type: Number,
+      default: 0,
+    },
+    sizeActiveIndex: {
+      type: Number,
+      default: 0,
+    },
   },
 
   emits: {
@@ -84,72 +121,50 @@ export default {
   },
 
   setup(props, context) {
-    const state = reactive({
-      combineImage: null,
-      preview: "",
-      loading: true,
-      backgroundIndex: -1,
-      composingIndex: -1,
+    // 背景
+    const {
+      backgroundList,
+      backgroundIndex,
+      backgroundName,
+      changeBackgroundIndex,
+      getBackgroundImage,
+    } = useBackground(props);
+
+    // 排版
+    const {
+      composingList,
+      composingIndex,
+      composingName,
+      changeComposingIndex,
+      getComposing,
+    } = useComposing(props);
+
+    // 尺寸
+    const { sizeList, sizeIndex, sizeName, currentSize, changeSizeIndex } =
+      useSize(props);
+
+    // 图片渲染器
+    const { preview, loading, renderPreview } = useCombineImage(props);
+
+    // 索引改变
+    watch([backgroundIndex, composingIndex, sizeIndex], () => {
+      renderNow();
     });
 
-    onMounted(() => {
-      renderPreview();
-    });
-
-    watch(
-      () => state.preview,
-      (val) => {
-        context.emit("change", {
-          preview: val,
-          backgroundIndex: state.backgroundIndex,
-          composingIndex: state.composingIndex
-        });
-      }
-    );
-
-    // 设置当前背景index
-    function changeBackgroundIndex(index) {
-      state.backgroundIndex = index;
-      renderPreview();
-    }
-
-    // 设置当前排版index
-    function changeComposingIndex(index) {
-      state.composingIndex = index;
-      renderPreview();
-    }
-
-    // 渲染效果图
-    async function renderPreview() {
-      if (!state.combineImage) {
-        state.combineImage = new CombineImage({
-          width: 500,
-          height: 750,
-        });
-      }
-
-      state.loading = true;
+    // 立刻渲染
+    const renderNow = debounce(() => {
       const params = getRenderParams();
-      state.preview = await state.combineImage.getURL(params);
-      state.loading = false;
-    }
+      if (!params.backgroundImage) {
+        return;
+      }
+
+      renderPreview(params);
+    }, 100);
 
     // 获取渲染参数
     function getRenderParams() {
-      const { backgroundList, composing } = props.data;
-      const backgroundImage = (
-        (backgroundList || [])[state.backgroundIndex] || {}
-      ).url;
-      // const layerList = ((composing || [])[state.composingIndex] || {}).position;
-
-      const layerList = [
-        {
-          angle: 0,
-          left: 1,
-          scale: 1.2619207974137931,
-          top: 20,
-        },
-      ];
+      const backgroundImage = getBackgroundImage(currentSize.value);
+      const layerList = getComposing(currentSize.value);
 
       return {
         backgroundImage,
@@ -157,6 +172,27 @@ export default {
         layerImage: props.customBodyPreviewURL,
       };
     }
+
+    // 预览图改变
+    watch(preview, (val) => {
+      context.emit("change", {
+        preview: val,
+        params: {
+          size: {
+            index: sizeIndex.value,
+            name: sizeName.value,
+          },
+          background: {
+            index: backgroundIndex.value,
+            name: backgroundName.value,
+          },
+          composing: {
+            index: composingIndex.value,
+            name: composingName.value,
+          },
+        },
+      });
+    });
 
     // 关闭
     function handleClose() {
@@ -169,11 +205,20 @@ export default {
     }
 
     return {
-      ...toRefs(state),
       handleClose,
       handleNext,
+      backgroundList,
+      backgroundIndex,
       changeBackgroundIndex,
+      sizeList,
+      sizeIndex,
+      currentSize,
+      changeSizeIndex,
+      composingList,
+      composingIndex,
       changeComposingIndex,
+      preview,
+      loading,
     };
   },
 };
@@ -208,7 +253,7 @@ export default {
       padding-top: 20px;
       .img {
         @include card-shadow-lg;
-        width: 150px;
+        width: auto;
         height: 225px;
         background-size: contain;
         background-repeat: no-repeat;

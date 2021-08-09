@@ -4,32 +4,34 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-30 10:36:21
+ * @LastEditTime: 2021-08-04 17:46:39
 -->
 <template>
   <div class="composing-selector">
-    <p class="composing-title">{{ title }}</p>
+    <p class="composing-title">Composing {{ pagination }}</p>
     <swiper
       :slides-per-view="5"
-      :space-between="2"
+      :space-between="5"
       :centered-slides="true"
       @swiper="onSwiper"
       @slideChange="onSlideChange"
       @click="onSlideClick"
     >
       <swiper-slide v-for="(item, index) in data" :key="index">
-        <div class="composing-card">{{ item.name }}</div>
+        <div class="composing-card">{{ item.title }}</div>
       </swiper-slide>
     </swiper>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, computed } from "vue";
+import { watch } from "vue";
 
 import { Swiper, SwiperSlide } from "swiper/swiper-vue.esm";
 // Import Swiper styles
 import "swiper/swiper.scss";
+
+import useSwiper from "../../../composables/useSwiper";
 
 export default {
   components: {
@@ -42,7 +44,7 @@ export default {
       type: Array,
       default: () => [],
     },
-    composingActiveIndex: {
+    activeIndex: {
       type: Number,
       default: 0,
     },
@@ -53,23 +55,21 @@ export default {
   },
 
   setup(props, context) {
-    const state = reactive({
-      swiper: null,
-    });
+    let { mySwiper, pagination } = useSwiper(props);
 
-    const title = computed(() => {
-      const total = props.data.length;
-      const currentIndex = state.swiper ? state.swiper.activeIndex : 0;
-      return `Background (${currentIndex + 1} / ${total})`;
-    });
-
-    onMounted(() => {
-      state.swiper.slideTo(props.composingActiveIndex);
-    });
+    // 当索引改变的时候修改激活对象
+    watch(
+      () => props.activeIndex,
+      (newIndex, oldIndex) => {
+        if (newIndex !== oldIndex) {
+          mySwiper.slideTo(newIndex);
+        }
+      }
+    );
 
     // 初始化
     function onSwiper(swiper) {
-      state.swiper = swiper;
+      mySwiper = swiper;
     }
 
     // onSlideChange
@@ -77,13 +77,13 @@ export default {
       context.emit("change", swiper.activeIndex);
     }
 
+    // 点击
     function onSlideClick(swiper) {
-      state.swiper.slideTo(swiper.clickedIndex);
+      mySwiper.slideTo(swiper.clickedIndex);
     }
 
     return {
-      ...toRefs(state),
-      title,
+      pagination,
       onSwiper,
       onSlideChange,
       onSlideClick,
@@ -97,7 +97,7 @@ export default {
 @import "src/styles/_mixins.scss";
 
 .composing-selector {
-  padding: 0 10px 10px 10px;
+  padding: 0 10px 0 10px;
   // background-color: #f9f9f9;
   margin-bottom: 5px;
   .composing-title {
@@ -130,15 +130,15 @@ export default {
   .composing-card {
     border-radius: 17px;
     background-color: #ffffff;
-    border: 2px solid #f2f2f2;
+    border: 1px solid #f2f2f2;
     cursor: pointer;
     text-align: center;
-    line-height: 30px;
+    line-height: 24px;
     font-size: 12px;
   }
   .swiper-slide-active {
     .composing-card {
-      border: 2px solid $theme-color;
+      border: 1px solid $theme-color;
     }
   }
 }

@@ -52,12 +52,17 @@
     },
 
     async mounted() {
+      // 设置加载状态
       this.setLoaded(false);
+      // 请求数据
       this.config = await getConfig();
+      // 设置加载状态
       this.setLoaded(true);
+      // 设置初始化选项
       this.setInitOption(this.config.increment);
+      // 绑定点击事件
       this.bindOpenButton();
-      this.hideDefaultButton();
+      // 获取激活的背景index
       this.getBackgroundActiveIndex();
     },
 
@@ -79,6 +84,7 @@
       async complete(data) {
         $('#extendForm').empty();
         this.setExtendForm(data.files);
+        this.setStatisticalForm(data.body);
         await this.dealIncrement(data.increment);
         $('.product-form__cart-submit').trigger('click');
       },
@@ -105,46 +111,76 @@
         $('#extendForm').append($input);
       },
 
+      // 设置统计表单
+      setStatisticalForm(data) {
+        const { groupName, name, url, id } = data;
+
+        const $website = $(`<input type="hidden" name="properties[webSite]"></input>`);
+        $website.val(website);
+        $('#extendForm').append($website);
+
+        const $groupName = $(`<input type="hidden" name="properties[productCategory]"></input>`);
+        $groupName.val(groupName);
+        $('#extendForm').append($groupName);
+
+        const $name = $(`<input type="hidden" name="properties[productName]"></input>`);
+        $name.val(name);
+        $('#extendForm').append($name);
+
+        const $url = $(`<input type="hidden" name="properties[templateUrl]"></input>`);
+        $url.val(url);
+        $('#extendForm').append($url);
+      },
+
       // 处理扩展信息
       dealIncrement(data) {
-        const { slides, relatedProduct, vip, backgroundIndex, composingIndex } = data;
-        const queue = [];
+        console.log(data)
+        // const { slides, relatedProduct, vip, backgroundIndex, composingIndex } = data;
+        // const queue = [];
 
-        if (slides) {
-          this.changeSlides(slides);
-        }
+        // if (slides) {
+        //   this.changeSlides(slides);
+        // }
 
-        if (backgroundIndex !== -1) {
-          this.changeColor(backgroundIndex);
-        }
+        // if (backgroundIndex !== -1) {
+        //   this.changeBackground(backgroundIndex);
+        // }
 
-        if (vip) {
-          queue.push(this.addVIP(vip));
-        }
+        // if (vip) {
+        //   queue.push(this.addVIP(vip));
+        // }
 
-        if (relatedProduct) {
-          queue.push(this.addRelatedProduct(relatedProduct));
-        }
-        return new Promise((resolve) => {
-          Promise.all(queue).then(() => {
-            resolve();
-          });
-        })
+        // if (relatedProduct) {
+        //   queue.push(this.addRelatedProduct(relatedProduct));
+        // }
+        // return new Promise((resolve) => {
+        //   Promise.all(queue).then(() => {
+        //     resolve();
+        //   });
+        // })
       },
 
       // 修改单双面
       changeSlides(slides) {
         const $select = getSelectDom('Type');
+        if ($select) {
+          return;
+        }
+
         const val = slides === 'double' ? "Double Side" : "Single Side";
         $select.val(val).trigger('change');
       },
 
-      // 修改颜色
-      changeColor(backgroundIndex) {
+      // 修改背景
+      changeBackground(backgroundIndex) {
+        const $select = getSelectDom('Color');
+        if ($select) {
+          return;
+        }
+
         const _this = this;
         const backgroundList = this.config.increment.backgroundList;
         const val = backgroundList[backgroundIndex].title;
-        const $select = getSelectDom('Color');
         $select.children('option').each(function () {
           if ($(this).attr('value') === val) {
             $select.val(val).trigger('change');
@@ -236,13 +272,6 @@
         } else {
           $("#customOpenButton").addClass('disabled');
         }
-      },
-
-      // 隐藏默认按钮
-      hideDefaultButton() {
-        $('.product-form__item--submit').hide();
-        $('.confirm-payment-button').hide();
-        $('.product-vip-gift-box-div').hide();
       },
 
       // 获取激活的背景index
@@ -483,6 +512,7 @@
     display: none !important;
   }
 
+  /* 隐藏不需要的 */
   .product-form__item--submit,
   .confirm-payment-button,
   .product-vip-gift-box-div {

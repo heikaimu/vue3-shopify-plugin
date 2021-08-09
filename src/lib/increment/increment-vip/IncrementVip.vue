@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-26 15:16:39
+ * @LastEditTime: 2021-08-06 13:29:51
 -->
 <template>
   <div class="increment-wrapper">
@@ -29,13 +29,13 @@
                 color="#fbe4a4"
               ></base-icon>
             </div>
-            <div class="button-content">VIP SERVICE + $2.99</div>
+            <div class="button-content">VIP SERVICE + ${{data.price}}</div>
             <div class="crown"></div>
             <div class="light"></div>
           </div>
         </div>
 
-        <p class="vip-text">{{ vipDesc }}</p>
+        <p class="vip-text">{{ data.desc }}</p>
       </div>
 
       <div class="add-to-cart">
@@ -65,8 +65,8 @@ export default {
       default: () => {},
     },
     value: {
-      type: Object,
-      default: null,
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -78,28 +78,18 @@ export default {
 
   setup(props, context) {
     const state = reactive({
-      active: false,
-      vipDesc:
-        "The best choice to process orders with priority producing & shipping",
+      active: false
     });
 
     onMounted(() => {
-      if (props.value) {
-        state.active = true;
-      } else {
-        state.active = false;
-      }
+      state.active = props.value;
     });
 
     // 选择vip
     async function handleSelect() {
       state.active = !state.active;
       await nextTick();
-      if (state.active) {
-        context.emit("change", toRaw(props.data));
-      } else {
-        context.emit("change", null);
-      }
+      context.emit("change", state.active);
     }
 
     // 关闭

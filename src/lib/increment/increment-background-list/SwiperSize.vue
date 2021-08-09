@@ -4,11 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-04 17:47:28
+ * @LastEditTime: 2021-08-04 17:46:36
 -->
 <template>
-  <div class="background-selector">
-    <p class="background-title">Background {{ pagination }}</p>
+  <div class="size-selector">
+    <p class="size-title">Size {{ pagination }}</p>
     <swiper
       :slides-per-view="5"
       :space-between="5"
@@ -17,14 +17,8 @@
       @slideChange="onSlideChange"
       @click="onSlideClick"
     >
-      <swiper-slide v-for="(item, index) in list" :key="index">
-        <div class="background-card">
-          <!-- <div
-            class="background-img"
-            :style="{ backgroundImage: `url(${item.url})` }"
-          ></div> -->
-          <img class="background-img" :src="item.url" alt="" />
-        </div>
+      <swiper-slide v-for="(item, index) in data" :key="index">
+        <div class="size-card">{{ item }}</div>
       </swiper-slide>
     </swiper>
   </div>
@@ -54,10 +48,6 @@ export default {
       type: Number,
       default: 0,
     },
-    size: {
-      type: String,
-      default: "100x100",
-    },
   },
 
   emits: {
@@ -66,17 +56,6 @@ export default {
 
   setup(props, context) {
     let { mySwiper, pagination } = useSwiper(props);
-
-    const list = computed(() => {
-      return props.data.map((group) => {
-        return {
-          title: group.title,
-          url:
-            (group.list.find((item) => item.size === props.size) || {}).url ||
-            "",
-        };
-      });
-    });
 
     // 当索引改变的时候修改激活对象
     watch(
@@ -105,7 +84,6 @@ export default {
 
     return {
       pagination,
-      list,
       onSwiper,
       onSlideChange,
       onSlideClick,
@@ -118,10 +96,11 @@ export default {
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
 
-.background-selector {
-  padding: 0 10px 10px 10px;
+.size-selector {
+  padding: 0 10px 0 10px;
   // background-color: #f9f9f9;
-  .background-title {
+  margin-bottom: 5px;
+  .size-title {
     @include flex-row-center;
     font-size: 12px;
     line-height: 2;
@@ -148,24 +127,17 @@ export default {
     }
   }
 
-  .background-card {
-    border: 1px solid #ffffff;
+  .size-card {
+    border-radius: 17px;
     background-color: #ffffff;
+    border: 1px solid #f1f2f2;
     cursor: pointer;
-    .background-img {
-      @include card-shadow-lg;
-      display: block;
-      width: 100%;
-      height: 70px;
-      object-fit: contain;
-      // background-size: contain;
-      // background-repeat: no-repeat;
-      // background-position: center center;
-      // transition: 0.3s;
-    }
+    text-align: center;
+    line-height: 24px;
+    font-size: 12px;
   }
   .swiper-slide-active {
-    .background-card {
+    .size-card {
       border: 1px solid $theme-color;
     }
   }

@@ -30,43 +30,44 @@
       <transition name="slide-bottom-fade" mode="out-in">
         <!-- 单双面 -->
         <increment-slides
-          v-if="incrementState.activeObj.name === 'slides'"
-          :data="incrementState.activeObj.data"
-          :customBodyPreviewURL="customBodyPreviewURL"
-          :value="incrementState.slides"
+          v-if="slidesVisible"
+          :data="incrementData.data"
+          :value="incrementData.value"
+          :customBodyPreviewURL="previewBody"
           @change="changeSlides"
           @close="closeIncrement"
-          @next="toNextIncrement"
+          @next="nextIncrement"
         />
 
         <!-- 背景图 -->
         <increment-background-list
-          v-else-if="incrementState.activeObj.name === 'backgroundList'"
-          :data="incrementState.activeObj.data"
-          :customBodyPreviewURL="customBodyPreviewURL"
+          v-else-if="backgroundVisible"
+          :data="incrementData"
+          :customBodyPreviewURL="previewBody"
           v-bind="$attrs"
-          @change="changePreview"
+          @change="changeBackground"
           @close="closeIncrement"
-          @next="toNextIncrement"
+          @next="nextIncrement"
         />
 
         <!-- 关联产品 -->
         <increment-related-product
-          v-else-if="incrementState.activeObj.name === 'relatedProduct'"
-          :data="incrementState.activeObj.data"
+          v-else-if="relatedProductVisible"
+          :data="incrementData.data"
+          :value="incrementData.value"
           @change="changeRelatedProduct"
           @close="closeIncrement"
-          @next="toNextIncrement"
+          @next="nextIncrement"
         />
 
         <!-- vip -->
         <increment-vip
-          v-else-if="incrementState.activeObj.name === 'vip'"
-          :data="incrementState.activeObj.data"
-          :value="incrementState.vip"
+          v-else-if="vipVisible"
+          :data="incrementData.data"
+          :value="incrementData.value"
           @change="changeVip"
           @close="closeIncrement"
-          @next="toNextIncrement"
+          @next="nextIncrement"
         />
       </transition>
 
@@ -82,7 +83,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, toRaw, onMounted, computed, watch } from "vue";
+import { nextTick, toRaw } from "vue";
 
 import StepFileSelect from "./step-file-select/StepFileSelect.vue";
 import StepImageStation from "./step-image-station/StepImageStation.vue";
@@ -93,7 +94,9 @@ import IncrementRelatedProduct from "./increment/increment-related-product/Incre
 import IncrementVip from "./increment/increment-vip/IncrementVip.vue";
 import FilesUploader from "./files-uploader/FilesUploader.vue";
 
-import { imageReset } from "../utils/image";
+import useBodyMain from "../composables/useBodyMain";
+import useUpload from "../composables/useUpload";
+import useIncrement from "../composables/useIncrement";
 
 export default {
   name: "MinimePillow",
@@ -124,233 +127,95 @@ export default {
   },
 
   setup(props, context) {
-    const state = reactive({
-      // 当前步骤
-      currentStep: "fileSelect",
-      // 原始文件base64
-      rawFileURL: "",
-      // 头像信息
-      avatar: {},
-      // 身体配置
-      bodyConfig: {},
-      // 定制身体模版预览图
-      customBodyPreviewURL: "",
-      // 文件上传列表
-      uploadFiles: [],
-      uploadVisible: false,
-    });
+    // 主流程
+    const {
+      currentStep,
+      avatar,
+      rawFileURL,
+      previewBody,
+      changeFile,
+      useCacheFile,
+      useAIAvatar,
+      setBodyConfig,
+      setStep,
+      setPreview,
+      getBodyConfig,
+    } = useBodyMain();
 
-    // 选择文件
-    function changeFile(file) {
-      // 压缩文件
-      imageReset({
-        file: file,
-        quality: 0.9,
-        targetSize: 1920,
-        angle: 0,
-      }).then((url) => {
-        state.rawFileURL = url;
-        setStep("imageStation");
-      });
-    }
+    // 增量
+    const {
+      previewWidthBackground,
+      queue,
+      hasIncrement,
+      incrementData,
+      slidesVisible,
+      publishVisible,
+      backgroundVisible,
+      relatedProductVisible,
+      vipVisible,
+      isLastIncrement,
+      changeSlides,
+      changeVip,
+      changeRelatedProduct,
+      setIncrementIndex,
+      closeIncrement,
+      changeBackground,
+      next,
+    } = useIncrement(props);
 
-    // 使用缓存文件
-    function useCacheFile(item) {
-      state.rawFileURL = item.rawFileURL;
-      state.avatar = {
-        url: item.url,
-        chin: item.chin,
-        width: item.width,
-        height: item.height,
-      };
-      setStep("bodyCustom");
-    }
+    // 上传
+    const { uploadFiles, uploadVisible, startUpload } = useUpload();
 
-    // 使用AI返回的头像
-    function useAIAvatar(avatar) {
-      state.avatar = avatar;
-      setStep("bodyCustom");
-    }
-
-    // 设置步骤
-    function setStep(step) {
-      state.currentStep = step;
-    }
-
-    // 设置当前选中的身体配置
-    function setBodyConfig(config) {
-      state.bodyConfig = config;
+    // 下一步
+    function nextIncrement() {
+      if (isLastIncrement.value) {
+        upload();
+      } else {
+        next();
+      }
     }
 
     // 保存定制主人物图
-    function confirmCustom(url) {
-      state.customBodyPreviewURL = url;
-      // 两种情况，如果没有任何增量直接上传文件
-      if (incrementState.queue.length === 0) {
-        uploadFiles();
+    async function confirmCustom(url) {
+      setPreview(url);
+      await nextTick();
+      if (hasIncrement) {
+        setIncrementIndex(0);
       } else {
-        incrementState.index = 0;
+        upload();
       }
-    }
-
-    // 关闭插件
-    function closePlugin() {
-      context.emit("close");
-    }
-
-    /**
-     * 增量服务
-     */
-
-    const incrementState = reactive({
-      queue: [],
-      index: -1,
-      activeObj: {},
-      slides: null,
-      preview: null,
-      relatedProduct: null,
-      vip: null,
-      backgroundIndex: -1,
-      composingIndex: -1,
-    });
-
-    // 进入时候，根据config的字段来设置扩展任务队列
-    onMounted(() => {
-      const { slides, backgroundList, composing, relatedProduct, vip } =
-        props.config.increment;
-
-      // 面选择
-      if (slides) {
-        incrementState.queue.push({
-          name: "slides",
-          data: slides,
-        });
-        incrementState.slides = "double";
-      }
-      // 背景图
-      if (backgroundList) {
-        // 背景图
-        const data = {};
-        data.backgroundList = backgroundList;
-        // 排版方式
-        if (composing) {
-          data.composing = composing;
-        }
-
-        incrementState.queue.push({
-          name: "backgroundList",
-          data: data,
-        });
-      }
-      // 关联产品
-      if (relatedProduct) {
-        incrementState.queue.push({
-          name: "relatedProduct",
-          data: relatedProduct,
-        });
-      }
-      // 关联产品
-      if (vip) {
-        incrementState.queue.push({
-          name: "vip",
-          data: vip,
-        });
-      }
-    });
-
-    // 当前增量索引发生变化的时候
-    watch(
-      () => incrementState.index,
-      (val) => {
-        if (incrementState.queue.length === 0) {
-          incrementState.activeObj = {};
-        } else if (val === -1) {
-          incrementState.activeObj = {};
-        } else {
-          incrementState.activeObj = incrementState.queue[val];
-        }
-      }
-    );
-
-    // 前往下一个增量服务, 如果已经是最后一个则开始文件上传
-    function toNextIncrement() {
-      if (incrementState.index < incrementState.queue.length - 1) {
-        incrementState.index += 1;
-      } else {
-        uploadFiles();
-      }
-    }
-
-    // 单双面选择服务
-    function changeSlides(val) {
-      incrementState.slides = val;
-    }
-
-    // 背景图
-    function changePreview({ preview, backgroundIndex, composingIndex }) {
-      incrementState.preview = preview;
-      incrementState.backgroundIndex = backgroundIndex;
-      incrementState.composingIndex = composingIndex;
-    }
-
-    // 关联产品增量服务
-    function changeRelatedProduct(val) {
-      incrementState.relatedProduct = val;
-    }
-
-    // VIP增量服务
-    function changeVip(val) {
-      incrementState.vip = val;
-    }
-
-    // 关闭增量服务
-    function closeIncrement() {
-      incrementState.index = -1;
     }
 
     // 文件上传
-    function uploadFiles() {
-      state.uploadFiles = [
+    function upload() {
+      const files = [
         {
           name: "raw",
-          url: state.rawFileURL,
+          url: rawFileURL,
         },
         {
           name: "ai",
-          url: state.avatar.url,
+          url: avatar.url,
         },
         {
           name: "preview",
           url: getPreviewURL(),
         },
       ];
-      state.uploadVisible = true;
+      startUpload(files);
     }
 
     // 获取需要上传的预览图
     function getPreviewURL() {
-      return incrementState.preview || state.customBodyPreviewURL;
+      return previewWidthBackground || previewBody;
     }
 
     // 文件上传完成
     function completeUpload(res) {
-      const { slides, relatedProduct, vip, backgroundIndex, composingIndex } = incrementState;
-      const { bodyConfig } = state;
       const data = {
         files: toRaw(res),
-        body: {
-          id: bodyConfig.id,
-          name: bodyConfig.name,
-          groupName: bodyConfig.groupName,
-          url: bodyConfig.images[0].url,
-        },
-        increment: {
-          slides: toRaw(slides),
-          backgroundIndex: toRaw(backgroundIndex),
-          composingIndex: toRaw(composingIndex),
-          relatedProduct: toRaw(relatedProduct),
-          vip: toRaw(vip),
-        },
+        body: getBodyConfig(),
+        increment: toRaw(queue.value)
       };
 
       context.emit("complete", data);
@@ -358,23 +223,43 @@ export default {
       closePlugin();
     }
 
+    // 关闭插件
+    function closePlugin() {
+      context.emit("close");
+    }
+
     return {
-      ...toRefs(state),
+      // == main body ==
+      currentStep,
+      avatar,
+      rawFileURL,
+      previewBody,
       changeFile,
       useCacheFile,
       useAIAvatar,
-      setStep,
-      closePlugin,
       setBodyConfig,
-      confirmCustom,
-      incrementState,
-      toNextIncrement,
+      setStep,
+      // == increment ==
+      incrementData,
+      slidesVisible,
+      publishVisible,
+      backgroundVisible,
+      relatedProductVisible,
+      vipVisible,
       closeIncrement,
       changeSlides,
-      changePreview,
-      changeRelatedProduct,
       changeVip,
+      changeRelatedProduct,
+      changeBackground,
+      // == upload ==
+      uploadFiles,
+      uploadVisible,
+      // == 外部 ==
+      confirmCustom,
+      closePlugin,
       completeUpload,
+      changeVip,
+      nextIncrement
     };
   },
 };

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-02 18:16:10
+ * @LastEditTime: 2021-08-03 17:38:33
 -->
 <template>
   <div class="body-card" @click="handleClick">
@@ -120,7 +120,7 @@ export default {
       if (data.type === "normal") {
         normalImage(skin);
       } else if (data.type === "hood") {
-        combineImage(skin);
+        hoodImage(skin);
       }
     }
 
@@ -137,7 +137,7 @@ export default {
     }
 
     // 带svg图片
-    function combineImage(skin) {
+    function hoodImage(skin) {
       state.loading = true;
       renderer.request({
         avatar: avatar.url,

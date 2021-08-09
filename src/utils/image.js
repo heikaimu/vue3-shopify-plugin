@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 16:48:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-02 15:02:07
+ * @LastEditTime: 2021-08-03 17:49:37
  */
 
 /**
@@ -343,66 +343,24 @@ function cropImage(image, x, y, width, height) {
  * 加载图片
  * @param {Array[String]} images - 图片链接数组
  */
+function loadImage(url) {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = function () {
+      resolve(image);
+    };
+    image.crossOrigin = 'Anonymous'; // 支持跨域图片
+    image.src = url;
+  });
+};
+
 function loadImages(images) {
-  const loadImage = url => {
-    return new Promise((resolve) => {
-      const image = new Image();
-      image.onload = function () {
-        resolve(image);
-      };
-      image.crossOrigin = 'Anonymous'; // 支持跨域图片
-      image.src = url;
-    });
-  };
   const queue = images.map(url => {
     return loadImage(url);
   });
   return new Promise((resolve) => {
     Promise.all(queue).then(res => {
       resolve(res);
-    });
-  });
-}
-
-/**
- * 多张图片合成
- * @param {Object} options
- * @param {Number} options.width - 宽度
- * @param {Number} options.height - 高度
- * @param {String} options.backgroundImage - 背景图（地址，base64）
- * @param {String} options.mainImage - 内容图（地址，base64）
- * @param {String} options.overlapImage - 遮盖图（地址，base64）
- */
-function combineImages(options) {
-  const { width, height, backgroundImage, mainImage, overlapImage } = options;
-  const urlList = [];
-  backgroundImage && urlList.push(backgroundImage);
-  mainImage && urlList.push(mainImage);
-  overlapImage && urlList.push(overlapImage);
-
-  return new Promise((resolve) => {
-    loadImages(urlList).then(images => {
-      // 生成画布
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-
-      // 渲染图片
-      for (let i = 0; i < images.length; i++) {
-        const image = images[i];
-        const x = (width - image.width) / 2;
-        const y = (height - image.height) / 2;
-        if (i === 1) {
-          ctx.drawImage(image, x, y - 30, image.width, image.height);
-        } else {
-          ctx.drawImage(image, x, y, image.width, image.height);
-        }
-      }
-
-      // 生成效果图
-      const url = canvas.toDataURL('image/png', 0.9);
-      resolve(url);
     });
   });
 }
@@ -419,6 +377,6 @@ export {
   debounce,
   throttle,
   cropImage,
-  loadImages,
-  combineImages
+  loadImage,
+  loadImages
 };

@@ -6,7 +6,7 @@ const product = {
   "published_at": "2021-07-26T04:47:37-04:00",
   "created_at": "2021-07-26T04:47:37-04:00",
   "vendor": "faceonboxerpillow",
-  "type": "Beachtowel",
+  "type": "test",
   "tags": [
     "baozhen",
     "custompillow",

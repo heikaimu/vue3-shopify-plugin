@@ -4,22 +4,19 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:33:04
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-29 17:34:52
+ * @LastEditTime: 2021-08-04 15:39:54
  */
 import { fabric } from 'fabric';
+import { loadImage } from './image';
 
 export class CombineImage {
-  constructor({ width, height }) {
-    this.canvas = new fabric.Canvas('composing', {
-      width,
-      height
-    });
+  constructor() {
+    this.canvas = new fabric.Canvas('composing');
   }
 
   getURL({ backgroundImage, layerList, layerImage }) {
-    return new Promise((reolve) => {
-      this.canvas.clear();
-      
+    return new Promise(async (reolve) => {
+      await this.setCanvasSize(backgroundImage);
       const queue = [];
       if (backgroundImage) {
         queue.push(this.setBackground(backgroundImage));
@@ -37,6 +34,13 @@ export class CombineImage {
         }, 300);
       });
     });
+  }
+
+  async setCanvasSize(backgroundImage) {
+    const image = await loadImage(backgroundImage);
+    this.canvas.setWidth(image.width);
+    this.canvas.setHeight(image.height);
+    this.canvas.clear();
   }
 
   addLayerList(list, url) {
@@ -76,11 +80,14 @@ export class CombineImage {
           img,
           this.canvas.renderAll.bind(this.canvas)
         );
-
         resolve();
       }, {
         crossOrigin: 'Anonymous'
       });
     });
+  }
+
+  stop() {
+
   }
 }

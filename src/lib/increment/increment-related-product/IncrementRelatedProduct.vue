@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-28 17:37:42
+ * @LastEditTime: 2021-08-06 13:40:13
 -->
 <template>
   <div class="increment-wrapper">
@@ -103,9 +103,9 @@ export default {
     // 前往下一步
     function handleNext(flag) {
       if (flag) {
-        context.emit("change", [toRaw(state.product)]);
+        context.emit("change", [state.product.id]);
       } else {
-        context.emit("change", null);
+        context.emit("change", []);
       }
       context.emit("next");
     }
