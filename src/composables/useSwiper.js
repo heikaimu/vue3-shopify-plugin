@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 16:42:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-04 17:14:31
+ * @LastEditTime: 2021-08-09 16:36:18
  */
 import { reactive, toRefs, computed } from "vue";
 
@@ -16,7 +16,7 @@ export default function useSwiper(props, context) {
 
   const pagination = computed(() => {
     const total = props.data.length;
-    const currentIndex = state.mySwiper ? state.mySwiper.activeIndex : 0;
+    const currentIndex = props.activeIndex;
     return `(${currentIndex + 1} / ${total})`;
   });
 

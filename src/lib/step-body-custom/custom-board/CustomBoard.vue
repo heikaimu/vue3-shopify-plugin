@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-30 17:35:43
+ * @LastEditTime: 2021-08-09 15:27:12
 -->
 <template>
   <div class="custom-board">
@@ -104,7 +104,6 @@ export default {
 
   setup(props, context) {
     const { avatar, config, skin } = props;
-    console.log(props.config);
     const state = reactive({
       canvas: null,
       loading: false,

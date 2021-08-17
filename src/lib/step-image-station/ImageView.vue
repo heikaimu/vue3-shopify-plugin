@@ -25,7 +25,7 @@
             </div>
           </li>
         </ul>
-        <div class="image-style-tab">
+        <!-- <div class="image-style-tab">
           <p
             class="menu"
             @click="handleChangeStyle('normal')"
@@ -40,7 +40,7 @@
           >
             Cartoonize + <span class="price">$2.99</span>
           </p>
-        </div>
+        </div> -->
       </div>
       <div class="image-view__notice">
         <base-notice

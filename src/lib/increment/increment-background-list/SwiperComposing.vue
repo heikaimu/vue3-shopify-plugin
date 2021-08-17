@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-04 17:46:39
+ * @LastEditTime: 2021-08-10 13:40:19
 -->
 <template>
   <div class="composing-selector">
@@ -129,16 +129,18 @@ export default {
 
   .composing-card {
     border-radius: 17px;
-    background-color: #ffffff;
-    border: 1px solid #f2f2f2;
+    background-color: #f2f2f2;
     cursor: pointer;
     text-align: center;
     line-height: 24px;
     font-size: 12px;
+    color: $context-color;
+    font-weight: 600;
   }
   .swiper-slide-active {
     .composing-card {
-      border: 1px solid $theme-color;
+      background-color: $theme-color;
+      color: #ffffff;
     }
   }
 }

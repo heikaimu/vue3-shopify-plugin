@@ -15,7 +15,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "test": "jest"
   },
   "dependencies": {
     "@better-scroll/core": "^2.4.1",
@@ -32,8 +33,12 @@
     "vue": "^3.1.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
     "@vitejs/plugin-vue": "^1.2.5",
     "@vue/compiler-sfc": "^3.0.5",
+    "babel-jest": "^27.0.6",
+    "jest": "^27.0.6",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
     "style-loader": "^2.0.0",

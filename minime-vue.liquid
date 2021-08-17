@@ -7,6 +7,41 @@
 <!-- 提交表单 -->
 <div id="extendForm"></div>
 
+<!-- 肤色选择 -->
+<div class="skin-selector">
+  <!-- <p class="skin-selector__title">肤色</p>
+  <p class="skin-selector__desc">肤色选择</p> -->
+
+  <div class="color-selector-wrapper">
+    <p class="color-title">Choose Your Skin Color</p>
+    <p class="color-desc">The face color will be made according to the photo you upload, please choose the skin tone of
+      the exposed body!</p>
+    <nav class="color-selector">
+      <p class="color-item active" _value="white" style="background-color: #faebd5;">
+        <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M511.33 32.22c-265.1 0-480 214.9-480 480s214.9 480 480 480 480-214.9 480-480-214.9-480-480-480z m245.88 372.65L461.85 702.75 270.46 510.47c-15.58-15.66-15.53-40.98 0.13-56.57 15.66-15.58 40.98-15.53 56.57 0.13l134.58 135.21 238.66-240.7c15.56-15.69 40.88-15.79 56.57-0.24 15.69 15.56 15.8 40.89 0.24 56.57z"
+            p-id="2302"></path>
+        </svg>
+      </p>
+      <p class="color-item" _value="black" style="background-color: #986e59;">
+        <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M511.33 32.22c-265.1 0-480 214.9-480 480s214.9 480 480 480 480-214.9 480-480-214.9-480-480-480z m245.88 372.65L461.85 702.75 270.46 510.47c-15.58-15.66-15.53-40.98 0.13-56.57 15.66-15.58 40.98-15.53 56.57 0.13l134.58 135.21 238.66-240.7c15.56-15.69 40.88-15.79 56.57-0.24 15.69 15.56 15.8 40.89 0.24 56.57z"
+            p-id="2302"></path>
+        </svg>
+      </p>
+      <p class="color-item" _value="yellow" style="background-color: #f7d8aa;">
+        <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M511.33 32.22c-265.1 0-480 214.9-480 480s214.9 480 480 480 480-214.9 480-480-214.9-480-480-480z m245.88 372.65L461.85 702.75 270.46 510.47c-15.58-15.66-15.53-40.98 0.13-56.57 15.66-15.58 40.98-15.53 56.57 0.13l134.58 135.21 238.66-240.7c15.56-15.69 40.88-15.79 56.57-0.24 15.69 15.56 15.8 40.89 0.24 56.57z"
+            p-id="2302"></path>
+        </svg>
+      </p>
+    </nav>
+  </div>
+</div>
+
 <!-- 打开按钮 -->
 <div id="customOpenButton" class="custom-open-button disabled">
   <p class="text">CUSTOM NOW</p>
@@ -21,10 +56,11 @@
 
 <script>
   // 全局配置
-  const plugType = "PLUG_INTERCEPTION_HEAD_NEW";
-  const website = "M";
+  const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
+  const WEBSITE = "TEST";
   const product = {{ product | json }};
   console.log('产品的type：', product.type);
+  console.log('产品的完整属性：', product);
 
   /**************************************
    ***************** Vue ****************
@@ -59,11 +95,15 @@
       // 设置加载状态
       this.setLoaded(true);
       // 设置初始化选项
-      this.setInitOption(this.config.increment);
+      this.setInitOption(this.config);
       // 绑定点击事件
       this.bindOpenButton();
+      // 绑定肤色选择事件
+      this.bindSkinSelect();
+      // 获取激活的尺寸index
+      this.getSizeActiveName(this.config);
       // 获取激活的背景index
-      this.getBackgroundActiveIndex();
+      this.getBackgroundActiveName(this.config);
     },
 
     methods: {
@@ -74,8 +114,9 @@
       },
 
       // 设置初始化选项
-      setInitOption(increment) {
-        if (increment.slides) {
+      setInitOption(config) {
+        const { slides } = config.currentProductTypeConfig;
+        if (slides && slides.visible) {
           this.changeSlides('single');
         }
       },
@@ -86,6 +127,7 @@
         this.setExtendForm(data.files);
         this.setStatisticalForm(data.body);
         await this.dealIncrement(data.increment);
+        this.changeProductOptionsValue(data.productOptionsValue);
         $('.product-form__cart-submit').trigger('click');
       },
 
@@ -97,6 +139,7 @@
           raw: 'Original'
         }
 
+        // 遍历所有图片
         for (let i in files) {
           const value = files[i];
           const name = map[i];
@@ -106,6 +149,7 @@
           this.visible = false;
         }
 
+        // 产品显示的预览图
         const $input = $(`<input type="hidden" name="properties[visibleKey]"></input>`);
         $input.val('Preview');
         $('#extendForm').append($input);
@@ -115,55 +159,85 @@
       setStatisticalForm(data) {
         const { groupName, name, url, id } = data;
 
-        const $website = $(`<input type="hidden" name="properties[webSite]"></input>`);
-        $website.val(website);
-        $('#extendForm').append($website);
+        // const $website = $(`<input type="hidden" name="properties[webSite]"></input>`);
+        // $website.val(WEBSITE);
+        // $('#extendForm').append($website);
 
-        const $groupName = $(`<input type="hidden" name="properties[productCategory]"></input>`);
-        $groupName.val(groupName);
-        $('#extendForm').append($groupName);
+        // const $groupName = $(`<input type="hidden" name="properties[productCategory]"></input>`);
+        // $groupName.val(groupName);
+        // $('#extendForm').append($groupName);
 
-        const $name = $(`<input type="hidden" name="properties[productName]"></input>`);
-        $name.val(name);
-        $('#extendForm').append($name);
+        // const $name = $(`<input type="hidden" name="properties[productName]"></input>`);
+        // $name.val(name);
+        // $('#extendForm').append($name);
 
-        const $url = $(`<input type="hidden" name="properties[templateUrl]"></input>`);
-        $url.val(url);
+        // const $url = $(`<input type="hidden" name="properties[templateUrl]"></input>`);
+        // $url.val(url);
+        // $('#extendForm').append($url);
+
+        const $url = $(`<input type="hidden" name="properties[_bodyTemplateOption]"></input>`);
+        const params = {
+          webSite: WEBSITE,
+          productCategory: groupName,
+          productName: name,
+          templateUrl: url
+        }
+        $url.val(JSON.stringify(params));
         $('#extendForm').append($url);
       },
 
       // 处理扩展信息
-      dealIncrement(data) {
-        console.log(data)
-        // const { slides, relatedProduct, vip, backgroundIndex, composingIndex } = data;
-        // const queue = [];
+      dealIncrement(list) {
+        const queue = [];
 
-        // if (slides) {
-        //   this.changeSlides(slides);
-        // }
+        for (const item of list) {
 
-        // if (backgroundIndex !== -1) {
-        //   this.changeBackground(backgroundIndex);
-        // }
+          // 单双面
+          if (item.name === 'slides') {
+            this.changeSlides(item.value);
+          }
 
-        // if (vip) {
-        //   queue.push(this.addVIP(vip));
-        // }
+          // 背景
+          if (item.name === 'background') {
+            const { background, composing, size } = item.value;
+            this.changeBackground('Color', background.title);
+            // this.changeBackground('Size', size.title);
+          }
 
-        // if (relatedProduct) {
-        //   queue.push(this.addRelatedProduct(relatedProduct));
-        // }
-        // return new Promise((resolve) => {
-        //   Promise.all(queue).then(() => {
-        //     resolve();
-        //   });
-        // })
+          // 文字
+          if (item.name === 'text' && item.value) {
+            queue.push(this.addCustomText({
+              id: item.data.id,
+              url: item.data.url,
+              text: item.value
+            }));
+          }
+
+          // vip
+          if (item.name === 'vip' && item.value) {
+            queue.push(this.addVIP(item.data.id));
+          }
+
+          // 关联产品
+          if (item.name === 'relatedProduct' && item.value.length !== 0) {
+            for (const id of item.value) {
+              const currentProduct = item.data.find(product => product.id === id);
+              queue.push(this.addRelatedProduct(currentProduct));
+            }
+          }
+        }
+
+        return new Promise((resolve) => {
+          Promise.all(queue).then(() => {
+            resolve();
+          });
+        })
       },
 
       // 修改单双面
       changeSlides(slides) {
         const $select = getSelectDom('Type');
-        if ($select) {
+        if (!$select) {
           return;
         }
 
@@ -171,36 +245,34 @@
         $select.val(val).trigger('change');
       },
 
-      // 修改背景
-      changeBackground(backgroundIndex) {
-        const $select = getSelectDom('Color');
-        if ($select) {
+      // 修改背景尺寸
+      changeBackground(key, title) {
+        const $select = getSelectDom(key);
+        if (!$select) {
           return;
         }
 
         const _this = this;
-        const backgroundList = this.config.increment.backgroundList;
-        const val = backgroundList[backgroundIndex].title;
         $select.children('option').each(function () {
-          if ($(this).attr('value') === val) {
-            $select.val(val).trigger('change');
-            setActiveRadio('Color', val);
+          if ($(this).attr('value') === title) {
+            $select.val(title).trigger('change');
+            setActiveRadio(key, title);
           }
         })
       },
 
       // 添加vip
-      async addVIP(data) {
+      async addVIP(id) {
         // 添加主商品字段
-        const value = this.getRandomID();
+        const randomID = this.getRandomID();
         const $input = $(`<input type="hidden" name="properties[_tempVip]"></input>`);
-        $input.val(value);
+        $input.val(randomID);
         $('#extendForm').append($input);
         // 加入购物车
         await this.addToCart({
-          id: data.virtualId,
+          id,
           quantity: 1,
-          "properties[_tempVip]": value,
+          "properties[_tempVip]": randomID,
           mask: 'body',
           refresh: true,
         })
@@ -208,23 +280,63 @@
       },
 
       // 添加附加商品
-      async addRelatedProduct(data) {
+      async addRelatedProduct(product) {
+        const { id, url } = product;
         // 添加主商品字段
-        const value = this.getRandomID();
+        const randomID = this.getRandomID();
         const $input = $(`<input type="hidden" name="properties[_related_product]"></input>`);
-        $input.val(value);
+        $input.val(randomID);
         $('#extendForm').append($input);
         // 加入购物车
-        const product = data[0];
         await this.addToCart({
-          id: product.virtualId,
+          id,
           quantity: 1,
-          "properties[Preview]": product.url,
-          "properties[_related_product]": value,
+          "properties[Preview]": url,
+          "properties[_related_product]": randomID,
           mask: 'body',
           refresh: true,
         });
         return Promise.resolve();
+      },
+
+      // 添加文字定制
+      async addCustomText(data) {
+        const { id, url, text } = data;
+        // 添加主商品字段
+        const randomID = this.getRandomID();
+        const $input = $(`<input type="hidden" name="properties[_related_product]"></input>`);
+        $input.val(randomID);
+        $('#extendForm').append($input);
+        // 加入购物车
+        await this.addToCart({
+          id,
+          quantity: 1,
+          "properties[Preview]": url,
+          "properties[text]": text,
+          "properties[_related_product]": randomID,
+          mask: 'body',
+          refresh: true,
+        });
+        return Promise.resolve();
+      },
+
+      // 修改属性值
+      changeProductOptionsValue(data) {
+        Object.keys(data).forEach(key => {
+          const $select = getSelectDom(key);
+          if (!$select) {
+            return;
+          }
+
+          const _this = this;
+          const title = data[key];
+          $select.children('option').each(function () {
+            if ($(this).attr('value') === title) {
+              $select.val(title).trigger('change');
+              setActiveRadio(key, title);
+            }
+          })
+        })
       },
 
       // 加入购物车
@@ -260,8 +372,20 @@
             const price = product.variants.find(item => item.sku === sku).price;
             this.config.productPrice = `$${(price / 100)}`;
             this.config.productTitle = product.title;
+            this.config.skuList = this.getSKUlist();
+            this.config.productOptionsValue = this.getProductOptionsValue();
             this.visible = true;
           }
+        })
+      },
+
+      // 绑定肤色选择
+      bindSkinSelect() {
+        $(".color-item").on('click', (e) => {
+          const item = $(e.currentTarget);
+          item.addClass('active').siblings('.color-item').removeClass('active');
+          const value = item.attr('_value');
+          this.config.defaultSkin = value;
         })
       },
 
@@ -274,28 +398,111 @@
         }
       },
 
+      // 获取激活的尺寸index
+      getSizeActiveName(config) {
+        const { background } = config.currentProductTypeConfig;
+
+        if (!background) {
+          return;
+        }
+
+        if (!background.visible) {
+          return;
+        }
+
+        const size = background.size;
+
+        // 色块
+        const $select = getSelectDom('Size');
+        if ($select) {
+          // 已经初始化赋值了
+          if ($select.val()) {
+            this.sizeActiveName = $select.val()
+          }
+          // 监听change
+          $select.on('change', () => {
+            this.sizeActiveName = $select.val()
+          })
+        }
+      },
+
       // 获取激活的背景index
-      getBackgroundActiveIndex() {
-        const backgroundList = this.config.increment.backgroundList;
+      getBackgroundActiveName(config) {
+        const { background } = config.currentProductTypeConfig;
+
+        if (!background) {
+          return;
+        }
+
+        if (!background.visible) {
+          return;
+        }
+
+        const backgroundList = background.data;
+
+        // 背景图
         const { tags } = product;
         const tag = tags.find(tag => tag.includes('bg-'));
         if (tag) {
-          // 背景图
-          this.backgroundActiveIndex = backgroundList.findIndex(item => item.title === tag);
-        } else {
-          // 色块
-          const $select = getSelectDom('Color');
-          if ($select) {
-            // 已经初始化赋值了
-            if ($select.val()) {
-              this.backgroundActiveIndex = backgroundList.findIndex(item => item.title === $select.val());
-            }
-            // 监听change
-            $select.on('change', () => {
-              this.backgroundActiveIndex = backgroundList.findIndex(item => item.title === $select.val());
-            })
-          }
+          this.backgroundActiveName = tag;
+          return;
         }
+
+        // 色块
+        const $select = getSelectDom('Color');
+        if ($select) {
+          // 已经初始化赋值了
+          if ($select.val()) {
+            this.backgroundActiveName = $select.val();
+          }
+          // 监听change
+          $select.on('change', () => {
+            this.backgroundActiveName = $select.val();
+          })
+        }
+      },
+
+      // 获取所有sku选项
+      getSKUlist() {
+        const typeKeys = product.options.map((key) => {
+          const arr = key.split(/[\:\?]/);
+          return arr[0] ? arr[0] : "";
+        });
+        const list = [];
+        for (const variant of product.variants) {
+          const { price, options, id, sku } = variant;
+
+          const obj = {
+            price,
+            id,
+            sku,
+            options: {},
+          };
+
+          for (let i = 0; i < typeKeys.length; i++) {
+            const key = typeKeys[i];
+            obj.options[key] = options[i];
+          }
+
+          list.push(obj);
+        }
+        return list;
+      },
+
+      // 获取所有选项值
+      getProductOptionsValue() {
+        const typeKeys = product.options.map((key) => {
+          const arr = key.split(/[\:\?]/);
+          return arr[0] ? arr[0] : "";
+        });
+
+        const obj = {};
+        for (const key of typeKeys) {
+          const $select = getSelectDom(key);
+          const value = $select ? $select.val() : '';
+          obj[key] = value;
+        }
+        return obj;
       }
 
     },
@@ -306,7 +513,8 @@
           MinimePillow,
           {
             config: this.config,
-            backgroundActiveIndex: this.backgroundActiveIndex,
+            sizeActiveName: this.sizeActiveName,
+            backgroundActiveName: this.backgroundActiveName,
             onClose: () => {
               this.visible = false;
             },
@@ -327,7 +535,7 @@
   // 获取配置参数
   function getConfig() {
     let config = {};
-    const url = `https://sc.globaladput.com/plugins/api/v1/configure?webSite=${website}&plugType=${plugType}`;
+    const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
 
     return new Promise((resolve, reject) => {
       $.ajax(url, {
@@ -339,9 +547,11 @@
               return;
             }
             config = JSON.parse(configItem.configure);
-            config.website = website;
-            config.increment = getIncrement(product.type, config);
-            topCard(config);
+            config.website = WEBSITE;
+            config.defaultSkin = 'white';
+            getProductConfig(config, product.type);
+            topBodyCard(config);
+
             resolve(config);
           }
         },
@@ -349,11 +559,37 @@
           reject(msg);
         }
       })
-    })
+    });
   }
 
-  // 置顶卡片
-  function topCard(config) {
+  // 获取当前增量
+  function getProductConfig(config, type) {
+    const currentConfig = config.productTypeConfigList.find(
+      (item) => item.type === type
+    );
+
+    if (!currentConfig) {
+      config.currentProductTypeConfig = {};
+      return;
+    }
+
+    config.currentProductTypeConfig = currentConfig;
+    // background
+    config.currentProductTypeConfig.background.data = (
+      config.currentProductTypeConfig.background.data || []
+    ).map((title) => {
+      return config.backgroundList.find((item) => item.title === title);
+    });
+    // composing
+    config.currentProductTypeConfig.background.composingList = (
+      config.currentProductTypeConfig.background.composing || []
+    ).map((title) => {
+      return config.composingList.find((item) => item.title === title);
+    });
+  }
+
+  // 置顶当前身体
+  function topBodyCard(config) {
     let currentItem = {};
     for (let i = 0; i < config.miniMeData.length; i++) {
       const group = config.miniMeData[i];
@@ -361,25 +597,11 @@
         const image = group.images[j];
         if (String(image.id) === String(getTagID())) {
           currentItem = image;
-        };
+        }
       }
     }
     const firstGroup = config.miniMeData[0];
     firstGroup.images.unshift(currentItem);
-  }
-
-  // 获取当前增量
-  function getIncrement(type, config) {
-    const typeItem = config.incrementMap.find(item => item.productType === type);
-    const modules = typeItem ? typeItem.modules : [];
-    const increment = config.increment;
-    const obj = {};
-    Object.keys(increment).forEach(key => {
-      if (modules.includes(key)) {
-        obj[key] = increment[key];
-      }
-    })
-    return obj;
   }
 
   // 获取当前TagID
@@ -505,6 +727,60 @@
 
   .button__loading span:nth-child(5) {
     -webkit-animation-delay: 0.65s;
+  }
+
+  /* 肤色 */
+  .color-selector-wrapper {
+    padding: 20px 0;
+  }
+
+  .color-selector-wrapper .color-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333333;
+    line-height: 1.2;
+    margin-bottom: 5px;
+  }
+
+  .color-selector-wrapper .color-desc {
+    font-size: 12px;
+    color: #666666;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .color-selector-wrapper .color-selector {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .color-selector-wrapper .color-selector .color-item {
+    width: 70px;
+    height: 40px;
+    border-radius: 4px;
+    border: 2px solid #f2f2f2;
+    font-size: 12px;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    margin-bottom: 0;
+    margin-right: 5px;
+  }
+
+  .color-selector-wrapper .color-selector .color-item svg {
+    width: 16px;
+    height: 16px;
+    fill: #ff533a;
+    display: none;
+  }
+
+  .color-selector-wrapper .color-selector .color-item.active {
+    border: 2px solid #ff533a;
+  }
+
+  .color-selector-wrapper .color-selector .color-item.active svg {
+    display: block;
   }
 
   /* 隐藏不需要的表单 */

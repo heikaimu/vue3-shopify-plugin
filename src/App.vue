@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-05 18:00:31
+ * @LastEditTime: 2021-08-16 13:07:35
 -->
 <!--
  * @Description: 
@@ -15,14 +15,18 @@
  * @LastEditTime: 2021-07-29 10:40:45
 -->
 <template>
-  <MinimePillow
-    :config="config"
-    :backgroundActiveIndex="backgroundActiveIndex"
-    :composingActiveIndex="composingActiveIndex"
-    v-if="visible"
-    @close="visible = false"
-    @complete="complete"
-  />
+  <div>
+    <MinimePillow
+      :config="config"
+      :sizeActiveName="sizeActiveName"
+      :backgroundActiveName="backgroundActiveName"
+      v-if="visible"
+      @close="visible = false"
+      @complete="complete"
+    />
+    <el-button @click="handleOpen">打开</el-button>
+    <el-button @click="handleChangeColor">变色</el-button>
+  </div>
 </template>
 
 <script>
@@ -30,9 +34,9 @@ import { reactive, toRefs, onMounted } from "vue";
 import MinimePillow from "./lib";
 import axios from "axios";
 
-const PLUGIN_TYPE = "PLUG_INTERCEPTION_HEAD_NEW";
+const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
 const WEBSITE = "TEST";
-import { product } from "../shopifyPageConfig";
+import { product } from "../shopifyPillowConfig";
 
 export default {
   components: {
@@ -45,20 +49,31 @@ export default {
       visible: false,
       backgroundActiveIndex: 0,
       composingActiveIndex: 0,
+      sizeActiveName: '30" x 40"',
+      backgroundActiveName: "Yellow",
     });
 
     onMounted(async () => {
       state.config = await getConfig();
-      state.visible = true;
     });
 
     function complete(data) {
       console.log(data);
     }
 
+    async function handleOpen() {
+      state.visible = true;
+    }
+
+    function handleChangeColor() {
+      state.config.defaultSkin = "black";
+    }
+
     return {
       ...toRefs(state),
       complete,
+      handleOpen,
+      handleChangeColor,
     };
   },
 };
@@ -66,7 +81,7 @@ export default {
 // 获取配置参数
 function getConfig() {
   let config = {};
-  const url = `https://sc.globaladput.com/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
+  const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
 
   return new Promise((resolve, reject) => {
     axios.get(url).then((res) => {
@@ -78,9 +93,12 @@ function getConfig() {
         }
         config = JSON.parse(configItem.configure);
         config.website = WEBSITE;
-        if (config.sizeList) {
-          delete config.sizeList;
-        }
+        config.defaultSkin = "yellow";
+        config.skuList = getSKUlist(product);
+        config.productOptionsValue = {
+          Type: 'Single Side',
+          Size: '20cm-8\"',
+        };
         
         getProductConfig(config, product.type);
         topBodyCard(config);
@@ -93,20 +111,55 @@ function getConfig() {
 
 // 获取当前增量
 function getProductConfig(config, type) {
-  const currentConfig = config.productTypeConfigList.find(item => item.type === type);
-  if (currentConfig) {
-    delete config.productTypeConfigList;
+  const currentConfig = config.productTypeConfigList.find(
+    (item) => item.type === type
+  );
+
+  if (!currentConfig) {
+    config.currentProductTypeConfig = {};
+    return;
   }
+
   config.currentProductTypeConfig = currentConfig;
-  
-  const backgroundData = config.currentProductTypeConfig.background.data
-  config.currentProductTypeConfig.background.data = backgroundData.map(title => {
-    return config.backgroundList.find(item => item.title === title);
-  })
-  delete config.backgroundList;
-  config.currentProductTypeConfig.background.composingList = config.composingList;
-  delete config.composingList;
-  console.log(config)
+  // background
+  config.currentProductTypeConfig.background.data = (
+    config.currentProductTypeConfig.background.data || []
+  ).map((title) => {
+    return config.backgroundList.find((item) => item.title === title);
+  });
+  // composing
+  config.currentProductTypeConfig.background.composingList = (
+    config.currentProductTypeConfig.background.composing || []
+  ).map((title) => {
+    return config.composingList.find((item) => item.title === title);
+  });
+}
+
+// 获取SKU list
+function getSKUlist(product) {
+  const typeKeys = product.options.map((key) => {
+    const arr = key.split(/[\:\?]/);
+    return arr[0] ? arr[0] : "";
+  });
+  const list = [];
+  for (const variant of product.variants) {
+    const { price, options, id, sku } = variant;
+
+    const obj = {
+      price,
+      id,
+      sku,
+      options: {},
+    };
+
+    for (let i = 0; i < typeKeys.length; i++) {
+      const key = typeKeys[i];
+      obj.options[key] = options[i];
+    }
+
+    list.push(obj);
+  }
+  return list;
 }
 
 // 置顶当前身体

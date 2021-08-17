@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:33:04
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-04 15:39:54
+ * @LastEditTime: 2021-08-13 16:00:41
  */
 import { fabric } from 'fabric';
 import { loadImage } from './image';
@@ -14,9 +14,9 @@ export class CombineImage {
     this.canvas = new fabric.Canvas('composing');
   }
 
-  getURL({ backgroundImage, layerList, layerImage }) {
+  getURL({ size, backgroundImage, layerList, layerImage }, id) {
     return new Promise(async (reolve) => {
-      await this.setCanvasSize(backgroundImage);
+      await this.setCanvasSize(size);
       const queue = [];
       if (backgroundImage) {
         queue.push(this.setBackground(backgroundImage));
@@ -30,16 +30,19 @@ export class CombineImage {
             format: 'png',
             quality: 1
           });
-          reolve(url);
+          reolve({
+            url,
+            id
+          });
         }, 300);
       });
     });
   }
 
-  async setCanvasSize(backgroundImage) {
-    const image = await loadImage(backgroundImage);
-    this.canvas.setWidth(image.width);
-    this.canvas.setHeight(image.height);
+  async setCanvasSize(size) {
+    // const image = await loadImage(backgroundImage);
+    this.canvas.setWidth(size.width);
+    this.canvas.setHeight(size.height);
     this.canvas.clear();
   }
 
@@ -57,10 +60,10 @@ export class CombineImage {
   }
 
   addLayer(item, url) {
-    const { scale, angle, left, top } = item;
+    const { angle, left, top, width } = item;
     return new Promise((resolve) => {
       fabric.Image.fromURL(url, (img) => {
-        img.scale(scale).set({
+        img.scale(width / img.width).set({
           left,
           top,
           angle

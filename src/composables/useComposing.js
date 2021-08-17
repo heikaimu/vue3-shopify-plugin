@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 14:27:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-06 14:09:46
+ * @LastEditTime: 2021-08-10 11:16:43
  */
 import { reactive, toRefs, onMounted, computed } from "vue";
 import { debounce } from "lodash";
@@ -23,7 +23,8 @@ export default function useComposing(props) {
 
   onMounted(() => {
     state.composingList = props.data.composingList;
-    changeComposingIndex(props.composingActiveIndex);
+    const index = state.composingList.findIndex(item => item.title === props.composingActiveName);
+    changeComposingIndex(index === -1 ? 0 : index);
   })
 
   // 背景修改

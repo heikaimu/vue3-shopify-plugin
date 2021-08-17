@@ -1,8 +1,16 @@
+/*
+ * @Description: 
+ * @Version: 2.0
+ * @Author: Yaowen Liu
+ * @Date: 2021-07-19 09:42:00
+ * @LastEditors: Yaowen Liu
+ * @LastEditTime: 2021-08-11 17:54:30
+ */
 import axios from 'axios';
 import { dataURLtoBlob, cropImage } from '../utils/image';
 
 const getToken = async (type) => {
-  const { status, data } = await axios.post(`https://sc.globaladput.com/plugins/api/v1/getSign?type=${type}`);
+  const { status, data } = await axios.post(`https://sback.globalhot.shop/plugins/api/v1/getSign?type=${type}`);
   if (status === 200 && data.status === '0') {
     return data.data;
   }

@@ -4,14 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-04 17:46:36
+ * @LastEditTime: 2021-08-10 13:42:22
 -->
 <template>
   <div class="size-selector">
     <p class="size-title">Size {{ pagination }}</p>
     <swiper
-      :slides-per-view="5"
-      :space-between="5"
+      :slides-per-view="3"
+      :space-between="3"
       :centered-slides="true"
       @swiper="onSwiper"
       @slideChange="onSlideChange"
@@ -129,16 +129,18 @@ export default {
 
   .size-card {
     border-radius: 17px;
-    background-color: #ffffff;
-    border: 1px solid #f1f2f2;
+    background-color: #f2f2f2;
     cursor: pointer;
     text-align: center;
     line-height: 24px;
     font-size: 12px;
+    color: $context-color;
+    font-weight: 600;
   }
   .swiper-slide-active {
     .size-card {
-      border: 1px solid $theme-color;
+      background-color: $theme-color;
+      color: #ffffff;
     }
   }
 }

@@ -44,8 +44,31 @@
           v-else-if="backgroundVisible"
           :data="incrementData"
           :customBodyPreviewURL="previewBody"
+          :sizeList="config.sizeList"
           v-bind="$attrs"
           @change="changeBackground"
+          @close="closeIncrement"
+          @next="nextIncrement"
+        />
+
+        <!-- 文字 -->
+        <increment-text
+          v-else-if="textVisible"
+          :data="incrementData.data"
+          :value="incrementData.value"
+          @change="changeText"
+          @close="closeIncrement"
+          @next="nextIncrement"
+        />
+
+        <!-- 推荐 -->
+        <increment-publish
+          v-else-if="publishVisible"
+          :data="incrementData.data"
+          :value="incrementData.value"
+          :productOptionsValue="productOptionsValue"
+          :skuList="config.skuList"
+          @change="changePublish"
           @close="closeIncrement"
           @next="nextIncrement"
         />
@@ -92,6 +115,8 @@ import IncrementSlides from "./increment/increment-slides/IncrementSlides.vue";
 import IncrementBackgroundList from "./increment/increment-background-list/IncrementBackgroundList.vue";
 import IncrementRelatedProduct from "./increment/increment-related-product/IncrementRelatedProduct.vue";
 import IncrementVip from "./increment/increment-vip/IncrementVip.vue";
+import IncrementText from "./increment/increment-text/IncrementText.vue";
+import IncrementPublish from "./increment/increment-publish/IncrementPublish.vue";
 import FilesUploader from "./files-uploader/FilesUploader.vue";
 
 import useBodyMain from "../composables/useBodyMain";
@@ -109,6 +134,8 @@ export default {
     IncrementBackgroundList,
     IncrementRelatedProduct,
     IncrementVip,
+    IncrementText,
+    IncrementPublish,
     FilesUploader,
   },
 
@@ -144,6 +171,7 @@ export default {
 
     // 增量
     const {
+      productOptionsValue,
       previewWidthBackground,
       queue,
       hasIncrement,
@@ -151,6 +179,7 @@ export default {
       slidesVisible,
       publishVisible,
       backgroundVisible,
+      textVisible,
       relatedProductVisible,
       vipVisible,
       isLastIncrement,
@@ -160,6 +189,8 @@ export default {
       setIncrementIndex,
       closeIncrement,
       changeBackground,
+      changeText,
+      changePublish,
       next,
     } = useIncrement(props);
 
@@ -179,7 +210,7 @@ export default {
     async function confirmCustom(url) {
       setPreview(url);
       await nextTick();
-      if (hasIncrement) {
+      if (hasIncrement.value) {
         setIncrementIndex(0);
       } else {
         upload();
@@ -191,11 +222,11 @@ export default {
       const files = [
         {
           name: "raw",
-          url: rawFileURL,
+          url: rawFileURL.value,
         },
         {
           name: "ai",
-          url: avatar.url,
+          url: avatar.value.url,
         },
         {
           name: "preview",
@@ -207,7 +238,7 @@ export default {
 
     // 获取需要上传的预览图
     function getPreviewURL() {
-      return previewWidthBackground || previewBody;
+      return previewWidthBackground.value || previewBody.value;
     }
 
     // 文件上传完成
@@ -215,7 +246,8 @@ export default {
       const data = {
         files: toRaw(res),
         body: getBodyConfig(),
-        increment: toRaw(queue.value)
+        increment: toRaw(queue.value),
+        productOptionsValue: toRaw(productOptionsValue.value)
       };
 
       context.emit("complete", data);
@@ -240,10 +272,12 @@ export default {
       setBodyConfig,
       setStep,
       // == increment ==
+      productOptionsValue,
       incrementData,
       slidesVisible,
       publishVisible,
       backgroundVisible,
+      textVisible,
       relatedProductVisible,
       vipVisible,
       closeIncrement,
@@ -251,6 +285,8 @@ export default {
       changeVip,
       changeRelatedProduct,
       changeBackground,
+      changeText,
+      changePublish,
       // == upload ==
       uploadFiles,
       uploadVisible,

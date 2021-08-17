@@ -4,13 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-28 17:50:49
+ * @LastEditTime: 2021-08-12 18:30:34
 -->
 <template>
   <div class="body-custom-wrapper">
     <custom-list
       :avatar="avatar"
       :config="config"
+      @changeColor="changeColor"
       @back="backToFileSelect"
       @select="selectCard"
     />
@@ -21,6 +22,7 @@
         :config="currentCardConfig"
         :title="config.productTitle"
         :price="config.productPrice"
+        :skin="skin"
         @back="customBoardVisible = false"
         @selectFile="backToFileSelect"
         @confirm="confirmCustom"
@@ -30,7 +32,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, computed } from "vue";
+import { reactive, toRefs } from "vue";
 
 import CustomList from "./custom-list/CustomList.vue";
 import CustomBoard from "./custom-board/CustomBoard.vue";
@@ -62,6 +64,7 @@ export default {
     const state = reactive({
       customBoardVisible: false,
       currentCardConfig: {},
+      skin: ''
     });
 
     // 返回文件选择
@@ -81,11 +84,16 @@ export default {
       context.emit("confirm", url);
     }
 
+    function changeColor(val) {
+      state.skin = val;
+    }
+
     return {
       ...toRefs(state),
       selectCard,
       backToFileSelect,
       confirmCustom,
+      changeColor
     };
   },
 };

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-02 13:56:47
+ * @LastEditTime: 2021-08-12 18:29:59
 -->
 <template>
   <div class="custom-list">
@@ -38,12 +38,15 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, computed } from "vue";
+import { reactive, toRefs, onMounted, computed, watch } from "vue";
 
 import BaseHeader from "../../../components/BaseHeader.vue";
 import SkinSelector from "./SkinSelector.vue";
 import SideNavigation from "./SideNavigation.vue";
 import BodyList from "./BodyList.vue";
+
+import useSkin from "../../../composables/useSkin";
+import useBodyNavigation from "../../../composables/useBodyNavigation";
 
 export default {
   components: {
@@ -67,22 +70,24 @@ export default {
   emits: {
     back: null,
     select: null,
+    changeColor: null
   },
 
   setup(props, context) {
     const { config } = props;
 
+    const { skinList, skin, changeSkin } = useSkin(props);
+
+    watch(skin, val => {
+      context.emit('changeColor', val);
+    })
+
+    const { currentGroupName, navigation, changeGroupName } =
+      useBodyNavigation(props);
+
     const state = reactive({
-      // 肤色
-      skin: "",
-      // 肤色列表
-      skinList: [],
       // 全部列表
       list: [],
-      // 导航
-      navigation: [],
-      // 当前分组
-      currentGroupName: "",
       // 当前使用的配置
       currentOption: {},
       // 定制显示
@@ -94,46 +99,17 @@ export default {
       state.list = config.miniMeData;
     });
 
-    // 当前组列表数据，导航数据
-    onMounted(() => {
-      if (config.miniMeData && config.miniMeData.length > 0) {
-        state.currentGroupName = config.miniMeData[0].name;
-        state.navigation = config.miniMeData.map((item, index) => {
-          return {
-            name: item.name,
-            count: item.images.length,
-          };
-        });
-      }
-    });
-
     const currentGrouplist = computed(() => {
       const currentGroup = (state.list || []).find(
-        (group) => group.name === state.currentGroupName
+        (group) => group.name === currentGroupName.value
       );
       return currentGroup ? currentGroup.images : [];
     });
 
-    function changeGroupName(name) {
-      state.currentGroupName = name;
-    }
-
-    // 肤色
-    onMounted(() => {
-      if (config.colors && config.colors.length > 0) {
-        state.skinList = config.colors;
-        state.skin = config.colors[0].name;
-      }
-    });
-
-    function changeSkin(skin) {
-      state.skin = skin;
-    }
-
     // 卡片选择
     function selectCard(item) {
       context.emit("select", {
-        groupName: state.currentGroupName,
+        groupName: currentGroupName.value,
         ...item,
       });
     }
@@ -145,9 +121,13 @@ export default {
 
     return {
       ...toRefs(state),
-      currentGrouplist,
+      skinList,
+      skin,
       changeSkin,
+      currentGroupName,
+      navigation,
       changeGroupName,
+      currentGrouplist,
       backToFileSelect,
       selectCard,
     };

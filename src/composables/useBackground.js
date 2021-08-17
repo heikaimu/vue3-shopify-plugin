@@ -4,12 +4,13 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 14:27:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-06 14:04:12
+ * @LastEditTime: 2021-08-12 13:53:16
  */
 import { reactive, toRefs, onMounted, computed } from "vue";
 import { debounce } from "lodash";
 
 export default function useBackground(props) {
+
   const state = reactive({
     backgroundList: [],
     backgroundIndex: -1
@@ -22,7 +23,8 @@ export default function useBackground(props) {
 
   onMounted(() => {
     state.backgroundList = props.data.backgroundList;
-    changeBackgroundIndex(props.backgroundActiveIndex);
+    const index = state.backgroundList.findIndex(item => item.title === props.backgroundActiveName);
+    changeBackgroundIndex(index === -1 ? 0 : index);
   })
 
   // 背景修改

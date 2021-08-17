@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-06 14:16:54
+ * @LastEditTime: 2021-08-10 10:54:11
 -->
 <template>
   <div class="increment-wrapper">
@@ -32,6 +32,7 @@
 
       <!-- 尺寸 -->
       <swiper-size
+        v-if="sizeList.length > 1"
         :data="sizeList"
         :activeIndex="sizeIndex"
         @change="changeSizeIndex"
@@ -100,16 +101,20 @@ export default {
       type: String,
       default: "",
     },
-    backgroundActiveIndex: {
-      type: Number,
-      default: 0,
+    backgroundActiveName: {
+      type: String,
+      default: "",
     },
-    composingActiveIndex: {
-      type: Number,
-      default: 0,
+    composingActiveName: {
+      type: String,
+      default: "",
     },
-    sizeActiveIndex: {
-      type: Number,
+    sizeActiveName: {
+      type: String,
+      default: "",
+    },
+    sizeList: {
+      type: Array,
       default: 0,
     },
   },
@@ -157,16 +162,20 @@ export default {
       if (!params.backgroundImage) {
         return;
       }
-
+      console.log("渲染一次");
       renderPreview(params);
     }, 100);
 
     // 获取渲染参数
     function getRenderParams() {
+      const size = props.sizeList.find(
+        (item) => item.label === currentSize.value
+      ).value;
       const backgroundImage = getBackgroundImage(currentSize.value);
       const layerList = getComposing(currentSize.value);
 
       return {
+        size: toRaw(size),
         backgroundImage,
         layerList,
         layerImage: props.customBodyPreviewURL,
@@ -180,15 +189,15 @@ export default {
         params: {
           size: {
             index: sizeIndex.value,
-            name: sizeName.value,
+            title: sizeName.value,
           },
           background: {
             index: backgroundIndex.value,
-            name: backgroundName.value,
+            title: backgroundName.value,
           },
           composing: {
             index: composingIndex.value,
-            name: composingName.value,
+            title: composingName.value,
           },
         },
       });

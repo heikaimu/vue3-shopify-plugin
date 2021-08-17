@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-04 17:47:28
+ * @LastEditTime: 2021-08-10 13:43:40
 -->
 <template>
   <div class="background-selector">
@@ -149,11 +149,11 @@ export default {
   }
 
   .background-card {
-    border: 1px solid #ffffff;
-    background-color: #ffffff;
+    border-radius: 6px;
+    border: 3px solid #f2f2f2;
+    background-color: #f2f2f2;
     cursor: pointer;
     .background-img {
-      @include card-shadow-lg;
       display: block;
       width: 100%;
       height: 70px;
@@ -166,7 +166,7 @@ export default {
   }
   .swiper-slide-active {
     .background-card {
-      border: 1px solid $theme-color;
+      border: 3px solid $theme-color;
     }
   }
 }

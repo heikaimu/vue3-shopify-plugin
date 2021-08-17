@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 14:27:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-06 14:10:07
+ * @LastEditTime: 2021-08-10 13:25:55
  */
 import { reactive, toRefs, computed, onMounted } from "vue";
 import { debounce } from "lodash";
@@ -21,18 +21,10 @@ export default function useSize(props) {
   })
 
   onMounted(() => {
-    state.sizeList = getSizeList()
-    changeSizeIndex(props.sizeActiveIndex);
+    state.sizeList = props.data.sizeList;
+    const index = state.sizeList.findIndex(size => size === props.sizeActiveName);
+    changeSizeIndex(index === -1 ? 0 : index);
   })
-
-  function getSizeList() {
-    const { backgroundList } = props.data;
-    if (!backgroundList || backgroundList.length === 0) {
-      return [];
-    }
-
-    return backgroundList[0].list.map((item) => item.size);
-  }
 
   // 尺寸当前值
   const currentSize = computed(() => {
