@@ -4,22 +4,24 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-06 11:05:55
+ * @LastEditTime: 2021-09-10 11:09:38
 -->
 <template>
   <div class="increment-wrapper">
     <div class="increment-blank" @click="handleClose"></div>
     <div class="increment-slides">
       <span class="close-icon">
-        <base-icon icon="close" @click="handleClose" />
+        <base-icon icon="close" @click="handleClose" id="icon_close_1"/>
       </span>
       <div class="preview-image">
         <img :src="customBodyPreviewURL" alt="" />
       </div>
-      <p class="custom-title">Printing Customization</p>
+      <p class="custom-title">Print back side？<br/>
+add your design mirrored on back side for only <strong>+$5.00</strong></p>
       <div class="slides-selector">
         <div
           v-for="(item, index) in data"
+          :id="`button_slide_${value}`"
           class="slides-selector__item"
           :class="{ active: item.value === value }"
           :key="index"
@@ -33,7 +35,7 @@
         </div>
       </div>
       <div class="add-to-cart">
-        <base-button type="primary" size="large" @click="handleNext"
+        <base-button type="primary" size="large" @click="handleNext" id="button_add_to_cart_1"
           >Add To Cart</base-button
         >
       </div>
@@ -44,8 +46,8 @@
 <script>
 import { reactive, toRefs, onMounted } from "vue";
 
-import BaseButton from "../../../components/BaseButton.vue";
-import BaseIcon from "../../../components/BaseIcon.vue";
+import BaseButton from "../../../base/BaseButton.vue";
+import BaseIcon from "../../../base/BaseIcon.vue";
 
 export default {
   components: {
@@ -136,10 +138,14 @@ export default {
     }
 
     .custom-title {
-      padding-bottom: 20px;
+      padding-bottom: 0 20px 20px 20px;
       text-align: center;
-      font-size: 18px;
-      color: $theme-color;
+      font-size: 16px;
+      color: $title-color;
+      strong {
+        font-weight: 600;
+        color: $theme-color;
+      }
     }
 
     .slides-selector {

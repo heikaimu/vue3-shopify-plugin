@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 13:04:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-01 11:21:08
+ * @LastEditTime: 2021-09-01 10:42:21
 -->
 <template>
   <div class="file-select">
@@ -137,7 +137,7 @@
     </div>
 
     <div class="file-select__bottom">
-      <base-button type="info" plain @click="closePlugin" id="button_cancel">Cancel</base-button>
+      <base-button type="info" plain @click="closePlugin">Cancel</base-button>
     </div>
   </div>
 </template>

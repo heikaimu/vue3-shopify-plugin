@@ -4,101 +4,562 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-27 16:58:31
+ * @LastEditTime: 2021-08-17 16:26:33
 -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="./src/styles/normalize.css">
-  <link rel="stylesheet" href="./dist/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+  <title>Vite App</title>
+  <link rel="stylesheet"
+    href="https://cdn.shopifycdn.net/s/files/1/0510/1423/8379/t/53/assets/theme.scss.css?v=7954619655120337871">
+  <style>
+    .home-page-publish {
+      width: 100%;
+      max-width: 1200px;
+      box-sizing: border-box;
+      margin: 10px auto 40px;
+    }
+
+    .home-page-publish__list {
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: -10px;
+      margin-right: -10px;
+    }
+
+    .home-page-publish__item {
+      box-sizing: border-box;
+      padding: 10px;
+      width: 100%;
+    }
+
+    .home-page-publish__item.col-1 {
+      width: 33.33%;
+    }
+
+    .home-page-publish__item.col-2 {
+      width: 66.66%;
+    }
+
+    .home-page-publish__card {
+      position: relative;
+      border: 1px solid #e7e7e7;
+      border-radius: 10px;
+      transition: .3s;
+    }
+
+    .home-page-publish__card.inline {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .home-page-publish__card+.home-page-publish__card {
+      margin-top: 20px;
+    }
+
+    .home-page-publish__card .card-main-pic {
+      overflow: hidden;
+      width: 100%;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .home-page-publish__card.inline .card-main-pic {
+      border-radius: 10px 0 0 10px;
+    }
+
+    .home-page-publish__card.inline .card-main-pic,
+    .home-page-publish__card.inline .card-sub-pic {
+      overflow: hidden;
+      width: 300px;
+    }
+
+    .home-page-publish__card .card-main-pic img {
+      width: 100%;
+      transition: .3s;
+    }
+
+    .home-page-publish__card .card-link {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    .home-page-publish__card .card-top {
+      position: absolute;
+      left: -10px;
+      top: 10px;
+      z-index: 999;
+      padding: 10px 20px;
+      background-color: #d7090b;
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .home-page-publish__card .card-top::before {
+      content: "Top";
+    }
+
+    .home-page-publish__card .card-info {
+      flex: 1;
+      padding: 30px 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .home-page-publish__card .card-info .info-title {
+      font-size: 18px;
+      color: #333333;
+      line-height: 1.4;
+      margin-bottom: 10px;
+      transition: .3s;
+      /* 超出三行隐藏 */
+      text-overflow: -o-ellipsis-lastline;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    .home-page-publish__card .card-info .info-stars {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .home-page-publish__card .card-info .info-stars i {
+      display: block;
+      width: 16px;
+      height: 16px;
+      margin-right: 10px;
+      background-size: contain;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAt1JREFUWEe9lz9oE2EYxp/3uwsFBf8MDoJuPfO11UFBrLnUKmgHFXSpUN2t0Cwq1rHJIqjYKQV1V6QuClqkCrY2F+uig7a5eNkUHBz8Awohd98rqW1N2ku5Sy/edHDf8zy/7/3+HqHJx83H+4npGgFlRZzRE8WHzVhRMyJ+1b6Ndf0tM3ZU9UT4TK67jw6Vvob1awrAy8evgOlGXRjxsJYo3mw5AE+0t6nNsXcAd9SHUUH8qOyl46VyGIjQFeC8HFSM234hgnCBEvadlgK4OTlLhAN+Icx4oyft7pYBuDl5lgj31gpgxjk9ad8PChFqCJQlJxk4tpY5Ac+FafdFDsB5OaAYgXrGoAHdLDwIAtGwAt9n9mzdwGVDCDKYyRACI0EMa9qkmbmkFDu/qc3Z0vP+m59+AYBfdxxVCgaIDWIYjOo7DDBEyFD/5gQFhkOAwwQHTI4QcOhg4QVVZmS6id5FwqUUMuRZkiNxa9KEvJwcB6G/Sf26ZESYIp7t6mTPG2ega11uIcUEzJGmnfk7Cf8zxHJ499z88jL8XxC14QtHeW3lWg2xMnwVQCuHwy/cF6AVEI3CGwJUP3g5OQrCxZCT27d5dcOJ9djphlux34fKjDwsBF5GBHAk1mNPhQJgS55XQKjbTSNYAQySad8NBeBZ8haAS1FUAMCoZtqXQwG4lnxCwIkoABh4qpv2yVAAKi8/MsOIAoAIjkjYuwID8AiE6pNeFOFLHmLS1igDtdLT90ZUnjY6dF2bjxLAdb3Otl6nEAiArfgpBXrUCIAAmxljWtLOLu4ZKSIMMSAbrwQ+TWbxcSAAz4oPA3Tdx+wLGFmhu1nqLv2sP0faNylXT4GQArB9tZavamax/ndu5WG0JPIsWb2A/tu5CL/AnBVubIx6P3xaa2h4evdOpVeGQJQCY2NN27Rm2plAFVgsa/WmtB9Ez4SiLCXn58LMCc51dinBKTBXl9+EZtqDfvo/bxQsRqlDyx0AAAAASUVORK5CYII=);
+      transition: .3s;
+    }
+
+    .home-page-publish__card .card-info .info-price {
+      font-size: 20px;
+      color: #d9080b;
+      transition: .3s;
+    }
+
+    .home-page-publish__card .card-info .info-shop-now {
+      display: flex;
+      align-items: center;
+    }
+
+    .home-page-publish__card .card-info .info-shop-now .shop-icon {
+      display: block;
+      width: 40px;
+      height: 40px;
+      border-radius: 4px 0 0 4px;
+      background-color: #ec7476;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: 20px 20px;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAqFJREFUWEfFlk2ITmEUx3//0ix8bBRCSpIRKYqdhdkgGpTxlaWPWYiNjEi+Sj6yIJMFZmxIkUSibEwyiYWU8VmyEPmYsrKh/HWm+053rnfeufPel/ep2317O/ec3/N/znPOEXVeqnN8+gFsTwXuA/F+CxyTdPFfAw5QwPYmYAowHdgILJd0519CDHoEtu8BYyXNrxdAO7CtxsG7gEOS4t23KimwAzgN9BvXACby65WkZXkAlgJ3gXWSrtYgOLaPA22S+jdeSYFpwDvgsKQDNQK4CTRKmjmkAmFg+zPQLWl1jQBeA28krcwL8ACYIKmxKIDtkcAP4ISk3XkBLgBRGxok/SoCYXse8DT8SerMC9AGROLMkdRTEGA9cAVYKKk7L8Aq4AbQIul6QYCDQCTzOEm9eQFmAS+AfZKO5AGw3QBMAiam3nOTo9wr6WjaT8VuaHsEELS3gC2Jw3A+uczv0n+jyoB+As5LChUGrCHbse0nwIJBdv8d+Jp6vgDxxPUd8Ej6Wc5HHoBLSWfclQnWF0DS7zxHM5hNHoD90UCyyVMkaO4cSKph2evzPwHGAA+TMx2QwdVApFtxfD/kESQqLAb2AIuqCZr6pktS07COIG1suxBAdve5FchARFOJ5tQr6UMlRWyPBmKk60lXv6IKXE6KUPjplBTN6q+VqJW2jVFs+IWo5Nl2qSw/Bs7EpAQ0A62SzmVUKtnGeN8KbAC2AmslXatKAds7gZNpJ7bfA88lrcgAlGzHS/qWJHJZ21y3IFMPNkvqsB3NJmp8u6TtGYBS7WiWdNv2DOAZ0JG1zQ2QQHxMzv8sEJNtTLl9QbJJYLtkG1W0BZgNNFVVBzK7iwl5CRA34JSkmJrKLtthuwZ4BIRyL7OGw1KgYBEq+3ndAf4AjJAEMEgdDEsAAAAASUVORK5CYII=);
+    }
+
+    .home-page-publish__card .card-info .info-shop-now .text {
+      height: 40px;
+      padding: 0 20px;
+      border-radius: 0 4px 4px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fdc528;
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .home-page-publish__card img {
+      display: block;
+      line-height: 0;
+    }
+
+
+    .home-page-publish__card:hover {
+      background-color: #f9f9f9;
+      box-shadow: 0 0 15px #cccccc;
+    }
+
+    .home-page-publish__card:hover .card-main-pic img {
+      transform: scale(1.05);
+    }
+
+    .home-page-publish__card:hover .card-info .info-title {
+      font-weight: 600;
+    }
+
+    .home-page-publish__card:hover .card-info .info-price {
+      font-weight: 600;
+    }
+
+    .home-page-publish__card:hover .card-info .info-stars i {
+      transform: scaleX(-100%);
+    }
+
+
+    @media screen and (max-width: 780px) {
+      .home-page-publish {
+        padding: 20px;
+      }
+
+      .home-page-publish__list {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -10px;
+        margin-right: -10px;
+      }
+
+      .home-page-publish__item {
+        box-sizing: border-box;
+        padding: 10px;
+        width: 100%;
+      }
+
+      .home-page-publish__item.col-1 {
+        width: 100%;
+      }
+
+      .home-page-publish__item.col-2 {
+        width: 100%;
+      }
+
+      .home-page-publish__card {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+      }
+
+      .home-page-publish__card.inline {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+      }
+
+      .home-page-publish__card+.home-page-publish__card {
+        margin-top: 20px;
+      }
+
+      .home-page-publish__card .card-main-pic {
+        width: 150px;
+        height: 150px;
+        flex: 0 0 150px;
+        border-radius: 6px 6px 0 0;
+      }
+
+      .home-page-publish__card.inline .card-main-pic {
+        border-radius: 6px 0 0 6px;
+      }
+
+      .home-page-publish__card.inline .card-main-pic,
+      .home-page-publish__card.inline .card-sub-pic {
+        overflow: hidden;
+        width: 150px;
+        height: 150px;
+        flex: 0 0 150px;
+      }
+
+      .home-page-publish__card.inline .card-sub-pic {
+        display: none;
+      }
+
+      .home-page-publish__card .card-main-pic img {
+        display: block;
+        width: 100%;
+        transition: .3s;
+      }
+
+      .home-page-publish__card .card-link {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+      }
+
+      .home-page-publish__card .card-top {
+        padding: 5px 10px;
+        font-size: 12px;
+      }
+
+      .home-page-publish__card .card-top::before {
+        content: "Top";
+      }
+
+      .home-page-publish__card .card-info {
+        padding: 10px;
+      }
+
+      .home-page-publish__card .card-info .info-title {
+        font-size: 16px;
+        color: #333333;
+        line-height: 1.4;
+        margin-bottom: 10px;
+        transition: .3s;
+        /* 超出三行隐藏 */
+        text-overflow: -o-ellipsis-lastline;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+        -webkit-box-orient: vertical;
+      }
+
+      .home-page-publish__card .card-info .info-stars {
+        display: flex;
+        margin-bottom: 10px;
+      }
+
+      .home-page-publish__card .card-info .info-stars i {
+        display: block;
+        width: 14px;
+        height: 14px;
+      }
+
+      .home-page-publish__card .card-info .info-price {
+        font-size: 16px;
+        color: #d9080b;
+        transition: .3s;
+        margin-bottom: 10px;
+      }
+
+      .home-page-publish__card .card-info .info-shop-now {
+        display: flex;
+        align-items: center;
+      }
+
+      .home-page-publish__card .card-info .info-shop-now .shop-icon {
+        display: block;
+        width: 30px;
+        height: 30px;
+        border-radius: 4px 0 0 4px;
+        background-color: #ec7476;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 16px 16px;
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAqFJREFUWEfFlk2ITmEUx3//0ix8bBRCSpIRKYqdhdkgGpTxlaWPWYiNjEi+Sj6yIJMFZmxIkUSibEwyiYWU8VmyEPmYsrKh/HWm+053rnfeufPel/ep2317O/ec3/N/znPOEXVeqnN8+gFsTwXuA/F+CxyTdPFfAw5QwPYmYAowHdgILJd0519CDHoEtu8BYyXNrxdAO7CtxsG7gEOS4t23KimwAzgN9BvXACby65WkZXkAlgJ3gXWSrtYgOLaPA22S+jdeSYFpwDvgsKQDNQK4CTRKmjmkAmFg+zPQLWl1jQBeA28krcwL8ACYIKmxKIDtkcAP4ISk3XkBLgBRGxok/SoCYXse8DT8SerMC9AGROLMkdRTEGA9cAVYKKk7L8Aq4AbQIul6QYCDQCTzOEm9eQFmAS+AfZKO5AGw3QBMAiam3nOTo9wr6WjaT8VuaHsEELS3gC2Jw3A+uczv0n+jyoB+As5LChUGrCHbse0nwIJBdv8d+Jp6vgDxxPUd8Ej6Wc5HHoBLSWfclQnWF0DS7zxHM5hNHoD90UCyyVMkaO4cSKph2evzPwHGAA+TMx2QwdVApFtxfD/kESQqLAb2AIuqCZr6pktS07COIG1suxBAdve5FchARFOJ5tQr6UMlRWyPBmKk60lXv6IKXE6KUPjplBTN6q+VqJW2jVFs+IWo5Nl2qSw/Bs7EpAQ0A62SzmVUKtnGeN8KbAC2AmslXatKAds7gZNpJ7bfA88lrcgAlGzHS/qWJHJZ21y3IFMPNkvqsB3NJmp8u6TtGYBS7WiWdNv2DOAZ0JG1zQ2QQHxMzv8sEJNtTLl9QbJJYLtkG1W0BZgNNFVVBzK7iwl5CRA34JSkmJrKLtthuwZ4BIRyL7OGw1KgYBEq+3ndAf4AjJAEMEgdDEsAAAAASUVORK5CYII=);
+      }
+
+      .home-page-publish__card .card-info .info-shop-now .text {
+        height: 30px;
+        padding: 0 10px;
+        border-radius: 0 4px 4px 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #fdc528;
+        font-size: 12px;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      .home-page-publish__card img {
+        display: block;
+        line-height: 0;
+      }
+
+
+      .home-page-publish__card:hover {
+        background-color: #f9f9f9;
+        box-shadow: 0 0 15px #cccccc;
+      }
+
+      .home-page-publish__card:hover .card-main-pic img {
+        transform: scale(1.05);
+      }
+
+      .home-page-publish__card:hover .card-info .info-title {
+        font-weight: 600;
+      }
+
+      .home-page-publish__card:hover .card-info .info-price {
+        font-weight: 600;
+      }
+
+      .home-page-publish__card:hover .card-info .info-stars i {
+        transform: scaleX(-100%);
+      }
+
+    }
+  </style>
 </head>
 
 <body>
+  <div class="home-page-publish">
+    <ul class="home-page-publish__list">
+      <li class="home-page-publish__item">
+        <div class="home-page-publish__card inline">
+          <a class="card-link"
+            href="collections/clothes/products/my-face-pillow-custom-pillow-personalized-photo-pillow-gift-pillow-toy-pink-strap-dress-throw-pillow-minime-pillow"
+            class="link"></a>
+          <span class="card-top">1</span>
+          <div class="card-main-pic">
+            <img
+              src="https://cdn.shopifycdn.net/s/files/1/0554/3670/5998/products/cf13b3535d9a31e1887bb4eb4176ad69_60df7783-7d16-48d4-8277-504ab9ec171a_300x.jpg?v=1618561566"
+              alt="" srcset="">
+          </div>
+          <div class="card-info">
+            <div class="card-info-content">
+              <p class="info-title">Red Heart Dress</p>
+              <span class="info-stars">
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+              </span>
+              <p class="info-price">$19.95</p>
+              <p class="info-shop-now">
+                <span class="shop-icon"></span>
+                <span class="text">SHOP NOW</span>
+              </p>
+            </div>
+          </div>
+          <div class="card-sub-pic">
+            <img
+              src="https://cdn.shopify.com/s/files/1/0343/0275/4948/files/1_b0eac854-223d-4548-a821-8318b93f15f3_320x.png?v=1626677755"
+              alt="" srcset="">
+          </div>
+        </div>
+      </li>
+      <li class="home-page-publish__item col-1">
+        <div class="home-page-publish__card">
+          <a class="card-link"
+            href="/collections/super-hero-new/products/my-face-pillow-custom-pillow-face-body-pillow-personalized-photo-pillow-gift-pillow-toy-spiderman-superhero-marvel-comic-throw-pillow-minime-pillow"
+            class="link"></a>
+          <span class="card-top">2</span>
+          <div class="card-main-pic">
+            <img
+              src="https://cdn.shopifycdn.net/s/files/1/0343/0275/4948/products/XBMMBZ-61_1000x1000.webp_8f15c6bd-7013-4862-bcb6-a78e7ba2f0a4_364x.jpg?v=1616229542"
+              alt="" srcset="">
+          </div>
+          <div class="card-info">
+            <div class="card-info-content">
+              <p class="info-title">Red Heart Dress</p>
+              <span class="info-stars">
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+              </span>
+              <p class="info-price">$19.95</p>
+              <p class="info-shop-now">
+                <span class="shop-icon"></span>
+                <span class="text">SHOP NOW</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="home-page-publish__item col-2">
+        <div class="home-page-publish__card inline">
+          <a class="card-link"
+            href="/collections/minime-pillow/products/my-face-pillow-custom-pillow-personalized-photo-pillow-gift-pillow-toy-new-york-mets-baseball-uniforms-alt-jersey-throw-pillow-minime-pillow"
+            class="link"></a>
+          <span class="card-top">3</span>
+          <div class="card-main-pic">
+            <img
+              src="https://cdn.shopifycdn.net/s/files/1/0343/0275/4948/products/1_e7e732f6-e1b1-4fe5-80bf-554a364699ea_234x.jpg?v=1623266606"
+              alt="" srcset="">
+          </div>
+          <div class="card-info">
+            <div class="card-info-content">
+              <p class="info-title">Red Heart Dress</p>
+              <span class="info-stars">
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+              </span>
+              <p class="info-price">$19.95</p>
+              <p class="info-shop-now">
+                <span class="shop-icon"></span>
+                <span class="text">SHOP NOW</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="home-page-publish__card inline">
+          <a class="card-link"
+            href="/collections/beach/products/custom-photo-beach-towel-quick-dry-bath-towel-summer-swimming-towel-red-swimsuit-girl-style"
+            class="link"></a>
+          <span class="card-top">4</span>
+          <div class="card-main-pic">
+            <img
+              src="https://cdn.shopify.com/s/files/1/0343/0275/4948/products/1_8b3cbb76-7ee6-4e04-b8cb-bddf2a38cd1f_234x.jpg?v=1626325752"
+              alt="" srcset="">
+          </div>
+          <div class="card-info">
+            <div class="card-info-content">
+              <p class="info-title">Red Heart Dress</p>
+              <span class="info-stars">
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+              </span>
+              <p class="info-price">$19.95</p>
+              <p class="info-shop-now">
+                <span class="shop-icon"></span>
+                <span class="text">SHOP NOW</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="home-page-publish__item">
+        <div class="home-page-publish__card inline">
+          <a class="card-link"
+            href="/collections/custom-wall-clock/products/custom-photo-wall-clock-black-roman-numerals-cute-superman-clock-12-14-16"
+            class="link"></a>
+          <span class="card-top">5</span>
+          <div class="card-main-pic">
+            <img
+              src="https://cdn.shopify.com/s/files/1/0343/0275/4948/products/1_03da271d-d795-4c7f-96f3-f8af1fa2b553_300x.jpg?v=1626252081"
+              alt="" srcset="">
+          </div>
+          <div class="card-info">
+            <div class="card-info-content">
+              <p class="info-title">Red Heart Dress</p>
+              <span class="info-stars">
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+                <i class="light"></i>
+              </span>
+              <p class="info-price">$19.95</p>
+              <p class="info-shop-now">
+                <span class="shop-icon"></span>
+                <span class="text">SHOP NOW</span>
+              </p>
+            </div>
+          </div>
+          <div class="card-sub-pic">
+            <img
+              src="https://cdn.shopify.com/s/files/1/0343/0275/4948/files/1_b0eac854-223d-4548-a821-8318b93f15f3_320x.png?v=1626677755"
+              alt="" srcset="">
+          </div>
+        </div>
+      </li>
 
-  <div id="app">
-    <minime :config="config" v-if="visible" @close="visible = false" @complete="complete" />
+    </ul>
   </div>
-
-  <script type="text/javascript" src="https://static.filestackapi.com/filestack-js/1.x.x/filestack.min.js"></script>
-  <script async src="https://sdk.amazonaws.com/js/aws-sdk-2.666.0.min.js"></script>
-  <script src="https://unpkg.com/vue@next"></script>
-  <script src="./dist/my-lib.umd.js"></script>
-  <script src="./node_modules/axios/dist/axios.js"></script>
-
-  <script>
-    const app = Vue.createApp({
-      data() {
-        return {
-          config: {},
-          visible: false,
-        }
-      },
-
-      mounted() {
-        axios.get("https://tsback.witemedia.com/api/v1/configure").then((res) => {
-          const item = res.data.data.find((item) => item.id === 12);
-          if (item) {
-            const config = JSON.parse(item.configure);
-
-            // 面选择
-            // config.increment.slides = [
-            //   {
-            //     title: 'Double-sided print',
-            //     value: 'double',
-            //     price: '+$5.99',
-            //   },
-            //   {
-            //     title: 'One side only print',
-            //     value: 'single'
-            //   }
-            // ]
-
-            // 关联产品
-            // config.increment.relatedProduct = [
-            //   {
-            //     id: 2,
-            //     title: "Would You Like To Add A Same Design Doll Keychain?",
-            //     price: 9.99,
-            //     virtualId: 39797718581419,
-            //     url: "https://cdn.shopifycdn.net/s/files/1/0510/1423/8379/files/dollkeychain.png?v=1620469152",
-            //     sideCount: 1,
-            //   },
-            // ];
-
-            config.skin = "yellow";
-            config.productId = 14;
-            config.productPrice = 20;
-            config.productTitle =
-              "My Face Pillow, Custom Pillow, Personalized Photo Pillow Gift Pillow Toy, Hula Dress, Throw Pillow, MiniMe Pillow";
-
-            // 沙滩巾
-            // config.hasBg = true;
-            // config.bgList = bgList;
-            // config.activeBgIndex = 0;
-
-            this.config = config;
-            this.visible = true;
-          }
-        });
-      },
-
-      methods: {
-        complete(data) {
-          console.log(data)
-        }
-      },
-
-    })
-
-    app.component('minime', MinimePillow)
-
-    app.mount('#app')
-  </script>
 </body>
 
 </html>

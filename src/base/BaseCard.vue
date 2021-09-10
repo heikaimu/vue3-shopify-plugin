@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 10:49:23
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-27 10:41:57
+ * @LastEditTime: 2021-09-10 10:21:34
 -->
 <template>
   <div class="base-card" @click.stop="handleClick">
@@ -13,7 +13,7 @@
         <img :src="src" alt="" srcset="" width="100" />
       </div>
     </div>
-    <p class="base-card__title">{{ title }}</p>
+    <!-- <p class="base-card__title">{{ title }}</p> -->
     <div class="base-card__close" @click.stop="handleClose">
       <span class="icon">
         <base-icon icon="close" :size="10" color="#ffffff"></base-icon>

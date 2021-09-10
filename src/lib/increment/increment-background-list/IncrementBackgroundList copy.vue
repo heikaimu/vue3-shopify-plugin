@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-07 17:43:50
+ * @LastEditTime: 2021-09-02 16:22:55
 -->
 <template>
   <div class="increment-wrapper">
@@ -13,47 +13,9 @@
       <span class="close-icon">
         <base-icon icon="close" @click="handleClose" />
       </span>
-      
       <div class="preview-image">
-        <!-- <base-loading-dot/> -->
-        <canvas id="bgCombineCanvas"></canvas>
-      </div>
-
-      <div class="canvas-handler" v-if="hasHandler">
-        <ul class="operations">
-          <li class="item">
-            <div class="card" @click="handleLayer('zoomUp')" id="icon_zoom_up">
-              <base-icon icon="zoomUp" color="#ff533a" />
-            </div>
-          </li>
-          <li class="item">
-            <div
-              class="card"
-              @click="handleLayer('zoomDown')"
-              id="icon_zoom_down"
-            >
-              <base-icon icon="zoomDown" color="#ff533a" />
-            </div>
-          </li>
-          <li class="item">
-            <div
-              class="card"
-              @click="handleLayer('rotateLeft')"
-              id="icon_rotate_left"
-            >
-              <base-icon icon="rotateLeft" color="#ff533a" />
-            </div>
-          </li>
-          <li class="item">
-            <div
-              class="card"
-              @click="handleLayer('rotateRight')"
-              id="icon_rotate_right"
-            >
-              <base-icon icon="rotateRight" color="#ff533a" />
-            </div>
-          </li>
-        </ul>
+        <img v-if="!loading" class="img" :src="preview" alt="" srcset="" />
+        <base-loading-dot v-else />
       </div>
 
       <base-notice class="bg-notice"
@@ -86,11 +48,7 @@
       ></swiper-background>
 
       <div class="add-to-cart">
-        <base-button
-          type="primary"
-          size="large"
-          @click="handleNext"
-          id="button_add_to_cart_2"
+        <base-button type="primary" size="large" @click="handleNext" id="button_add_to_cart_2"
           >Add To Cart</base-button
         >
       </div>
@@ -99,7 +57,7 @@
 </template>
 
 <script>
-import { watch, toRaw, onMounted, nextTick } from "vue";
+import { watch, toRaw } from "vue";
 
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
@@ -115,6 +73,7 @@ import useComposing from "../../../composables/useComposing";
 import useSize from "../../../composables/useSize";
 
 import { debounce } from "lodash";
+import { fabric } from 'fabric';
 
 export default {
   components: {
@@ -161,6 +120,7 @@ export default {
   },
 
   setup(props, context) {
+
     // 背景
     const {
       backgroundList,
@@ -184,26 +144,20 @@ export default {
       useSize(props);
 
     // 图片渲染器
-    const { loading, hasHandler, renderPreview, getPreviewURL, handleLayer } =
-      useCombineImage(props);
+    const { preview, loading, renderPreview } = useCombineImage(props);
 
-    // 如果是尺寸和排版变更了，则全部重新渲染
-    watch([composingIndex, sizeIndex], () => {
-      renderNow(true);
-    });
-
-    // 如果只是背景切换了，则修改背景
-    watch([backgroundIndex], () => {
-      renderNow(false);
+    // 索引改变
+    watch([backgroundIndex, composingIndex, sizeIndex], () => {
+      renderNow();
     });
 
     // 立刻渲染
-    const renderNow = debounce((renderAll = true) => {
+    const renderNow = debounce(() => {
       const params = getRenderParams();
       if (!params.backgroundImage) {
         return;
       }
-      renderPreview(params, renderAll);
+      renderPreview(params);
     }, 100);
 
     // 获取渲染参数
@@ -222,31 +176,26 @@ export default {
       };
     }
 
-    // 更新背景图
-    function updatePreviewInfo() {
-      return new Promise((resolve) => {
-        getPreviewURL().then((url) => {
-          context.emit("change", {
-            preview: url,
-            params: {
-              size: {
-                index: sizeIndex.value,
-                title: sizeName.value,
-              },
-              background: {
-                index: backgroundIndex.value,
-                title: backgroundName.value,
-              },
-              composing: {
-                index: composingIndex.value,
-                title: composingName.value,
-              },
-            },
-          });
-          resolve();
-        });
+    // 预览图改变
+    watch(preview, (val) => {
+      context.emit("change", {
+        preview: val,
+        params: {
+          size: {
+            index: sizeIndex.value,
+            title: sizeName.value,
+          },
+          background: {
+            index: backgroundIndex.value,
+            title: backgroundName.value,
+          },
+          composing: {
+            index: composingIndex.value,
+            title: composingName.value,
+          },
+        },
       });
-    }
+    });
 
     // 关闭
     function handleClose() {
@@ -254,8 +203,7 @@ export default {
     }
 
     // 前往下一步
-    async function handleNext() {
-      await updatePreviewInfo();
+    function handleNext() {
       context.emit("next");
     }
 
@@ -272,9 +220,8 @@ export default {
       composingList,
       composingIndex,
       changeComposingIndex,
+      preview,
       loading,
-      hasHandler,
-      handleLayer,
     };
   },
 };
@@ -305,8 +252,8 @@ export default {
     .preview-image {
       @include flex-row-center;
       width: 100%;
+      height: 300px;
       padding-top: 20px;
-      padding-bottom: 10px;
       .img {
         @include card-shadow-lg;
         width: auto;
@@ -315,25 +262,6 @@ export default {
         background-repeat: no-repeat;
         background-position: center center;
         transition: 0.3s;
-      }
-    }
-
-    .canvas-handler {
-      @include flex-row-center;
-      padding-bottom: 10px;
-      .operations {
-        @include flex-row-center;
-        .item {
-          .card {
-            display: flex;
-            margin: 0 5px;
-            padding: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            cursor: pointer;
-            position: relative;
-          }
-        }
       }
     }
 

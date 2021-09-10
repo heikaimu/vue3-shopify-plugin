@@ -10,17 +10,17 @@
         </div>
         <ul class="operations">
           <li class="item">
-            <div class="card" @click="handleCrop">
+            <div class="card" @click="handleCrop" id="icon_crop">
               <base-icon icon="cropper" />
             </div>
           </li>
           <li class="item">
-            <div class="card" @click="handleRotate(-90)">
+            <div class="card" @click="handleRotate(-90)" id="icon_rotate_left">
               <base-icon icon="rotateLeft" />
             </div>
           </li>
           <li class="item">
-            <div class="card" @click="handleRotate(90)">
+            <div class="card" @click="handleRotate(90)" id="icon_rotate_right">
               <base-icon icon="rotateRight" />
             </div>
           </li>
@@ -41,38 +41,50 @@
             Cartoonize + <span class="price">$2.99</span>
           </p>
         </div> -->
-      </div>
-      <div class="image-view__notice">
-        <base-notice
-          >AI image cropping is mainly for preview.NOT FINAL DESIGN! Our
-          designer will finalize the perfect fit!</base-notice
-        >
+        <div class="image-view__notice">
+          <base-notice
+            >AI image cropping is mainly for preview.NOT FINAL DESIGN! Our
+            designer will finalize the perfect fit!</base-notice
+          >
+        </div>
       </div>
     </div>
     <div class="image-view__bottom">
       <base-row :gutter="10">
         <base-col :span="12">
-          <base-button plain @click="handleBack">Replace</base-button>
+          <base-button plain @click="handleBack" id="button_replace_1"
+            >Replace</base-button
+          >
         </base-col>
         <base-col :span="12">
-          <base-button type="primary" @click="handleAIAvatar" :blod="600">CONFIRM</base-button>
+          <base-button
+            type="primary"
+            @click="handleConfirm"
+            :blod="600"
+            id="button_confirm_1"
+            >CONFIRM</base-button
+          >
         </base-col>
       </base-row>
     </div>
 
-    <loading-avatar :visible="loadingVisible" :state="loadingState" :loadingPendingText="loadingPendingText"/>
+    <loading-avatar
+      :visible="loadingVisible"
+      :state="loadingState"
+      :loadingPendingText="loadingPendingText"
+    />
   </div>
 </template>
 
 <script>
 import { reactive, toRefs } from "vue";
 
-import BaseHeader from "../../components/BaseHeader.vue";
-import BaseButton from "../../components/BaseButton.vue";
-import BaseNotice from "../../components/BaseNotice.vue";
-import BaseIcon from "../../components/BaseIcon.vue";
-import BaseRow from "../../components/BaseRow.vue";
-import BaseCol from "../../components/BaseCol.vue";
+import BaseHeader from "../../base/BaseHeader.vue";
+import BaseButton from "../../base/BaseButton.vue";
+import BaseNotice from "../../base/BaseNotice.vue";
+import BaseIcon from "../../base/BaseIcon.vue";
+import BaseRow from "../../base/BaseRow.vue";
+import BaseCol from "../../base/BaseCol.vue";
 import LoadingAvatar from "./LoadingAvatar.vue";
 
 import { imageReset } from "../../utils/image";
@@ -93,6 +105,11 @@ export default {
     fileURL: {
       type: String,
       deafult: "",
+    },
+    // 是否定制
+    isCustomBody: {
+      type: Boolean,
+      default: true,
     },
   },
 
@@ -117,7 +134,7 @@ export default {
       // AI
       loadingVisible: false,
       loadingState: "pending",
-      loadingPendingText: ''
+      loadingPendingText: "",
     });
 
     // 裁剪
@@ -152,7 +169,7 @@ export default {
           state.loadingVisible = true;
           try {
             state.loadingState = "pending";
-            state.loadingPendingText = 'Cartoonizing';
+            state.loadingPendingText = "Cartoonizing";
             state.cartoonFileURL = await getCartoonURL(props.fileURL);
             state.loadingState = "success";
             context.emit("cartoonize", state.cartoonFileURL);
@@ -169,15 +186,27 @@ export default {
       }
     }
 
-    // AI扣头
-    async function handleAIAvatar() {
+    // 保存文件
+    function handleConfirm() {
+      if (props.isCustomBody) {
+         _getAvatarByAI();
+      } else {
+        const file = {
+          url: props.fileURL
+        }
+        context.emit("setAvatar", [file]);
+      }
+    }
+
+    async function _getAvatarByAI() {
       state.loadingVisible = true;
       try {
         state.loadingState = "pending";
-        state.loadingPendingText = 'AI Cropping your photo';
+        state.loadingPendingText = "AI Cropping your photo";
         const avatarList = await getAIAvatar(props.fileURL);
         state.loadingState = "success";
         setTimeout(() => {
+          console.log(avatarList)
           context.emit("setAvatar", avatarList);
         }, 1500);
       } catch {
@@ -203,7 +232,7 @@ export default {
       handleCrop,
       handleRotate,
       handleChangeStyle,
-      handleAIAvatar,
+      handleConfirm,
       handleBack,
       handleClose,
     };

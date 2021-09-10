@@ -31,8 +31,8 @@
 <script>
 import { reactive, toRefs, ref, onMounted, watch, nextTick } from "vue";
 
-import BaseRow from "../../../components/BaseRow.vue";
-import BaseCol from "../../../components/BaseCol.vue";
+import BaseRow from "../../../base/BaseRow.vue";
+import BaseCol from "../../../base/BaseCol.vue";
 import BodyCard from "./BodyCard.vue";
 import { clearRenderer } from "../../../utils/minimeRenderer";
 import { debounce, throttle } from "lodash";

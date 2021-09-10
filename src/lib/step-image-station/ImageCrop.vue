@@ -16,6 +16,7 @@
         <div class="operations">
           <div class="button">
             <base-icon
+              id="icon_zoom_up"
               icon="zoomUp"
               :size="16"
               color="#666666"
@@ -24,6 +25,7 @@
           </div>
           <div class="button">
             <base-icon
+              id="icon_zoom_down"
               icon="zoomDown"
               :size="16"
               color="#666666"
@@ -32,6 +34,7 @@
           </div>
           <div class="button">
             <base-icon
+              id="icon_reset"
               icon="reset"
               :size="16"
               color="#666666"
@@ -40,7 +43,7 @@
           </div>
         </div>
         <div class="confirm-button-wrapper">
-          <base-button type="primary" @click="handleConfirm">CONFIRM</base-button>
+          <base-button type="primary" @click="handleConfirm" id="button_confirm_2">CONFIRM</base-button>
         </div>
       </footer>
     </div>
@@ -50,10 +53,10 @@
 <script>
 import { reactive, onMounted } from "vue";
 
-import BaseHeader from "../../components/BaseHeader.vue";
-import BaseButton from "../../components/BaseButton.vue";
-import BaseNotice from "../../components/BaseNotice.vue";
-import BaseIcon from "../../components/BaseIcon.vue";
+import BaseHeader from "../../base/BaseHeader.vue";
+import BaseButton from "../../base/BaseButton.vue";
+import BaseNotice from "../../base/BaseNotice.vue";
+import BaseIcon from "../../base/BaseIcon.vue";
 import Cropper from "cropperjs";
 import "../../styles/cropper.scss";
 

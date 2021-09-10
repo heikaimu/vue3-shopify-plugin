@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-06 13:29:51
+ * @LastEditTime: 2021-09-01 11:13:24
 -->
 <template>
   <div class="increment-wrapper">
@@ -20,6 +20,7 @@
             class="vip-button"
             :class="{ active: active }"
             @click="handleSelect"
+            id="button_add_to_cart_9"
           >
             <div class="checkbox-inner">
               <base-icon
@@ -39,7 +40,7 @@
       </div>
 
       <div class="add-to-cart">
-        <base-button type="primary" size="large" @click="handleNext(true)"
+        <base-button type="primary" size="large" @click="handleNext(true)" id="button_add_to_cart_10"
           >Sure & Add To Cart</base-button
         >
       </div>
@@ -50,8 +51,8 @@
 <script>
 import { reactive, toRefs, toRaw, onMounted, nextTick } from "vue";
 
-import BaseButton from "../../../components/BaseButton.vue";
-import BaseIcon from "../../../components/BaseIcon.vue";
+import BaseButton from "../../../base/BaseButton.vue";
+import BaseIcon from "../../../base/BaseIcon.vue";
 
 export default {
   components: {

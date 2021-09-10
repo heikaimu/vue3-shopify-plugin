@@ -4,14 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 17:23:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-26 09:56:08
+ * @LastEditTime: 2021-09-01 11:07:02
 -->
 <template>
   <div class="brightness-bar" :class="{ active: active }">
-    <div class="brightness-button open" @click="active = true">
+    <div class="brightness-button open" @click="active = true" id="icon_brightness_open">
       <base-icon icon="brightness" color="goldenrod"></base-icon>
     </div>
-    <div class="brightness-button close" @click="active = false">
+    <div class="brightness-button close" @click="active = false" id="icon_brightness_close">
       <base-icon icon="arrowLeft" color="goldenrod"></base-icon>
     </div>
     <div class="brightness-wrapper">
@@ -52,7 +52,7 @@
 <script>
 import { reactive, toRefs, computed } from "vue";
 
-import BaseIcon from "../../../components/BaseIcon.vue";
+import BaseIcon from "../../../base/BaseIcon.vue";
 import "element-plus/lib/theme-chalk/index.css";
 import { ElSlider } from "element-plus";
 

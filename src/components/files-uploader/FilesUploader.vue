@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-23 15:22:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-27 12:51:01
+ * @LastEditTime: 2021-08-26 10:41:09
 -->
 <template>
   <div class="files-uploader-wrapper">
@@ -86,7 +86,7 @@ export default {
     function upload(item) {
       const { name, url } = item;
       uploadFile({
-        name: `${state.time}_${props.website}_${name}_${getRandomID()}`,
+        name: `${state.time}_${props.website}_${name}_${getRandomID()}.jpg`,
         file: url ? dataURLtoBlob(url) : null,
         onSuccess: (res) => {
           state.uploadRes[item.name] = res;

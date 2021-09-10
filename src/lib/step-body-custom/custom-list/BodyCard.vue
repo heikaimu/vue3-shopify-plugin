@@ -46,7 +46,7 @@
 <script>
 import { reactive, toRefs, watch, onMounted } from "vue";
 
-import BaseIcon from "../../../components/BaseIcon.vue";
+import BaseIcon from "../../../base/BaseIcon.vue";
 
 import { renderer } from "../../../utils/minimeRenderer";
 import { loadImages, getFileSize } from "../../../utils/image";

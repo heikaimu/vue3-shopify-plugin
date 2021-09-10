@@ -27,8 +27,8 @@
 <script>
 import { toRaw } from "vue";
 
-import BaseHeader from "../../components/BaseHeader.vue";
-import BaseNotice from "../../components/BaseNotice.vue";
+import BaseHeader from "../../base/BaseHeader.vue";
+import BaseNotice from "../../base/BaseNotice.vue";
 
 export default {
   components: {

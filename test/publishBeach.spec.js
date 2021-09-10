@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-13 10:29:16
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-16 10:24:46
+ * @LastEditTime: 2021-08-17 13:36:40
  */
 import { getSKUList, publishSKU } from '../src/utils/productSKU';
 import { product } from '../shopifyBeachConfig';

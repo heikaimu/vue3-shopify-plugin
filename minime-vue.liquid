@@ -57,7 +57,7 @@
 <script>
   // 全局配置
   const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
-  const WEBSITE = "TEST";
+  const WEBSITE = "M";
   const product = {{ product | json }};
   console.log('产品的type：', product.type);
   console.log('产品的完整属性：', product);
@@ -117,7 +117,7 @@
       setInitOption(config) {
         const { slides } = config.currentProductTypeConfig;
         if (slides && slides.visible) {
-          this.changeSlides('single');
+          this.changeOptionsValue('Type', 'Single Side');
         }
       },
 
@@ -126,8 +126,8 @@
         $('#extendForm').empty();
         this.setExtendForm(data.files);
         this.setStatisticalForm(data.body);
-        await this.dealIncrement(data.increment);
-        this.changeProductOptionsValue(data.productOptionsValue);
+        await this.dealIncrement(data.increment, data.files);
+        this.changeOptionsValueMultiple(data.productOptionsValue);
         $('.product-form__cart-submit').trigger('click');
       },
 
@@ -159,22 +159,6 @@
       setStatisticalForm(data) {
         const { groupName, name, url, id } = data;
 
-        // const $website = $(`<input type="hidden" name="properties[webSite]"></input>`);
-        // $website.val(WEBSITE);
-        // $('#extendForm').append($website);
-
-        // const $groupName = $(`<input type="hidden" name="properties[productCategory]"></input>`);
-        // $groupName.val(groupName);
-        // $('#extendForm').append($groupName);
-
-        // const $name = $(`<input type="hidden" name="properties[productName]"></input>`);
-        // $name.val(name);
-        // $('#extendForm').append($name);
-
-        // const $url = $(`<input type="hidden" name="properties[templateUrl]"></input>`);
-        // $url.val(url);
-        // $('#extendForm').append($url);
-
         const $url = $(`<input type="hidden" name="properties[_bodyTemplateOption]"></input>`);
         const params = {
           webSite: WEBSITE,
@@ -187,21 +171,22 @@
       },
 
       // 处理扩展信息
-      dealIncrement(list) {
+      dealIncrement(list, files) {
         const queue = [];
 
         for (const item of list) {
 
           // 单双面
           if (item.name === 'slides') {
-            this.changeSlides(item.value);
+            const value = item.value === 'double' ? "Double Side" : "Single Side";
+            this.changeOptionsValue('Type', value);
           }
 
           // 背景
           if (item.name === 'background') {
             const { background, composing, size } = item.value;
-            this.changeBackground('Color', background.title);
-            // this.changeBackground('Size', size.title);
+            this.changeOptionsValue('Color', background.title);
+            // this.changeOptionsValue('Size', size.title);
           }
 
           // 文字
@@ -222,7 +207,7 @@
           if (item.name === 'relatedProduct' && item.value.length !== 0) {
             for (const id of item.value) {
               const currentProduct = item.data.find(product => product.id === id);
-              queue.push(this.addRelatedProduct(currentProduct));
+              queue.push(this.addRelatedProduct(currentProduct, files));
             }
           }
         }
@@ -231,33 +216,6 @@
           Promise.all(queue).then(() => {
             resolve();
           });
-        })
-      },
-
-      // 修改单双面
-      changeSlides(slides) {
-        const $select = getSelectDom('Type');
-        if (!$select) {
-          return;
-        }
-
-        const val = slides === 'double' ? "Double Side" : "Single Side";
-        $select.val(val).trigger('change');
-      },
-
-      // 修改背景尺寸
-      changeBackground(key, title) {
-        const $select = getSelectDom(key);
-        if (!$select) {
-          return;
-        }
-
-        const _this = this;
-        $select.children('option').each(function () {
-          if ($(this).attr('value') === title) {
-            $select.val(title).trigger('change');
-            setActiveRadio(key, title);
-          }
         })
       },
 
@@ -280,7 +238,7 @@
       },
 
       // 添加附加商品
-      async addRelatedProduct(product) {
+      async addRelatedProduct(product, files) {
         const { id, url } = product;
         // 添加主商品字段
         const randomID = this.getRandomID();
@@ -292,6 +250,7 @@
           id,
           quantity: 1,
           "properties[Preview]": url,
+          "properties[Original]": files.preview,
           "properties[_related_product]": randomID,
           mask: 'body',
           refresh: true,
@@ -320,22 +279,26 @@
         return Promise.resolve();
       },
 
-      // 修改属性值
-      changeProductOptionsValue(data) {
+      // 批量修改属性
+      changeOptionsValueMultiple(data) {
         Object.keys(data).forEach(key => {
-          const $select = getSelectDom(key);
-          if (!$select) {
-            return;
-          }
+          this.changeOptionsValue(key, data[key]);
+        })
+      },
 
-          const _this = this;
-          const title = data[key];
-          $select.children('option').each(function () {
-            if ($(this).attr('value') === title) {
-              $select.val(title).trigger('change');
-              setActiveRadio(key, title);
-            }
-          })
+      // 修改属性
+      changeOptionsValue(key, value) {
+        const $select = getSelectDom(key);
+        if (!$select) {
+          return;
+        }
+
+        const _this = this;
+        $select.children('option').each(function () {
+          if ($(this).attr('value') === value) {
+            $select.val(value).trigger('change');
+            setActiveRadio(key, value);
+          }
         })
       },
 
@@ -372,8 +335,8 @@
             const price = product.variants.find(item => item.sku === sku).price;
             this.config.productPrice = `$${(price / 100)}`;
             this.config.productTitle = product.title;
-            this.config.skuList = this.getSKUlist();
-            this.config.productOptionsValue = this.getProductOptionsValue();
+            this.config.skuList = this.getSKUlist(product);
+            this.config.productOptionsValue = this.getProductOptionsValue(product);
             this.visible = true;
           }
         })
@@ -462,8 +425,8 @@
         }
       },
 
-      // 获取所有sku选项
-      getSKUlist() {
+      // SKU list
+      getSKUlist(product) {
         const typeKeys = product.options.map((key) => {
           const arr = key.split(/[\:\?]/);
           return arr[0] ? arr[0] : "";
@@ -490,7 +453,7 @@
       },
 
       // 获取所有选项值
-      getProductOptionsValue() {
+      getProductOptionsValue(product) {
         const typeKeys = product.options.map((key) => {
           const arr = key.split(/[\:\?]/);
           return arr[0] ? arr[0] : "";
@@ -502,6 +465,11 @@
           const value = $select ? $select.val() : '';
           obj[key] = value;
         }
+
+        // 需要排除的字段
+        delete obj.Color; // 颜色
+        delete obj.Type; // 单双面
+
         return obj;
       }
 
@@ -562,7 +530,7 @@
     });
   }
 
-  // 获取当前增量
+  // 修改配置参数
   function getProductConfig(config, type) {
     const currentConfig = config.productTypeConfigList.find(
       (item) => item.type === type
@@ -574,12 +542,33 @@
     }
 
     config.currentProductTypeConfig = currentConfig;
+    // body
+    const body = config.currentProductTypeConfig.body;
+    if (body) {
+      const { custom, list: bodyList } = body;
+      if (custom) {
+        for (let i = config.miniMeData.length - 1; i >= 0; i--) {
+          const group = config.miniMeData[i];
+          for (let j = group.images.length - 1; j >= 0; j--) {
+            const item = group.images[j];
+            if (!bodyList.includes(item.index)) {
+              group.images.splice(j, 1);
+            }
+          }
+          if (group.images.length === 0) {
+            config.miniMeData.splice(i, 1);
+          }
+        }
+      }
+    }
+
     // background
     config.currentProductTypeConfig.background.data = (
       config.currentProductTypeConfig.background.data || []
     ).map((title) => {
       return config.backgroundList.find((item) => item.title === title);
     });
+
     // composing
     config.currentProductTypeConfig.background.composingList = (
       config.currentProductTypeConfig.background.composing || []

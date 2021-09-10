@@ -1,8 +1,9 @@
 <template>
   <div class="image-station">
     <image-view
-      :fileURL="viewFile"
       v-if="currentState === 'view'"
+      :fileURL="viewFile"
+      :isCustomBody="isCustomBody"
       @rotate="rotateViewFile"
       @crop="goToCrop"
       @cartoonize="cartoonizeImage"
@@ -48,6 +49,11 @@ export default {
       type: String,
       default: "",
     },
+    // 是否定制
+    isCustomBody: {
+      type: Boolean,
+      default: true
+    }
   },
 
   emits: {

@@ -4,9 +4,9 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 17:08:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-05 17:41:37
+ * @LastEditTime: 2021-09-10 10:58:48
  */
-import { reactive, toRefs } from "vue";
+import { reactive, toRefs, onMounted } from "vue";
 
 import { imageReset } from "../utils/image";
 
@@ -14,6 +14,8 @@ export default function useBodyMain(props, context) {
   const state = reactive({
     // 当前步骤
     currentStep: "fileSelect",
+    // 是否进行身体定制（包含扣头）
+    isCustomBody: true,
     // 原始文件base64
     rawFileURL: "",
     // 头像信息
@@ -24,6 +26,15 @@ export default function useBodyMain(props, context) {
     previewBody: ""
   });
 
+  onMounted(() => {
+    // 如果身体配置模版数量为0，则不进行定制
+    if (props.config.miniMeData.length === 0) {
+      state.isCustomBody = false;
+    } else {
+      state.isCustomBody = true;
+    }
+  })
+
   // 选择文件
   function changeFile(file) {
     // 压缩文件
@@ -33,14 +44,14 @@ export default function useBodyMain(props, context) {
       targetSize: 1920,
       angle: 0,
     }).then((url) => {
-      state.rawFileURL = url;
+      setRawFile(url);
       setStep("imageStation");
     });
   }
 
   // 使用缓存文件
   function useCacheFile(item) {
-    state.rawFileURL = item.rawFileURL;
+    setRawFile(item.rawFileURL);
     state.avatar = {
       url: item.url,
       chin: item.chin,
@@ -50,8 +61,13 @@ export default function useBodyMain(props, context) {
     setStep("bodyCustom");
   }
 
+  // 设置源文件
+  function setRawFile(url) {
+    state.rawFileURL = url;
+  }
+
   // 使用AI返回的头像
-  function useAIAvatar(avatar) {
+  function saveAIAvatar(avatar) {
     state.avatar = avatar;
     setStep("bodyCustom");
   }
@@ -61,7 +77,7 @@ export default function useBodyMain(props, context) {
     state.bodyConfig = config;
   }
 
-  // 设置步骤
+  // 步骤
   function setStep(step) {
     state.currentStep = step;
   }
@@ -85,8 +101,9 @@ export default function useBodyMain(props, context) {
     ...toRefs(state),
     changeFile,
     useCacheFile,
-    useAIAvatar,
+    saveAIAvatar,
     setBodyConfig,
+    setRawFile,
     setStep,
     setPreview,
     getBodyConfig

@@ -55,7 +55,8 @@ export function publishSKU(list, optionKey, options, publishName) {
 
   // 获取推荐
   const currentIndex = sortList.findIndex(item => {
-    return _isInclude(item.options, options);
+    const isInclude = _isInclude(item.options, options);
+    return isInclude;
   })
   const currentItem = sortList[currentIndex];
 
@@ -71,6 +72,10 @@ export function publishSKU(list, optionKey, options, publishName) {
   }
 
   if (!publishItem || !currentItem) {
+    return false;
+  }
+
+  if (publishItem.price === currentItem.price) {
     return false;
   }
 
@@ -92,6 +97,7 @@ function _isInclude(a, b) {
       return false;
     }
   }
+
   return true;
 }
 

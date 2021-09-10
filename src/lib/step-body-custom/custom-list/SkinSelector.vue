@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-20 10:41:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-21 13:03:33
+ * @LastEditTime: 2021-09-01 10:54:46
 -->
 <template>
   <div class="color-selector-wrapper">
@@ -12,6 +12,7 @@
     <nav class="color-selector">
       <p
         v-for="(item, index) in list"
+        :id="`menu_skin_${item.name}`"
         class="color-item"
         :class="{ active: item.name === skin }"
         :key="index"
@@ -25,7 +26,7 @@
 </template>
 
 <script>
-import BaseIcon from "../../../components/BaseIcon.vue";
+import BaseIcon from "../../../base/BaseIcon.vue";
 
 export default {
   components: {

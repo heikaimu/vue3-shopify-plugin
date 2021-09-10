@@ -1,21 +1,26 @@
 <template>
   <div class="plugin-dialog">
     <div class="plugin-dialog__content">
+      <!-- 主流程 -->
       <transition name="slide-left-fade" mode="out-in">
+        <!-- 文件选择 -->
         <step-file-select
           v-if="currentStep === 'fileSelect'"
           @change="changeFile"
-          @selectCache="useCacheFile"
+          @selectCache="handleUseCacheFile"
           @setStep="setStep"
           @close="closePlugin"
         />
+        <!-- 图片处理 -->
         <step-image-station
           v-else-if="currentStep === 'imageStation'"
           :rawFileURL="rawFileURL"
-          @setAvatar="useAIAvatar"
+          :isCustomBody="isCustomBody"
+          @setAvatar="saveImage"
           @setStep="setStep"
           @close="closePlugin"
         />
+        <!-- 身体定制 -->
         <step-body-custom
           v-else-if="currentStep === 'bodyCustom'"
           :avatar="avatar"
@@ -101,6 +106,11 @@
         :website="config.website"
         @complete="completeUpload"
       />
+
+      <!-- 加载 -->
+      <div class="publish-loading" v-if="publishLoading">
+        <base-loading-dot />
+      </div>
     </div>
   </div>
 </template>
@@ -117,7 +127,8 @@ import IncrementRelatedProduct from "./increment/increment-related-product/Incre
 import IncrementVip from "./increment/increment-vip/IncrementVip.vue";
 import IncrementText from "./increment/increment-text/IncrementText.vue";
 import IncrementPublish from "./increment/increment-publish/IncrementPublish.vue";
-import FilesUploader from "./files-uploader/FilesUploader.vue";
+import FilesUploader from "../components/files-uploader/FilesUploader.vue";
+import BaseLoadingDot from "../base/BaseLoadingDot.vue";
 
 import useBodyMain from "../composables/useBodyMain";
 import useUpload from "../composables/useUpload";
@@ -137,6 +148,7 @@ export default {
     IncrementText,
     IncrementPublish,
     FilesUploader,
+    BaseLoadingDot,
   },
 
   props: {
@@ -156,18 +168,20 @@ export default {
   setup(props, context) {
     // 主流程
     const {
+      isCustomBody,
       currentStep,
       avatar,
       rawFileURL,
       previewBody,
       changeFile,
       useCacheFile,
-      useAIAvatar,
+      saveAIAvatar,
       setBodyConfig,
+      setRawFile,
       setStep,
       setPreview,
       getBodyConfig,
-    } = useBodyMain();
+    } = useBodyMain(props);
 
     // 增量
     const {
@@ -178,6 +192,7 @@ export default {
       incrementData,
       slidesVisible,
       publishVisible,
+      publishLoading,
       backgroundVisible,
       textVisible,
       relatedProductVisible,
@@ -192,10 +207,35 @@ export default {
       changeText,
       changePublish,
       next,
-    } = useIncrement(props);
+    } = useIncrement(props, previewBody);
 
     // 上传
     const { uploadFiles, uploadVisible, startUpload } = useUpload();
+
+    /*
+    保存文件处理后的图片
+    如果有身体定制则走定制流程
+    没有身体直接走增量服务
+    */
+    function saveImage(data) {
+      if (isCustomBody.value) {
+        saveAIAvatar(data);
+      } else {
+        confirmCustom(data.url);
+      }
+    }
+
+    /*
+    适用缓存文件
+    */
+    function handleUseCacheFile(item) {
+      if (isCustomBody.value) {
+        useCacheFile(item);
+      } else {
+        setRawFile(item.rawFileURL);
+        confirmCustom(item.url);
+      }
+    }
 
     // 下一步
     function nextIncrement() {
@@ -247,7 +287,7 @@ export default {
         files: toRaw(res),
         body: getBodyConfig(),
         increment: toRaw(queue.value),
-        productOptionsValue: toRaw(productOptionsValue.value)
+        productOptionsValue: toRaw(productOptionsValue.value),
       };
 
       context.emit("complete", data);
@@ -263,12 +303,12 @@ export default {
     return {
       // == main body ==
       currentStep,
+      isCustomBody,
       avatar,
       rawFileURL,
       previewBody,
       changeFile,
-      useCacheFile,
-      useAIAvatar,
+      handleUseCacheFile,
       setBodyConfig,
       setStep,
       // == increment ==
@@ -276,6 +316,7 @@ export default {
       incrementData,
       slidesVisible,
       publishVisible,
+      publishLoading,
       backgroundVisible,
       textVisible,
       relatedProductVisible,
@@ -295,7 +336,8 @@ export default {
       closePlugin,
       completeUpload,
       changeVip,
-      nextIncrement
+      nextIncrement,
+      saveImage,
     };
   },
 };
@@ -356,6 +398,13 @@ export default {
 }
 .slide-left-fade-leave-active {
   transition: all 0.1s ease;
+}
+
+// 加载
+.publish-loading {
+  @include pos-absolute(0, 0, 0, 0, 2021);
+  @include flex-row-center;
+  background-color: #ffffff;
 }
 
 @media screen and (max-width: 750px) {

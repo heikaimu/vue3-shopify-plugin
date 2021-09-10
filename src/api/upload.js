@@ -1,3 +1,12 @@
+/*
+ * @Description: 
+ * @Version: 2.0
+ * @Author: Yaowen Liu
+ * @Date: 2021-07-23 15:40:12
+ * @LastEditors: Yaowen Liu
+ * @LastEditTime: 2021-09-07 15:25:59
+ */
+import axios from 'axios';
 /**
  * 上传文件到S3服务器
  * @param {Object} params 
@@ -8,7 +17,7 @@
  * @param {Function} params.onProgress - 进度
  * @returns 
  */
-export const uploadFile = (params) => {
+export const uploadFile = async (params) => {
 
   const file = params.file;
   const name = params.name;
@@ -16,61 +25,36 @@ export const uploadFile = (params) => {
   const onError = params.onError || null;
   const onProgress = params.onProgress || null;
 
-  // S3桶名字
-  const temporaryBucket = `faceonboxer/temporary`;
-  const endpoint = new AWS.Endpoint('s3-accelerate.amazonaws.com');
-  const accessKeyId = 'AKIAW6ATM4SRHZTQDIGM';
-  const secretAccessKey = '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';
-  const region = 'us-west-1'
-  const ACL = 'public-read';
-
-  // 创建S3实例
-  const s3 = new AWS.S3({
-    endpoint,
-    accessKeyId,
-    secretAccessKey,
-    region
+  const url = await accessUploadURL({
+    fileName: name
   });
 
-  // 构造上传参数
-  const uploadParams = {
-    Bucket: temporaryBucket,
-    Key: `${name}.jpg`,
-    Body: file,
-    ContentType: 'image',
-    ACL
-  };
-
-  // 发起请求
-  const request = s3.putObject(uploadParams, (err) => {
-    if (err) {
-      reject(err);
+  const { status } = await axios.put(url, file, {
+    headers: {
+      'Content-Type': 'image'
     }
   });
 
-  // 监听进度
-  request.on('httpUploadProgress', (progress) => {
-    const val = parseInt((progress.loaded / progress.total) * 100);
-    if (onProgress) {
-      onProgress(val);
-    }
-  });
+  if (status === 200) {
+    const sourceURL = url.split('?')[0];
+    onSuccess(sourceURL);
+  } else {
+    onError();
+  }
+}
 
-  // 监听成功
-  request.on('success', () => {
-    const temporary = temporaryBucket.split('/')[1];
-    const url = `https://face.globaladput.com/${temporary}/${name}.jpg`;
-    if (onSuccess) {
-      onSuccess(url);
+/**
+ * 
+ * @param {Object} params 
+ * @param {String} params.fileName
+ * @returns 
+ */
+function accessUploadURL(params) {
+  return new Promise(async (resolve, reject) => {
+    const url = 'https://sback.globalhot.shop/plugins/api/v1/getAwsSign';
+    const { status, data } = await axios.post(url, params);
+    if (status === 200 && data.status === '0') {
+      resolve(data.data);
     }
-  });
-
-  // 监听失败
-  request.on('error', () => {
-    console.log('Ajax request failed...');
-    if (onError) {
-      onError();
-    }
-    request.send();
-  });
+  })
 }

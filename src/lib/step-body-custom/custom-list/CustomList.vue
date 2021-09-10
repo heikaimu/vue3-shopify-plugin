@@ -40,7 +40,7 @@
 <script>
 import { reactive, toRefs, onMounted, computed, watch } from "vue";
 
-import BaseHeader from "../../../components/BaseHeader.vue";
+import BaseHeader from "../../../base/BaseHeader.vue";
 import SkinSelector from "./SkinSelector.vue";
 import SideNavigation from "./SideNavigation.vue";
 import BodyList from "./BodyList.vue";

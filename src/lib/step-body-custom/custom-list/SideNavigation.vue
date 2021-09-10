@@ -4,12 +4,13 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:31:51
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-30 15:38:20
+ * @LastEditTime: 2021-09-01 11:02:46
 -->
 <template>
   <div class="anchor">
     <ul class="anchor__list">
       <li
+        :id="getID(item)"
         class="anchor__item"
         :class="{ active: item.name === value }"
         v-for="item in list"
@@ -46,8 +47,14 @@ export default {
       context.emit("change", item.name);
     }
 
+    function getID(item) {
+      const name = item.name.toLowerCase().replace(/\s+/g, '_');
+      return `menu_group_${name}`;
+    }
+
     return {
       handleClick,
+      getID
     };
   },
 };

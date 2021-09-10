@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-06 13:40:13
+ * @LastEditTime: 2021-09-01 11:11:10
 -->
 <template>
   <div class="increment-wrapper">
@@ -31,7 +31,7 @@
 
       <div class="add-to-cart">
         <div class="item">
-          <base-button type="primary" size="large" @click="handleNext(true)"
+          <base-button type="primary" size="large" @click="handleNext(true)" id="button_add_to_cart_3"
             >Sure & Add To Cart</base-button
           >
         </div>
@@ -46,6 +46,7 @@
             size="large"
             plain
             @click="handleNext(false)"
+            id="button_add_to_cart_4"
             >No Thanks & Add To Cart</base-button
           >
         </div>
@@ -57,8 +58,8 @@
 <script>
 import { reactive, toRefs, toRaw, onMounted, nextTick } from "vue";
 
-import BaseButton from "../../../components/BaseButton.vue";
-import BaseIcon from "../../../components/BaseIcon.vue";
+import BaseButton from "../../../base/BaseButton.vue";
+import BaseIcon from "../../../base/BaseIcon.vue";
 
 export default {
   components: {

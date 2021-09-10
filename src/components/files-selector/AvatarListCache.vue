@@ -4,12 +4,12 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-10 11:03:29
+ * @LastEditTime: 2021-07-30 15:23:32
 -->
 <template>
   <div class="avatar-cache">
     <div class="avatar-cache-header">
-      <p class="avatar-cache-header__title">Images Records（Click To Use）</p>
+      <p class="avatar-cache-header__title">Avatar Records（Click To Use）</p>
       <span class="avatar-cache-header__clear-button" @click="handleClearAll">Clear All</span>
     </div>
     <div class="cache-list-wrapper">
@@ -91,12 +91,6 @@ export default {
 @import "src/styles/_mixins.scss";
 
 .avatar-cache {
-}
-
-.cache-list-wrapper {
-  .base-col {
-    margin-bottom: 20px;
-  }
 }
 
 .avatar-cache-header {

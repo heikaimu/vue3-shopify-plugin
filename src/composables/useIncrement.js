@@ -4,17 +4,24 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-16 13:07:26
+ * @LastEditTime: 2021-09-07 14:21:41
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
 
-export default function useIncrement(props) {
+import { CombineImage } from "../utils/combineImage";
+
+export default function useIncrement(props, previewBody) {
+
+  const combineImage = new CombineImage();
+  
   const state = reactive({
     productOptionsValue: {},
     previewWidthBackground: null,
     queue: [],
-    index: -1
+    index: -1,
+    sizeList: [],
+    publishLoading: false
   })
 
   // 设置初始化值
@@ -94,10 +101,62 @@ export default function useIncrement(props) {
   const publishVisible = computed(() => {
     return currentIncrement.value && currentIncrement.value.name === 'publish';
   })
+  // 修改推荐值如果是尺寸，并且插件内有可选尺寸，需要重新渲染预览图
   function changePublish(data) {
+    if (data.key === 'Size') {
+      const currentSize = props.config.sizeList.find(item => {
+        return item.label === data.sku.title;
+      })
+
+      if (currentSize) {
+        renderPreview(currentSize);
+      }
+    }
+
     _changeProductOptionsValue(data.key, data.sku.title);
   }
   // ===============推荐 END===============
+
+  // ===============渲染带背景的预览图===============
+  const layerImage = computed(() => {
+    return previewBody.value;
+  })
+  async function renderPreview(size) {
+    const background = state.queue.find(item => item.name === 'background');
+    if (background) {
+      const params = {
+        size: toRaw(size.value),
+        backgroundImage: getBackground(background, size),
+        layerList: getComposing(background, size),
+        layerImage: layerImage.value,
+      }
+      state.publishLoading = true;
+      const { url, id } = await combineImage.getURL(params, 'renderAgain');
+      state.publishLoading = false;
+      state.previewWidthBackground = url;
+    }
+  }
+
+  function getBackground(data, size) {
+    const item = (data.backgroundList || [])[data.value.background.index];
+    if (!item) {
+      return [];
+    }
+    
+    const background = item.list.find(item => item.size === size.label);
+    return background ? background.url : '';
+  }
+
+  function getComposing(data, size) {
+    const item = (data.composingList || [])[data.value.composing.index];
+    if (!item) {
+      return [];
+    }
+    
+    const composing = item.list.find(item => item.name === size.label);
+    return composing ? composing.position : [];
+  }
+  // ===============渲染带背景的预览图 END===============
 
   // ===============背景===============
   function initBackground(background) {
@@ -107,18 +166,30 @@ export default function useIncrement(props) {
         backgroundList: toRaw(background.data),
         composingList: toRaw(background.composingList),
         sizeList: toRaw(background.size),
+        overlayImage: background.overlayImage,
+        backgroundImage: background.backgroundImage,
         value: {}
       });
+      state.sizeList = background.size;
     }
   }
   const backgroundVisible = computed(() => {
     return currentIncrement.value && currentIncrement.value.name === 'background';
   })
   function changeBackground(val) {
-    _changeValue('background', val.params);
     state.previewWidthBackground = val.preview;
-    _changeProductOptionsValue('Size', val.params.size.title);
+    
+    // 修改背景
+    _changeValue('background', val.params);
+
+    // 修改颜色
     _changeProductOptionsValue('Color', val.params.background.title);
+
+    // 只有当尺寸属于SKU中的一个的情况才能修改SKU
+    const sizeIndex = props.config.skuList.findIndex(item => item.options.Size === val.params.size.title);
+    if (sizeIndex > -1) {
+      _changeProductOptionsValue('Size', val.params.size.title)
+    };
   }
   // ===============背景 END===============
 

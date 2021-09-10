@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-09 15:27:12
+ * @LastEditTime: 2021-09-01 11:05:24
 -->
 <template>
   <div class="custom-board">
@@ -30,10 +30,10 @@
     <div class="custom-board__bottom">
       <base-row :gutter="10">
         <base-col :span="8">
-          <base-button plain @click="backToList">Replace</base-button>
+          <base-button plain @click="backToList" id="button_replace_2">Replace</base-button>
         </base-col>
         <base-col :span="16">
-          <base-button type="primary" full :blod="600" @click="handleConfirm"
+          <base-button type="primary" full :blod="600" @click="handleConfirm" id="button_confirm_3"
             >CONFIRM</base-button
           >
         </base-col>
@@ -52,11 +52,11 @@
 <script>
 import { reactive, toRefs, ref, toRaw, onMounted } from "vue";
 
-import BaseHeader from "../../../components/BaseHeader.vue";
-import BaseRow from "../../../components/BaseRow.vue";
-import BaseCol from "../../../components/BaseCol.vue";
-import BaseButton from "../../../components/BaseButton.vue";
-import BaseIcon from "../../../components/BaseIcon.vue";
+import BaseHeader from "../../../base/BaseHeader.vue";
+import BaseRow from "../../../base/BaseRow.vue";
+import BaseCol from "../../../base/BaseCol.vue";
+import BaseButton from "../../../base/BaseButton.vue";
+import BaseIcon from "../../../base/BaseIcon.vue";
 import BrightnessBar from "./BrightnessBar.vue";
 import CanvasLayer from "./CanvasLayers.vue";
 

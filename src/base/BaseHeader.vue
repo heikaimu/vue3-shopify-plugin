@@ -4,11 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-16 14:28:55
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-28 18:01:24
+ * @LastEditTime: 2021-09-01 11:13:55
 -->
 <template>
   <div class="base-header">
-    <div class="base-header__close" @click="$emit('close')">
+    <div class="base-header__close" @click="$emit('close')" id="icon_header_close">
       <base-icon :icon="icon" />
     </div>
     <div class="base-header__title" :class="{center:center}">

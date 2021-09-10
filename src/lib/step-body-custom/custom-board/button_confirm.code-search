@@ -1,0 +1,19 @@
+# Query: button_confirm
+# ContextLines: 1
+
+3 个结果 - 3 文件
+
+src/lib/step-body-custom/custom-board/CustomBoard.vue:
+  35          <base-col :span="16">
+  36:           <base-button type="primary" full :blod="600" @click="handleConfirm" id="button_confirm"
+  37              >CONFIRM</base-button
+
+src/lib/step-image-station/ImageCrop.vue:
+  45          <div class="confirm-button-wrapper">
+  46:           <base-button type="primary" @click="handleConfirm" id="button_confirm_2">CONFIRM</base-button>
+  47          </div>
+
+src/lib/step-image-station/ImageView.vue:
+  57          <base-col :span="12">
+  58:           <base-button type="primary" @click="handleAIAvatar" :blod="600" id="button_confirm_1">CONFIRM</base-button>
+  59          </base-col>

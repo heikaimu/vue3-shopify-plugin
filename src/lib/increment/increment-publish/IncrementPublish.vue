@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-16 16:34:48
+ * @LastEditTime: 2021-09-08 10:14:47
 -->
 <template>
   <div class="increment-wrapper">
@@ -16,14 +16,14 @@
 
       <div class="text-wrapper">
         <div class="text__preview">
-          <img class="img" :src="currentItem.url" alt="" srcset="" />
+          <img v-if="currentItem.url" class="img" :src="currentItem.url" alt="" srcset="" />
         </div>
         <p class="desc">{{ currentItem.desc }}</p>
         <p class="add-price">{{ currentPrice }}</p>
       </div>
       <div class="add-to-cart">
         <div class="item">
-          <base-button type="primary" size="large" @click="handleNext(true)"
+          <base-button type="primary" size="large" @click="handleNext(true)" id="button_add_to_cart_7"
             >Sure & Next</base-button
           >
         </div>
@@ -38,6 +38,7 @@
             size="large"
             plain
             @click="handleNext(false)"
+            id="button_add_to_cart_8"
             >No Thanks & Next</base-button
           >
         </div>
@@ -49,9 +50,9 @@
 <script>
 import { reactive, toRefs, computed, toRaw, onMounted, watch } from "vue";
 
-import BaseNotice from "../../../components/BaseNotice.vue";
-import BaseButton from "../../../components/BaseButton.vue";
-import BaseIcon from "../../../components/BaseIcon.vue";
+import BaseNotice from "../../../base/BaseNotice.vue";
+import BaseButton from "../../../base/BaseButton.vue";
+import BaseIcon from "../../../base/BaseIcon.vue";
 
 import { publishSKU } from "../../../utils/productSKU";
 import { number } from "../../../utils/number";
@@ -106,7 +107,12 @@ export default {
           };
         })
         .filter((item) => item.sku);
-      console.log(state.publishQueue);
+
+      if (state.publishQueue.length === 0) {
+        context.emit("next");
+        return;
+      }
+
       state.queueIndex = 0;
     });
 
