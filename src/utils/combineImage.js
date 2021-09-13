@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:33:04
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-13 16:00:41
+ * @LastEditTime: 2021-09-13 11:26:03
  */
 import { fabric } from 'fabric';
 import { loadImage } from './image';
@@ -66,7 +66,10 @@ export class CombineImage {
         img.scale(width / img.width).set({
           left,
           top,
-          angle
+          angle,
+          originX: 'center',
+          originY: 'center',
+          centeredScaling: true
         });
         this.canvas.add(img);
         resolve();

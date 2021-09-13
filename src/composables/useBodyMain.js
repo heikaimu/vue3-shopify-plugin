@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 17:08:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-10 10:58:48
+ * @LastEditTime: 2021-09-13 09:27:26
  */
 import { reactive, toRefs, onMounted } from "vue";
 
@@ -89,11 +89,15 @@ export default function useBodyMain(props, context) {
 
   // 获取身体配置
   function getBodyConfig() {
-    return {
-      id: state.bodyConfig.id,
-      name: state.bodyConfig.name,
-      groupName: state.bodyConfig.groupName,
-      url: state.bodyConfig.images[0].url,
+    if (state.isCustomBody) {
+      return {
+        id: state.bodyConfig.id,
+        name: state.bodyConfig.name,
+        groupName: state.bodyConfig.groupName,
+        url: state.bodyConfig.images[0].url,
+      }
+    } else {
+      return {}
     }
   }
 
