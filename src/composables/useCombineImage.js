@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 15:03:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-08 10:16:01
+ * @LastEditTime: 2021-09-13 11:25:58
  */
 import { reactive, toRefs, onMounted } from "vue";
 import { fabric } from 'fabric';
@@ -165,10 +165,10 @@ export default function useCombineImage(props) {
           left: left * scale,
           top: top * scale,
           angle,
-          selectable: state.hasHandler
-          // originX: 'center',
-          // originY: 'center',
-          // centeredScaling: true,
+          selectable: state.hasHandler,
+          originX: 'center',
+          originY: 'center',
+          centeredScaling: true
         });
         canvas.add(img);
         resolve();
