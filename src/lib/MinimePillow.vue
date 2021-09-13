@@ -3,33 +3,22 @@
     <div class="plugin-dialog__content">
       <!-- 主流程 -->
       <transition name="slide-left-fade" mode="out-in">
-        <ImageSelectPlugin @close="closePlugin" />
         <!-- 文件选择 -->
-        <!-- <step-file-select
+        <image-select-plugin
           v-if="currentStep === 'fileSelect'"
-          @change="changeFile"
-          @selectCache="handleUseCacheFile"
-          @setStep="setStep"
-          @close="closePlugin"
-        /> -->
-        <!-- 图片处理 -->
-        <!-- <step-image-station
-          v-else-if="currentStep === 'imageStation'"
-          :rawFileURL="rawFileURL"
           :isCustomBody="isCustomBody"
-          @setAvatar="saveImage"
-          @setStep="setStep"
           @close="closePlugin"
-        /> -->
+          @complete="handleCompleteImageSelect"
+        />
         <!-- 身体定制 -->
-        <!-- <step-body-custom
+        <step-body-custom
           v-else-if="currentStep === 'bodyCustom'"
           :avatar="avatar"
           :config="config"
           @selectBody="setBodyConfig"
           @confirm="confirmCustom"
           @setStep="setStep"
-        /> -->
+        />
       </transition>
 
       <!-- 增量服务 -->
@@ -120,8 +109,6 @@
 import { nextTick, toRaw } from "vue";
 
 import ImageSelectPlugin from "./image-select-plugin/ImageSelectPlugin.vue";
-import StepFileSelect from "./step-file-select/StepFileSelect.vue";
-import StepImageStation from "./step-image-station/StepImageStation.vue";
 import StepBodyCustom from "./step-body-custom/StepBodyCustom.vue";
 import IncrementSlides from "./increment/increment-slides/IncrementSlides.vue";
 import IncrementBackgroundList from "./increment/increment-background-list/IncrementBackgroundList.vue";
@@ -141,8 +128,6 @@ export default {
 
   components: {
     ImageSelectPlugin,
-    StepFileSelect,
-    StepImageStation,
     StepBodyCustom,
     IncrementSlides,
     IncrementBackgroundList,
@@ -175,12 +160,9 @@ export default {
       currentStep,
       avatar,
       rawFileURL,
+      saveFileAndAvatar,
       previewBody,
-      changeFile,
-      useCacheFile,
-      saveAIAvatar,
       setBodyConfig,
-      setRawFile,
       setStep,
       setPreview,
       getBodyConfig,
@@ -220,23 +202,12 @@ export default {
     如果有身体定制则走定制流程
     没有身体直接走增量服务
     */
-    function saveImage(data) {
+    function handleCompleteImageSelect(data) {
+      saveFileAndAvatar(data);
       if (isCustomBody.value) {
-        saveAIAvatar(data);
+        setStep('bodyCustom');
       } else {
-        confirmCustom(data.url);
-      }
-    }
-
-    /*
-    适用缓存文件
-    */
-    function handleUseCacheFile(item) {
-      if (isCustomBody.value) {
-        useCacheFile(item);
-      } else {
-        setRawFile(item.rawFileURL);
-        confirmCustom(item.url);
+        confirmCustom(data.avatar.url);
       }
     }
 
@@ -310,8 +281,6 @@ export default {
       avatar,
       rawFileURL,
       previewBody,
-      changeFile,
-      handleUseCacheFile,
       setBodyConfig,
       setStep,
       // == increment ==
@@ -340,7 +309,7 @@ export default {
       completeUpload,
       changeVip,
       nextIncrement,
-      saveImage,
+      handleCompleteImageSelect,
     };
   },
 };

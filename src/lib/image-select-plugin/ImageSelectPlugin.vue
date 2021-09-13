@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-10 13:51:14
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-10 17:54:48
+ * @LastEditTime: 2021-09-13 14:30:16
 -->
 <template>
   <div class="file-select">
@@ -102,7 +102,7 @@ export default {
     });
 
     // ========================== 文件选择 ========================
-    // 选择文件
+    // 选择新文件
     function handleChangeFile(url) {
       state.rawFile = url;
       state.viewFile = url;
@@ -111,11 +111,13 @@ export default {
 
     // 使用缓存
     function handleUseCache(item) {
-      const { rawFileURL, url, chin } = item;
+      const { rawFileURL, url, chin, width, height } = item;
       state.rawFile = rawFileURL;
       state.avatar = {
         chin,
         url,
+        width,
+        height
       };
       completeSelect();
     }
@@ -139,8 +141,7 @@ export default {
     // 保存图片
     function handleSaveImage(data) {
       if (data.length === 1) {
-        state.avatar = data[0];
-        saveAndUseAvatar(state.avatar);
+        saveAndUseAvatar(data[0]);
       } else if (data.length > 1) {
         state.currentState = "avatar";
         state.avatarList = data;
@@ -159,6 +160,7 @@ export default {
           width: image.width,
           height: image.height,
         };
+        state.avatar = data;
         cacheAvatar({
           ...data,
           rawFileURL: toRaw(state.rawFile),
@@ -219,4 +221,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "src/styles/_variables.scss";
+@import "src/styles/_mixins.scss";
+
+.file-select {
+  @include flex-col-sb;
+  width: 100%;
+  height: 100%;
+  .file-select__top {
+    width: 100%;
+  }
+  .file-select__medium {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    background-color: #f2f2f2;
+  }
+  .file-select__bottom {
+    width: 100%;
+    padding: 10px;
+    background-color: #f2f2f2;
+  }
+}
 </style>

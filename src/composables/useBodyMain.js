@@ -4,11 +4,9 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 17:08:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-13 09:27:26
+ * @LastEditTime: 2021-09-13 14:22:58
  */
 import { reactive, toRefs, onMounted } from "vue";
-
-import { imageReset } from "../utils/image";
 
 export default function useBodyMain(props, context) {
   const state = reactive({
@@ -35,41 +33,11 @@ export default function useBodyMain(props, context) {
     }
   })
 
-  // 选择文件
-  function changeFile(file) {
-    // 压缩文件
-    imageReset({
-      file: file,
-      quality: 0.9,
-      targetSize: 1920,
-      angle: 0,
-    }).then((url) => {
-      setRawFile(url);
-      setStep("imageStation");
-    });
-  }
-
-  // 使用缓存文件
-  function useCacheFile(item) {
-    setRawFile(item.rawFileURL);
-    state.avatar = {
-      url: item.url,
-      chin: item.chin,
-      width: item.width,
-      height: item.height,
-    };
-    setStep("bodyCustom");
-  }
-
-  // 设置源文件
-  function setRawFile(url) {
-    state.rawFileURL = url;
-  }
-
-  // 使用AI返回的头像
-  function saveAIAvatar(avatar) {
+  // 保存头像和源文件
+  function saveFileAndAvatar(data) {
+    const { avatar, rawFile } = data;
     state.avatar = avatar;
-    setStep("bodyCustom");
+    state.rawFileURL = rawFile;
   }
 
   // 设置当前选中的身体配置
@@ -103,11 +71,8 @@ export default function useBodyMain(props, context) {
 
   return {
     ...toRefs(state),
-    changeFile,
-    useCacheFile,
-    saveAIAvatar,
+    saveFileAndAvatar,
     setBodyConfig,
-    setRawFile,
     setStep,
     setPreview,
     getBodyConfig

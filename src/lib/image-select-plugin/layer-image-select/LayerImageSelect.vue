@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 13:04:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-10 15:17:19
+ * @LastEditTime: 2021-09-13 14:04:27
 -->
 <template>
   <div class="layer-file-select">
@@ -249,31 +249,39 @@ export default {
   height: 100%;
   .layer-file-select__top {
     width: 100%;
-    padding-bottom: 5px;
+    padding: 20px 20px 5px 20px;
   }
   .layer-file-select__medium {
     width: 100%;
     flex: 1;
+    padding: 0px 20px 0 20px;
     overflow-y: auto;
     overflow-x: hidden;
     background-color: #f2f2f2;
+  }
+  .layer-file-select__bottom {
+    width: 100%;
+    padding: 10px;
+    background-color: #f2f2f2;
+  }
+}
 
-    .layer-file-select__list {
+    .file-select__list {
       @include card-shadow;
       overflow: hidden;
       border-radius: 6px;
       margin-bottom: 0;
 
-      & + .layer-file-select__list {
+      & + .file-select__list {
         margin-top: 10px;
       }
     }
 
-    .layer-file-select__item:last-child .layer-file-select__card {
+    .file-select__item:last-child .file-select__card {
       border-bottom: none;
     }
 
-    .layer-file-select__card {
+    .file-select__card {
       @include flex-row-sb;
       height: 60px;
       padding: 0 15px;
@@ -314,11 +322,4 @@ export default {
         line-height: 1;
       }
     }
-  }
-  .layer-file-select__bottom {
-    width: 100%;
-    padding: 10px;
-    background-color: #f2f2f2;
-  }
-}
 </style>
