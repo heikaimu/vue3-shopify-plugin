@@ -3,32 +3,33 @@
     <div class="plugin-dialog__content">
       <!-- 主流程 -->
       <transition name="slide-left-fade" mode="out-in">
+        <ImageSelectPlugin @close="closePlugin" />
         <!-- 文件选择 -->
-        <step-file-select
+        <!-- <step-file-select
           v-if="currentStep === 'fileSelect'"
           @change="changeFile"
           @selectCache="handleUseCacheFile"
           @setStep="setStep"
           @close="closePlugin"
-        />
+        /> -->
         <!-- 图片处理 -->
-        <step-image-station
+        <!-- <step-image-station
           v-else-if="currentStep === 'imageStation'"
           :rawFileURL="rawFileURL"
           :isCustomBody="isCustomBody"
           @setAvatar="saveImage"
           @setStep="setStep"
           @close="closePlugin"
-        />
+        /> -->
         <!-- 身体定制 -->
-        <step-body-custom
+        <!-- <step-body-custom
           v-else-if="currentStep === 'bodyCustom'"
           :avatar="avatar"
           :config="config"
           @selectBody="setBodyConfig"
           @confirm="confirmCustom"
           @setStep="setStep"
-        />
+        /> -->
       </transition>
 
       <!-- 增量服务 -->
@@ -118,6 +119,7 @@
 <script>
 import { nextTick, toRaw } from "vue";
 
+import ImageSelectPlugin from "./image-select-plugin/ImageSelectPlugin.vue";
 import StepFileSelect from "./step-file-select/StepFileSelect.vue";
 import StepImageStation from "./step-image-station/StepImageStation.vue";
 import StepBodyCustom from "./step-body-custom/StepBodyCustom.vue";
@@ -138,6 +140,7 @@ export default {
   name: "MinimePillow",
 
   components: {
+    ImageSelectPlugin,
     StepFileSelect,
     StepImageStation,
     StepBodyCustom,
