@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 15:03:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-13 11:25:58
+ * @LastEditTime: 2021-09-15 17:53:32
  */
 import { reactive, toRefs, onMounted } from "vue";
 import { fabric } from 'fabric';
@@ -16,8 +16,7 @@ export default function useCombineImage(props) {
   let _scale = 1;
   let _overlayImage = '';
   let _backgroundImage = '';
-  let _canvasPreview = null;
-  let _canvasOriginal = null;
+  let _canvasLive = null;
 
   const state = reactive({
     loading: true,
@@ -25,12 +24,11 @@ export default function useCombineImage(props) {
   })
 
   onMounted(() => {
-    _canvasOriginal = new fabric.Canvas('canvasOriginal');
     _overlayImage = props.data.overlayImage;
     _backgroundImage = props.data.backgroundImage;
   })
 
-  // 渲染效果图
+  // 渲染实时图
   async function renderPreview(params, renderAll) {
     _params = params;
     const { backgroundImage, layerList, size } = _params;
@@ -38,16 +36,16 @@ export default function useCombineImage(props) {
     // 是否显示控制器
     state.hasHandler = layerList.length === 1 && (_overlayImage || _backgroundImage);
 
-    if (_canvasPreview && !renderAll) {
+    if (_canvasLive && !renderAll) {
       // 如果有canvas并且不渲染所有则只渲染背景
       const queue = [];
-      _setBackgroundAndOverlay(_canvasPreview, queue, backgroundImage, _scale);
-    } else if (_canvasPreview && renderAll) {
+      _setBackgroundAndOverlay(_canvasLive, queue, backgroundImage, _scale);
+    } else if (_canvasLive && renderAll) {
       // 如果有canvas并且渲染所有
       _renderCanvas(params);
     } else {
       // 没有canvas的情况走完整流程
-      _canvasPreview = new fabric.Canvas('bgCombineCanvas');
+      _canvasLive = new fabric.Canvas('bgCombineCanvas');
       _renderCanvas(params);
     }
 
@@ -57,16 +55,16 @@ export default function useCombineImage(props) {
   async function _renderCanvas(params) {
     const { size, backgroundImage, layerList, layerImage } = params;
     const queue = [];
-    await _setCanvasSize({ canvas: _canvasPreview, size, scale: _scale });
-    _setBackgroundAndOverlay(_canvasPreview, queue, backgroundImage, _scale);
+    await _setCanvasSize({ canvas: _canvasLive, size, scale: _scale });
+    _setBackgroundAndOverlay(_canvasLive, queue, backgroundImage, _scale);
     if (layerList && layerList.length > 0) {
-      _addLayerList({ canvas: _canvasPreview, list: layerList, url: layerImage, scale: _scale })
+      _addLayerList({ canvas: _canvasLive, list: layerList, url: layerImage, scale: _scale })
     }
   }
 
   // 操作
   function handleLayer(action) {
-    const layer = _canvasPreview.getObjects()[0];
+    const layer = _canvasLive.getObjects()[0];
     if (!layer) {
       return;
     }
@@ -95,43 +93,21 @@ export default function useCombineImage(props) {
         break;
     }
 
-    _canvasPreview.renderAll();
+    _canvasLive.renderAll();
   }
 
   // 获取预览图
   async function getPreviewURL() {
-    const { size, backgroundImage, layerImage } = _params;
-    const items = _canvasPreview.getObjects();
-
-    await _setCanvasSize({ canvas: _canvasOriginal, size, scale: 1 });
-
-    const queue = [];
-
-    _setBackgroundAndOverlay(_canvasOriginal, queue, backgroundImage, 1);
-
-    const layerList = items.map(item => {
-      const { top, left, scaleX, width, angle } = item;
-      return {
-        angle,
-        top: top / _scale,
-        left: left / _scale,
-        width: width * scaleX / _scale
-      }
-    })
-    if (layerList && layerList.length > 0) {
-      queue.push(_addLayerList({ canvas: _canvasOriginal, list: layerList, url: layerImage, scale: 1 }));
-    }
-
+    const { size } = _params;
+    _canvasLive.setWidth(size.width);
+    _canvasLive.setHeight(size.height);
+    _canvasLive.setZoom(size.height / HEIGHT);
     return new Promise((resolve) => {
-      Promise.all(queue).then(() => {
-        setTimeout(() => {
-          const url = _canvasOriginal.toDataURL({
-            format: 'png',
-            quality: 1
-          });
-          resolve(url);
-        }, 300);
+      const url = _canvasLive.toDataURL({
+        format: 'png',
+        quality: 1
       });
+      resolve(url);
     })
   }
 

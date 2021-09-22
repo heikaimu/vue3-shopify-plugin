@@ -205,29 +205,29 @@ export default {
     function handleCompleteImageSelect(data) {
       saveFileAndAvatar(data);
       if (isCustomBody.value) {
-        setStep('bodyCustom');
+        setStep("bodyCustom");
       } else {
         confirmCustom(data.avatar.url);
       }
     }
 
-    // 下一步
+    // 保存定制主人物图
+    async function confirmCustom(url) {
+      if (hasIncrement.value) {
+        setPreview(url);
+        await nextTick();
+        setIncrementIndex(0);
+      } else {
+        upload();
+      }
+    }
+
+    // 下一步增量
     function nextIncrement() {
       if (isLastIncrement.value) {
         upload();
       } else {
         next();
-      }
-    }
-
-    // 保存定制主人物图
-    async function confirmCustom(url) {
-      setPreview(url);
-      await nextTick();
-      if (hasIncrement.value) {
-        setIncrementIndex(0);
-      } else {
-        upload();
       }
     }
 
@@ -247,7 +247,7 @@ export default {
           url: getPreviewURL(),
         },
       ];
-      startUpload(files);
+      startUpload(files.filter(item => item.url));
     }
 
     // 获取需要上传的预览图
