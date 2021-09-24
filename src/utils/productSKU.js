@@ -62,7 +62,7 @@ export function publishSKU(list, optionKey, options, publishName) {
 
   let publishItem;
   const publishByName = sortList.find(item => item.options[optionKey] === publishName);
-  if (publishName && publishByName) {
+  if (publishName && publishByName && currentItem) {
     if (publishByName.price < currentItem.price) {
       return false;
     }

@@ -4,13 +4,13 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-12 18:30:34
+ * @LastEditTime: 2021-09-23 11:12:37
 -->
 <template>
   <div class="body-custom-wrapper">
     <custom-list
-      :avatar="avatar"
       :config="config"
+      v-bind="$attrs"
       @changeColor="changeColor"
       @back="backToFileSelect"
       @select="selectCard"
@@ -18,11 +18,11 @@
     <transition name="slide-up-fade" mode="out-in">
       <custom-board
         v-if="customBoardVisible"
-        :avatar="avatar"
         :config="currentCardConfig"
         :title="config.productTitle"
         :price="config.productPrice"
         :skin="skin"
+        v-bind="$attrs"
         @back="customBoardVisible = false"
         @selectFile="backToFileSelect"
         @confirm="confirmCustom"
@@ -44,10 +44,6 @@ export default {
   },
 
   props: {
-    avatar: {
-      type: Object,
-      deafult: () => {},
-    },
     config: {
       type: Object,
       deafult: () => {},

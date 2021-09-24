@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-12 14:43:01
+ * @LastEditTime: 2021-09-24 15:44:30
 -->
 <template>
   <div class="body-wrapper" ref="bodyContainer">
@@ -17,9 +17,9 @@
           class="body-card-row"
         >
           <body-card
-            :data="item"
+            :config="item"
             :skin="skin"
-            :avatar="avatar"
+            v-bind="$attrs"
             @click="handleClick(item)"
           ></body-card>
         </base-col>
@@ -45,10 +45,6 @@ export default {
   },
 
   props: {
-    avatar: {
-      type: Object,
-      deafult: () => {},
-    },
     list: {
       type: Array,
       default: () => [],

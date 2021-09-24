@@ -1,6 +1,15 @@
 <template>
   <div class="plugin-dialog">
     <div class="plugin-dialog__content">
+      <!-- 扩展头像弹出窗 -->
+      <div class="image-extend-selector-dialog" v-if="extendSelectorVisible">
+        <image-select-plugin
+          :isCustomBody="isCustomBody"
+          @close="closeImageExtendSelector"
+          @complete="handleCompleteExtendSelect"
+        />
+      </div>
+
       <!-- 主流程 -->
       <transition name="slide-left-fade" mode="out-in">
         <!-- 文件选择 -->
@@ -10,14 +19,16 @@
           @close="closePlugin"
           @complete="handleCompleteImageSelect"
         />
+
         <!-- 身体定制 -->
-        <step-body-custom
+        <body-custom
           v-else-if="currentStep === 'bodyCustom'"
-          :avatar="avatar"
+          :selectFiles="selectFiles"
           :config="config"
           @selectBody="setBodyConfig"
           @confirm="confirmCustom"
           @setStep="setStep"
+          @openImageExtendSelector="openImageExtendSelector"
         />
       </transition>
 
@@ -106,10 +117,10 @@
 </template>
 
 <script>
-import { nextTick, toRaw } from "vue";
+import { nextTick, toRaw, ref } from "vue";
 
 import ImageSelectPlugin from "./image-select-plugin/ImageSelectPlugin.vue";
-import StepBodyCustom from "./step-body-custom/StepBodyCustom.vue";
+import BodyCustom from "./body-custom/BodyCustom.vue";
 import IncrementSlides from "./increment/increment-slides/IncrementSlides.vue";
 import IncrementBackgroundList from "./increment/increment-background-list/IncrementBackgroundList.vue";
 import IncrementRelatedProduct from "./increment/increment-related-product/IncrementRelatedProduct.vue";
@@ -128,7 +139,7 @@ export default {
 
   components: {
     ImageSelectPlugin,
-    StepBodyCustom,
+    BodyCustom,
     IncrementSlides,
     IncrementBackgroundList,
     IncrementRelatedProduct,
@@ -158,8 +169,7 @@ export default {
     const {
       isCustomBody,
       currentStep,
-      avatar,
-      rawFileURL,
+      selectFiles,
       saveFileAndAvatar,
       previewBody,
       setBodyConfig,
@@ -211,6 +221,22 @@ export default {
       }
     }
 
+    // 扩展图片
+    const extendSelectorVisible = ref(false);
+    function openImageExtendSelector() {
+      setImageExtendSelectorVisible(true);
+    }
+    function closeImageExtendSelector() {
+      setImageExtendSelectorVisible(false);
+    }
+    function handleCompleteExtendSelect(data) {
+      saveFileAndAvatar(data);
+      setImageExtendSelectorVisible(false);
+    }
+    function setImageExtendSelectorVisible(flag) {
+      extendSelectorVisible.value = flag;
+    }
+
     // 保存定制主人物图
     async function confirmCustom(url) {
       if (hasIncrement.value) {
@@ -233,21 +259,25 @@ export default {
 
     // 文件上传
     function upload() {
-      const files = [
+      let files = [
         {
-          name: "raw",
-          url: rawFileURL.value,
-        },
-        {
-          name: "ai",
-          url: avatar.value.url,
-        },
-        {
-          name: "preview",
+          name: "Preview",
           url: getPreviewURL(),
         },
       ];
-      startUpload(files.filter(item => item.url));
+      selectFiles.value.forEach((item, index) => {
+        files.push(
+          {
+            name: `Original_${index}`,
+            url: item.rawFile,
+          },
+          {
+            name: `Ai_${index}`,
+            url: item.avatar.url,
+          }
+        );
+      });
+      startUpload(files.filter((item) => item.url));
     }
 
     // 获取需要上传的预览图
@@ -278,8 +308,7 @@ export default {
       // == main body ==
       currentStep,
       isCustomBody,
-      avatar,
-      rawFileURL,
+      selectFiles,
       previewBody,
       setBodyConfig,
       setStep,
@@ -303,6 +332,11 @@ export default {
       // == upload ==
       uploadFiles,
       uploadVisible,
+      // 扩展图片
+      extendSelectorVisible,
+      openImageExtendSelector,
+      handleCompleteExtendSelect,
+      closeImageExtendSelector,
       // == 外部 ==
       confirmCustom,
       closePlugin,
@@ -323,6 +357,7 @@ export default {
   @include pos-fixed(0, 0, 0, 0, 999999);
   @include flex-row-center;
   background-color: rgba($color: #000000, $alpha: 0.8);
+  font-family: "Roboto", Arial, Helvetica, sans-serif;
 
   .plugin-dialog__content {
     width: 400px;
@@ -331,9 +366,29 @@ export default {
     overflow: hidden;
     background-color: #ffffff;
     position: relative;
-  }
 
-  font-family: "Roboto", Arial, Helvetica, sans-serif;
+    .image-extend-selector-dialog {
+      @include pos-absolute(0, 0, 0, 0, 2020);
+      background-color: #ffffff;
+    }
+  }
+}
+
+// 加载
+.publish-loading {
+  @include pos-absolute(0, 0, 0, 0, 2021);
+  @include flex-row-center;
+  background-color: #ffffff;
+}
+
+@media screen and (max-width: 750px) {
+  .plugin-dialog {
+    .plugin-dialog__content {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+  }
 }
 
 // 下方
@@ -370,22 +425,5 @@ export default {
 }
 .slide-left-fade-leave-active {
   transition: all 0.1s ease;
-}
-
-// 加载
-.publish-loading {
-  @include pos-absolute(0, 0, 0, 0, 2021);
-  @include flex-row-center;
-  background-color: #ffffff;
-}
-
-@media screen and (max-width: 750px) {
-  .plugin-dialog {
-    .plugin-dialog__content {
-      width: 100%;
-      height: 100%;
-      border-radius: 0;
-    }
-  }
 }
 </style>

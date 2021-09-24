@@ -30,7 +30,8 @@
     "localforage": "^1.9.0",
     "lodash": "^4.17.21",
     "swiper": "^6.8.0",
-    "vue": "^3.1.5"
+    "vue": "^3.1.5",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",

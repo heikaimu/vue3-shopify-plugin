@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-01 11:05:24
+ * @LastEditTime: 2021-09-24 17:11:06
 -->
 <template>
   <div class="custom-board">
@@ -15,29 +15,43 @@
         :subText="title"
         icon="arrowDown"
         @close="backToList"
-      />
+      >
+        <base-button
+          v-if="filesMax > 1"
+          type="primary"
+          full
+          :blod="600"
+          class="custom-board__button--confirm"
+          @click="handleConfirm"
+          id="button_confirm_3"
+          >CONFIRM</base-button
+        >
+      </base-header>
     </div>
     <div class="custom-board__medium">
       <!-- fabric -->
       <div class="custom-board__canvas-box" ref="canvasBox">
         <canvas id="customBoard"></canvas>
-        <!-- fabric-layer -->
         <canvas-layer :list="layerList" @change="changeActiveLayer" />
       </div>
       <!-- 色彩饱和度调整 -->
-      <brightness-bar :url="avatar.url" @change="changeAvatar" />
+      <!-- <brightness-bar :url="currentAvatar.url" @change="changeAvatar" /> -->
     </div>
     <div class="custom-board__bottom">
-      <base-row :gutter="10">
+      <base-row :gutter="10" v-if="filesMax === 1">
         <base-col :span="8">
           <base-button plain @click="backToList" id="button_replace_2">Replace</base-button>
         </base-col>
         <base-col :span="16">
-          <base-button type="primary" full :blod="600" @click="handleConfirm" id="button_confirm_3"
-            >CONFIRM</base-button
-          >
+          <base-button type="primary" full :blod="600" @click="handleConfirm" id="button_confirm_3">CONFIRM</base-button>
         </base-col>
       </base-row>
+      <custom-files
+        v-else
+        :list="selectFiles"
+        :max="filesMax"
+        @open="handleOpenImageExtendSelector"
+      ></custom-files>
     </div>
 
     <!-- loading -->
@@ -50,7 +64,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref, toRaw, onMounted } from "vue";
+import { reactive, toRefs, ref, computed, onMounted, watch } from "vue";
 
 import BaseHeader from "../../../base/BaseHeader.vue";
 import BaseRow from "../../../base/BaseRow.vue";
@@ -59,8 +73,11 @@ import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
 import BrightnessBar from "./BrightnessBar.vue";
 import CanvasLayer from "./CanvasLayers.vue";
+import CustomFiles from "./CustomFiles.vue";
 
-import Minime from "../../../utils/minime";
+import CanvasRenderer from "../../../utils/canvasRenderer";
+import { getLayers } from "../../../utils/layers";
+import { debounce } from "lodash";
 
 export default {
   components: {
@@ -71,10 +88,11 @@ export default {
     BaseIcon,
     BrightnessBar,
     CanvasLayer,
+    CustomFiles,
   },
 
   props: {
-    avatar: {
+    selectFiles: {
       type: Object,
       deafult: () => {},
     },
@@ -100,72 +118,101 @@ export default {
     back: null,
     selectFile: null,
     confirm: null,
+    openImageExtendSelector: null,
   },
 
   setup(props, context) {
-    const { avatar, config, skin } = props;
+    const { config, skin } = props;
+
+    let fabricInstance = null;
+
     const state = reactive({
-      canvas: null,
       loading: false,
       layerList: [],
-      currentAvatarURL: "",
+      currentAvatar: {},
+    });
+
+    const filesMax = computed(() => {
+      if (config.faceList) {
+        return config.faceList.length;
+      } else {
+        return 1;
+      }
     });
 
     onMounted(() => {
-      state.currentAvatarURL = avatar.url;
-      if (!state.canvas) instanceMinime();
+      // if (filesMax.value === 1) {
+      //   for (let i = props.selectFiles.length - 1; i >= 0; i--) {
+      //     if (i === props.selectFiles.length - 1) {
+      //       continue;
+      //     }
+      //     props.selectFiles.splice(i, 1);
+      //   }
+      // }
+      renderer();
     });
+
+    watch(
+      () => props.selectFiles,
+      () => {
+        renderer();
+      },
+      { deep: true }
+    );
 
     // 实力化插件
     const canvasBox = ref(null);
-    function instanceMinime() {
-      state.loading = true;
-
-      const { width, height } = canvasBox.value.getBoundingClientRect();
-      const normalHeight = (width / 500) * 660;
-      state.canvas = new Minime("customBoard", {
-        width,
-        height: Math.min(normalHeight, height),
-      });
-      renderer();
+    function setCanvasInstance() {
+      if (!fabricInstance) {
+        const { width, height } = canvasBox.value.getBoundingClientRect();
+        const normalHeight = (width / 500) * 660;
+        fabricInstance = new CanvasRenderer("customBoard", {
+          width,
+          height: Math.min(normalHeight, height),
+          scale: width / config.width,
+        });
+      }
     }
 
-    function renderer() {
-      state.canvas.setOption({
-        avatar: state.currentAvatarURL,
-        chin: avatar.chin,
-        option: config,
-        skin: skin,
-        success: () => {
-          state.loading = false;
-          renderLayer();
+    // 渲染器
+    const renderer = debounce(function() {
+      setCanvasInstance();
+      config.faceList = config.faceList ? config.faceList : [config.face, config.face, config.face];
+      const layers = getLayers({
+        config,
+        files: props.selectFiles,
+        skin,
+      });
+
+      fabricInstance.render({
+        layers,
+        success: (items) => {
+          renderLayer(items);
         },
         replacePhoto: () => {
           context.emit("selectFile");
         },
       });
-    }
+    }, 300)
 
     // 渲染图层
-    function renderLayer() {
-      const items = state.canvas.canvas.getObjects();
-      const usingItems = items.filter(item => {
-        return item.name;
+    function renderLayer(items) {
+      const availableItems = items.filter((item) => {
+        return item.name !== "svg";
       });
-      state.canvas.canvas.setActiveObject(usingItems[0]);
-      state.canvas.canvas.renderAll();
-      state.layerList = usingItems.map((item) => {
+      state.layerList = availableItems.map((item, index) => {
+        item.active = index === 0;
         return {
           obj: item,
           url: item.getSrc(),
         };
       });
+      fabricInstance.setActiveObject(availableItems[0]);
     }
 
     // 修改激活图层
     function changeActiveLayer(item, index) {
-      state.canvas.canvas.setActiveObject(item.obj);
-      state.canvas.canvas.renderAll();
+      fabricInstance.setActiveObject(item.obj);
       for (let i = 0; i < state.layerList.length; i++) {
         if (i === index) {
           state.layerList[i].obj.active = true;
@@ -177,13 +224,13 @@ export default {
 
     // 修改头像
     function changeAvatar(url) {
-      state.currentAvatarURL = url;
+      state.currentAvatar.url = url;
       renderer();
     }
 
     // 保存数据
     function handleConfirm() {
-      const url = state.canvas.canvas.toDataURL();
+      const url = fabricInstance.toDataURL();
       context.emit("confirm", url);
     }
 
@@ -192,13 +239,20 @@ export default {
       context.emit("back");
     }
 
+    // 打开图片扩展
+    function handleOpenImageExtendSelector() {
+      context.emit("openImageExtendSelector");
+    }
+
     return {
       ...toRefs(state),
       canvasBox,
+      filesMax,
       backToList,
       changeActiveLayer,
       changeAvatar,
       handleConfirm,
+      handleOpenImageExtendSelector,
     };
   },
 };
@@ -249,5 +303,8 @@ export default {
       transform: rotate(1turn);
     }
   }
+}
+.custom-board__button--confirm {
+  width: 120px;
 }
 </style>

@@ -4,9 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 17:08:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-13 14:22:58
+ * @LastEditTime: 2021-09-24 15:20:21
  */
 import { reactive, toRefs, onMounted } from "vue";
+import { getRandomID } from '../utils/image'
 
 export default function useBodyMain(props, context) {
   const state = reactive({
@@ -14,10 +15,8 @@ export default function useBodyMain(props, context) {
     currentStep: "fileSelect",
     // 是否进行身体定制（包含扣头）
     isCustomBody: true,
-    // 原始文件base64
-    rawFileURL: "",
-    // 头像信息
-    avatar: {},
+    // 用户选择文件
+    selectFiles: [],
     // 身体配置
     bodyConfig: {},
     // 定制身体模版预览图
@@ -36,8 +35,11 @@ export default function useBodyMain(props, context) {
   // 保存头像和源文件
   function saveFileAndAvatar(data) {
     const { avatar, rawFile } = data;
-    state.avatar = avatar;
-    state.rawFileURL = rawFile;
+    state.selectFiles.push({
+      avatar,
+      rawFile,
+      id: getRandomID()
+    })
   }
 
   // 设置当前选中的身体配置

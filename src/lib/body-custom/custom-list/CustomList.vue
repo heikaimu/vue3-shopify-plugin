@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-12 18:29:59
+ * @LastEditTime: 2021-09-22 15:57:24
 -->
 <template>
   <div class="custom-list">
@@ -29,7 +29,7 @@
         <body-list
           :list="currentGrouplist"
           :skin="skin"
-          :avatar="avatar"
+          v-bind="$attrs"
           @select="selectCard"
         />
       </div>
@@ -57,10 +57,6 @@ export default {
   },
 
   props: {
-    avatar: {
-      type: Object,
-      deafult: () => {},
-    },
     config: {
       type: Object,
       deafult: () => {},

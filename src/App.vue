@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-17 17:49:11
+ * @LastEditTime: 2021-09-22 15:21:47
 -->
 <!--
  * @Description: 
@@ -43,7 +43,7 @@ import axios from "axios";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
 const WEBSITE = "M";
-import { product } from "../shopifyOnlyTextConfig";
+import { product } from "../shopifyPillowConfig";
 
 export default {
   components: {
