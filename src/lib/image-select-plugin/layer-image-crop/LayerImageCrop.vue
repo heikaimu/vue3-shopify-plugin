@@ -84,7 +84,6 @@ export default {
 
     onMounted(() => {
       const image = document.getElementById("image");
-      console.log(image)
       state.cropper = new Cropper(image, {
         // aspectRatio: 1,
         autoCropArea: 0.9,

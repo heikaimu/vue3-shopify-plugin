@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 13:04:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-13 14:04:27
+ * @LastEditTime: 2021-10-08 15:17:20
 -->
 <template>
   <div class="layer-file-select">
@@ -215,7 +215,6 @@ export default {
             .then((response) => response.blob())
             .then(async (blob) => {
               const newURL = await blobToDataURL(blob);
-              console.log(newURL)
               context.emit("change", newURL);
             });
         },

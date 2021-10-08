@@ -4,8 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-24 11:03:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-24 14:16:47
+ * @LastEditTime: 2021-09-24 17:54:57
  */
+import { getRandomID } from './image';
+
 export function getLayers({ config, files, skin }) {
   let layers = [];
 
@@ -36,6 +38,7 @@ function getBody(config, skin, type) {
     sort: 1,
     globalCompositeOperation: type === "hood" ? "destination-over" : "",
     type: type === "normal" ? "background" : "overlay",
+    id: getRandomID()
   }
 }
 
@@ -55,6 +58,7 @@ function getAnnexList(config, skin) {
         sort: 4,
         customControls: true,
         type: "annex",
+        id: getRandomID()
       });
     }
   }
@@ -65,7 +69,7 @@ function getAvatarList(config, files, type) {
   if (files.length === 0) {
     return [];
   }
-  
+
   const list = config.faceList;
   return list.map((item, index) => {
     const { left, top, angle, width } = item;
@@ -82,7 +86,8 @@ function getAvatarList(config, files, type) {
       sort: 3,
       customControls: true,
       globalCompositeOperation: type === "hood" ? "source-atop" : "",
-      type: "avatar"
+      type: "avatar",
+      id: getRandomID()
     }
   })
 }
@@ -96,5 +101,6 @@ function getSVG(config) {
     sort: 2,
     selectable: false,
     type: "svg",
+    id: getRandomID()
   }
 }

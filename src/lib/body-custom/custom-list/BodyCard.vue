@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-24 17:18:08
+ * @LastEditTime: 2021-09-26 10:52:25
 -->
 <template>
   <div class="body-card" @click="handleClick">
@@ -44,6 +44,7 @@ import BaseIcon from "../../../base/BaseIcon.vue";
 import { renderer } from "../../../utils/minimeRenderer";
 import { loadImage } from "../../../utils/image";
 import { getLayers } from "../../../utils/layers";
+import { stubTrue } from "lodash";
 
 export default {
   components: {
@@ -89,6 +90,14 @@ export default {
       }
     );
 
+    watch(
+      () => props.selectFiles,
+      () => {
+        renderImage(props.skin);
+      },
+      { deep: stubTrue }
+    );
+
     // 渲染卡片
     function renderImage(skin) {
       if (config.type === "normal") {
@@ -101,20 +110,20 @@ export default {
     // 带svg图片
     function hoodImage(skin) {
       state.loading = true;
-      renderer
-        .request({
-          config: config,
-          files: props.selectFiles,
-          skin: skin,
-        })
-        .then((url) => {
-          state.bodyURL = url;
-          state.loading = false;
-        });
+      const layers = getLayers({
+        config,
+        files: props.selectFiles,
+        skin,
+      });
+      renderer.request(layers).then((url) => {
+        state.bodyURL = url;
+        state.loading = false;
+      });
     }
 
     // 普通图片
     function normalImage(skin) {
+      state.bodyURL = '';
       const currentSkinImage = config.images.find(
         (item) => item.color === skin
       );
@@ -129,14 +138,12 @@ export default {
 
     // 背景图加载完成
     async function bgLoad(e) {
-      config.faceList = config.faceList ? config.faceList : [config.face];
       const layers = getLayers({
         config,
         files: props.selectFiles,
         skin,
       }).filter((item) => ["avatar", "annex"].includes(item.type));
       state.layerList = await getLayerList(layers, e.target.width);
-      console.log(state.layerList)
     }
 
     function getLayerList(layers, targetWidth) {
@@ -149,9 +156,18 @@ export default {
           const img = await loadImage(url);
           const currentWidth = width * scale;
           const currentHeight = (img.height / img.width) * currentWidth;
-          const currentTop = type === "avatar" ? top * scale - currentHeight : top * scale;
-          const currentLeft = type === "avatar" ? left * scale - currentWidth / 2 : left * scale;
-          const offsetY = offset ? offset[1] * scale : 0;
+          const currentTop =
+            type === "avatar" ? top * scale - currentHeight : top * scale;
+          const currentLeft =
+            type === "avatar" ? left * scale - currentWidth / 2 : left * scale;
+          // const offsetY = offset ? offset[1] * scale : 0;
+
+          let offsetY = 0;
+          if (offset) {
+            const chinTop = (offset[1] * currentWidth) / img.width;
+            offsetY = currentHeight - chinTop;
+          }
+
           list.push({
             url: url,
             style: {
@@ -160,7 +176,7 @@ export default {
               top: `${currentTop + offsetY}px`,
               left: `${currentLeft}px`,
               transform: `rotate(${angle}deg)`,
-              zIndex: type === "annex" ? 2 : 1
+              zIndex: type === "annex" ? 2 : 1,
             },
           });
         }
@@ -210,7 +226,7 @@ export default {
 .body-card__avatar-img {
   display: block;
   position: absolute;
-  // transform-origin: bottom;
+  transform-origin: bottom;
 }
 .body-card__edit-tag {
   @include flex-row-center;

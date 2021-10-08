@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 17:08:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-24 15:20:21
+ * @LastEditTime: 2021-10-08 11:16:39
  */
 import { reactive, toRefs, onMounted } from "vue";
 import { getRandomID } from '../utils/image'
@@ -15,6 +15,8 @@ export default function useBodyMain(props, context) {
     currentStep: "fileSelect",
     // 是否进行身体定制（包含扣头）
     isCustomBody: true,
+    // 设置定制状态
+    customState: false,
     // 用户选择文件
     selectFiles: [],
     // 身体配置
@@ -35,7 +37,7 @@ export default function useBodyMain(props, context) {
   // 保存头像和源文件
   function saveFileAndAvatar(data) {
     const { avatar, rawFile } = data;
-    state.selectFiles.push({
+    state.selectFiles.unshift({
       avatar,
       rawFile,
       id: getRandomID()
@@ -57,6 +59,11 @@ export default function useBodyMain(props, context) {
     state.previewBody = url;
   }
 
+  // 设置定制状态
+  function setCustomState(flag) {
+    state.customState = flag;
+  }
+
   // 获取身体配置
   function getBodyConfig() {
     if (state.isCustomBody) {
@@ -65,9 +72,12 @@ export default function useBodyMain(props, context) {
         name: state.bodyConfig.name,
         groupName: state.bodyConfig.groupName,
         url: state.bodyConfig.images[0].url,
+        faceNum: state.bodyConfig.faceList.length
       }
     } else {
-      return {}
+      return {
+        faceNum: 1
+      }
     }
   }
 
@@ -77,6 +87,7 @@ export default function useBodyMain(props, context) {
     setBodyConfig,
     setStep,
     setPreview,
-    getBodyConfig
+    getBodyConfig,
+    setCustomState
   }
 }

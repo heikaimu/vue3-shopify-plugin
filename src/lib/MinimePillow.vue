@@ -33,72 +33,13 @@
       </transition>
 
       <!-- 增量服务 -->
-      <transition name="slide-bottom-fade" mode="out-in">
-        <!-- 单双面 -->
-        <increment-slides
-          v-if="slidesVisible"
-          :data="incrementData.data"
-          :value="incrementData.value"
-          :customBodyPreviewURL="previewBody"
-          @change="changeSlides"
-          @close="closeIncrement"
-          @next="nextIncrement"
-        />
-
-        <!-- 背景图 -->
-        <increment-background-list
-          v-else-if="backgroundVisible"
-          :data="incrementData"
-          :customBodyPreviewURL="previewBody"
-          :sizeList="config.sizeList"
-          v-bind="$attrs"
-          @change="changeBackground"
-          @close="closeIncrement"
-          @next="nextIncrement"
-        />
-
-        <!-- 文字 -->
-        <increment-text
-          v-else-if="textVisible"
-          :data="incrementData.data"
-          :value="incrementData.value"
-          @change="changeText"
-          @close="closeIncrement"
-          @next="nextIncrement"
-        />
-
-        <!-- 推荐 -->
-        <increment-publish
-          v-else-if="publishVisible"
-          :data="incrementData.data"
-          :value="incrementData.value"
-          :productOptionsValue="productOptionsValue"
-          :skuList="config.skuList"
-          @change="changePublish"
-          @close="closeIncrement"
-          @next="nextIncrement"
-        />
-
-        <!-- 关联产品 -->
-        <increment-related-product
-          v-else-if="relatedProductVisible"
-          :data="incrementData.data"
-          :value="incrementData.value"
-          @change="changeRelatedProduct"
-          @close="closeIncrement"
-          @next="nextIncrement"
-        />
-
-        <!-- vip -->
-        <increment-vip
-          v-else-if="vipVisible"
-          :data="incrementData.data"
-          :value="incrementData.value"
-          @change="changeVip"
-          @close="closeIncrement"
-          @next="nextIncrement"
-        />
-      </transition>
+      <increment-services
+        :customState="customState"
+        :config="config"
+        :previewBody="previewBody"
+        @save="saveIncrement"
+        @close="setCustomState"
+      />
 
       <!-- 文件上传S3 -->
       <files-uploader
@@ -108,10 +49,6 @@
         @complete="completeUpload"
       />
 
-      <!-- 加载 -->
-      <div class="publish-loading" v-if="publishLoading">
-        <base-loading-dot />
-      </div>
     </div>
   </div>
 </template>
@@ -121,18 +58,12 @@ import { nextTick, toRaw, ref } from "vue";
 
 import ImageSelectPlugin from "./image-select-plugin/ImageSelectPlugin.vue";
 import BodyCustom from "./body-custom/BodyCustom.vue";
-import IncrementSlides from "./increment/increment-slides/IncrementSlides.vue";
-import IncrementBackgroundList from "./increment/increment-background-list/IncrementBackgroundList.vue";
-import IncrementRelatedProduct from "./increment/increment-related-product/IncrementRelatedProduct.vue";
-import IncrementVip from "./increment/increment-vip/IncrementVip.vue";
-import IncrementText from "./increment/increment-text/IncrementText.vue";
-import IncrementPublish from "./increment/increment-publish/IncrementPublish.vue";
 import FilesUploader from "../components/files-uploader/FilesUploader.vue";
+import IncrementServices from "./increment/IncrementServices.vue";
 import BaseLoadingDot from "../base/BaseLoadingDot.vue";
 
 import useBodyMain from "../composables/useBodyMain";
 import useUpload from "../composables/useUpload";
-import useIncrement from "../composables/useIncrement";
 
 export default {
   name: "MinimePillow",
@@ -140,13 +71,8 @@ export default {
   components: {
     ImageSelectPlugin,
     BodyCustom,
-    IncrementSlides,
-    IncrementBackgroundList,
-    IncrementRelatedProduct,
-    IncrementVip,
-    IncrementText,
-    IncrementPublish,
     FilesUploader,
+    IncrementServices,
     BaseLoadingDot,
   },
 
@@ -168,41 +94,17 @@ export default {
     // 主流程
     const {
       isCustomBody,
+      customState,
       currentStep,
       selectFiles,
-      saveFileAndAvatar,
       previewBody,
+      saveFileAndAvatar,
       setBodyConfig,
       setStep,
       setPreview,
+      setCustomState,
       getBodyConfig,
     } = useBodyMain(props);
-
-    // 增量
-    const {
-      productOptionsValue,
-      previewWidthBackground,
-      queue,
-      hasIncrement,
-      incrementData,
-      slidesVisible,
-      publishVisible,
-      publishLoading,
-      backgroundVisible,
-      textVisible,
-      relatedProductVisible,
-      vipVisible,
-      isLastIncrement,
-      changeSlides,
-      changeVip,
-      changeRelatedProduct,
-      setIncrementIndex,
-      closeIncrement,
-      changeBackground,
-      changeText,
-      changePublish,
-      next,
-    } = useIncrement(props, previewBody);
 
     // 上传
     const { uploadFiles, uploadVisible, startUpload } = useUpload();
@@ -237,35 +139,41 @@ export default {
       extendSelectorVisible.value = flag;
     }
 
-    // 保存定制主人物图
+    /*
+    保存定制主人物图
+    修改主定制状态
+    */
     async function confirmCustom(url) {
-      if (hasIncrement.value) {
-        setPreview(url);
-        await nextTick();
-        setIncrementIndex(0);
-      } else {
-        upload();
-      }
-    }
-
-    // 下一步增量
-    function nextIncrement() {
-      if (isLastIncrement.value) {
-        upload();
-      } else {
-        next();
-      }
+      setPreview(url);
+      await nextTick();
+      setCustomState(true);
     }
 
     // 文件上传
-    function upload() {
+    let otherData = {};
+    function saveIncrement(params) {
+      const { preview, increment, productOptionsValue } = params;
+
+      // 增量和产品SKU选项
+      otherData = {
+        increment,
+        productOptionsValue,
+      };
+
+      // 上传准备
+      prepareUpload(preview);
+    }
+
+    // 上传准备
+    function prepareUpload(preview) {
       let files = [
         {
           name: "Preview",
-          url: getPreviewURL(),
+          url: preview,
         },
       ];
-      selectFiles.value.forEach((item, index) => {
+      const { faceNum } = getBodyConfig();
+      selectFiles.value.slice(0, faceNum).forEach((item, index) => {
         files.push(
           {
             name: `Original_${index}`,
@@ -280,18 +188,13 @@ export default {
       startUpload(files.filter((item) => item.url));
     }
 
-    // 获取需要上传的预览图
-    function getPreviewURL() {
-      return previewWidthBackground.value || previewBody.value;
-    }
-
     // 文件上传完成
     function completeUpload(res) {
       const data = {
         files: toRaw(res),
         body: getBodyConfig(),
-        increment: toRaw(queue.value),
-        productOptionsValue: toRaw(productOptionsValue.value),
+        increment: toRaw(otherData.increment),
+        productOptionsValue: toRaw(otherData.productOptionsValue),
       };
 
       context.emit("complete", data);
@@ -305,44 +208,24 @@ export default {
     }
 
     return {
-      // == main body ==
       currentStep,
       isCustomBody,
       selectFiles,
       previewBody,
+      customState,
       setBodyConfig,
       setStep,
-      // == increment ==
-      productOptionsValue,
-      incrementData,
-      slidesVisible,
-      publishVisible,
-      publishLoading,
-      backgroundVisible,
-      textVisible,
-      relatedProductVisible,
-      vipVisible,
-      closeIncrement,
-      changeSlides,
-      changeVip,
-      changeRelatedProduct,
-      changeBackground,
-      changeText,
-      changePublish,
-      // == upload ==
+      setCustomState,
+      saveIncrement,
       uploadFiles,
       uploadVisible,
-      // 扩展图片
       extendSelectorVisible,
       openImageExtendSelector,
       handleCompleteExtendSelect,
       closeImageExtendSelector,
-      // == 外部 ==
       confirmCustom,
       closePlugin,
       completeUpload,
-      changeVip,
-      nextIncrement,
       handleCompleteImageSelect,
     };
   },
@@ -389,24 +272,6 @@ export default {
       border-radius: 0;
     }
   }
-}
-
-// 下方
-.slide-bottom-fade-enter-from,
-.slide-bottom-fade-leave-to {
-  transform: translate3d(0, -30px, 0);
-  opacity: 0;
-}
-.slide-bottom-fade-leave-from,
-.slide-bottom-fade-enter-to {
-  transform: translate3d(0, 0, 0);
-  opacity: 1;
-}
-.slide-bottom-fade-enter-active {
-  transition: all 0.3s ease-in-out;
-}
-.slide-bottom-fade-leave-active {
-  transition: all 0.1s ease;
 }
 
 // 左方

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-22 15:21:47
+ * @LastEditTime: 2021-10-08 16:26:41
 -->
 <!--
  * @Description: 
@@ -43,7 +43,7 @@ import axios from "axios";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
 const WEBSITE = "M";
-import { product } from "../shopifyPillowConfig";
+import { product } from "../shopifyBlanketConfig";
 
 export default {
   components: {
@@ -65,8 +65,7 @@ export default {
     });
 
     function complete(data) {
-      console.log(data)
-      window.open(data.files.preview);
+      window.open(data.files.Preview);
     }
 
     async function handleOpen() {
@@ -131,7 +130,7 @@ function getConfig() {
         config.defaultSkin = "yellow";
         config.skuList = getSKUlist(product);
         config.productOptionsValue = {
-          Size: '27.6" X 59"',
+          Size: '30" x 40"',
         };
 
         getProductConfig(config, product.type);
@@ -151,6 +150,7 @@ function getProductConfig(config, type) {
 
   if (!currentConfig) {
     config.currentProductTypeConfig = {};
+    console.error(`当前产品分类${type}不正确，请填写正确的分类后重试`);
     return;
   }
 
@@ -173,6 +173,13 @@ function getProductConfig(config, type) {
     }
   } else {
     config.miniMeData = [];
+  }
+
+  // 便利所有身体配置，创建faceList
+  for (const group of config.miniMeData) {
+    for (const item of group.images) {
+      item.faceList = item.faceList ? item.faceList : [item.face];
+    }
   }
 
   // background
@@ -222,7 +229,7 @@ function topBodyCard(config) {
   if (config.miniMeData.length === 0) {
     return;
   }
-  
+
   let currentItem = {};
   for (let i = 0; i < config.miniMeData.length; i++) {
     const group = config.miniMeData[i];

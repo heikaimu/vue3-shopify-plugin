@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-23 15:40:12
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-07 15:25:59
+ * @LastEditTime: 2021-09-29 16:00:48
  */
 import axios from 'axios';
 /**
@@ -36,7 +36,8 @@ export const uploadFile = async (params) => {
   });
 
   if (status === 200) {
-    const sourceURL = url.split('?')[0];
+    let sourceURL = url.split('?')[0];
+    sourceURL = sourceURL.replace('faceonboxer.s3.us-west-1.amazonaws.com', 'face.globaladput.com');
     onSuccess(sourceURL);
   } else {
     onError();
@@ -44,7 +45,7 @@ export const uploadFile = async (params) => {
 }
 
 /**
- * 
+ * 获取S3临时上传地址
  * @param {Object} params 
  * @param {String} params.fileName
  * @returns 

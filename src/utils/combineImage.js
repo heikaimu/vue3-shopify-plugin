@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:33:04
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-13 11:26:03
+ * @LastEditTime: 2021-09-27 11:24:04
  */
 import { fabric } from 'fabric';
 import { loadImage } from './image';
@@ -40,7 +40,6 @@ export class CombineImage {
   }
 
   async setCanvasSize(size) {
-    // const image = await loadImage(backgroundImage);
     this.canvas.setWidth(size.width);
     this.canvas.setHeight(size.height);
     this.canvas.clear();

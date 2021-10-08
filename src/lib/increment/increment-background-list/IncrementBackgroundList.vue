@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-07 17:43:50
+ * @LastEditTime: 2021-09-28 16:55:16
 -->
 <template>
   <div class="increment-wrapper">
@@ -206,6 +206,8 @@ export default {
       renderPreview(params, renderAll);
     }, 100);
 
+    let textRenderParams = {};
+
     // 获取渲染参数
     function getRenderParams() {
       const size = props.sizeList.find(
@@ -213,12 +215,15 @@ export default {
       ).value;
       const backgroundImage = getBackgroundImage(currentSize.value);
       const layerList = getComposing(currentSize.value);
-
+      textRenderParams = {
+        size: toRaw(size),
+        layerList: layerList.filter(item => item.type === 'text')
+      }
       return {
         size: toRaw(size),
         backgroundImage,
-        layerList,
-        layerImage: props.customBodyPreviewURL,
+        layerList: layerList.filter(item => item.type !== 'text'),
+        layerImage: props.customBodyPreviewURL
       };
     }
 
@@ -240,8 +245,9 @@ export default {
               composing: {
                 index: composingIndex.value,
                 title: composingName.value,
-              },
+              }
             },
+            textRenderParams
           });
           resolve();
         });

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-24 15:44:30
+ * @LastEditTime: 2021-09-26 10:43:28
 -->
 <template>
   <div class="body-wrapper" ref="bodyContainer">
@@ -186,5 +186,11 @@ export default {
   .body-card-row {
     margin-bottom: 20px;
   }
+}
+
+.fixed-page {
+  position: fixed;
+  left: 0;
+  top: 0;
 }
 </style>

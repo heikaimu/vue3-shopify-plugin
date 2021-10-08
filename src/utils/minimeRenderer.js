@@ -4,11 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-02 15:51:31
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-02 17:55:22
+ * @LastEditTime: 2021-09-26 10:32:05
  */
 import RequestDecorator from './requestDecorator';
-import { loadImages } from './image';
-import Minime from './minime';
+import Minime from './canvasRenderer';
 
 const COUNT = 10;
 const minimeList = [];
@@ -16,6 +15,7 @@ for (let i = 0; i < COUNT; i++) {
   const renderer = new Minime("", {
     width: 500,
     height: 650,
+    scale: 500 / 3100
   });
 
   minimeList.push({
@@ -40,14 +40,12 @@ export const renderer = new RequestDecorator({
 });
 
 // 渲染
-function renderImage({ avatar, option, skin }) {
+function renderImage(layers) {
   return new Promise((resolve) => {
     const minime = getFreeMinime();
     if (minime) {
-      minime.renderer.setOption({
-        avatar,
-        option,
-        skin,
+      minime.renderer.render({
+        layers,
         success: () => {
           const url = minime.renderer.toDataURL({
             format: 'png',

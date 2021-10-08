@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-22 16:26:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-24 14:19:58
+ * @LastEditTime: 2021-09-26 10:13:20
 -->
 <template>
   <draggable
@@ -23,7 +23,7 @@
           <div class="custom-files__box">
             <img :src="element.avatar.url" alt="" srcset="" />
           </div>
-          <div class="close-icon" @click="handleRemove(element)">
+          <div class="close-icon" v-if="list.length > 1" @click="handleRemove(element)">
             <base-icon icon="close" :size="12" color="#ffffff"></base-icon>
           </div>
         </div>

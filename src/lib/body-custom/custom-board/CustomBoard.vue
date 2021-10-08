@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-24 17:11:06
+ * @LastEditTime: 2021-10-08 15:17:08
 -->
 <template>
   <div class="custom-board">
@@ -34,16 +34,29 @@
         <canvas id="customBoard"></canvas>
         <canvas-layer :list="layerList" @change="changeActiveLayer" />
       </div>
-      <!-- 色彩饱和度调整 -->
-      <!-- <brightness-bar :url="currentAvatar.url" @change="changeAvatar" /> -->
+      <!-- 色彩饱和度调整，单头的时候出现 -->
+      <brightness-bar
+        v-if="filesMax === 1"
+        :url="singleAvatar.rawAvatarURL"
+        @change="changeAvatar"
+      />
     </div>
     <div class="custom-board__bottom">
       <base-row :gutter="10" v-if="filesMax === 1">
         <base-col :span="8">
-          <base-button plain @click="backToList" id="button_replace_2">Replace</base-button>
+          <base-button plain @click="backToList" id="button_replace_2"
+            >Replace</base-button
+          >
         </base-col>
         <base-col :span="16">
-          <base-button type="primary" full :blod="600" @click="handleConfirm" id="button_confirm_3">CONFIRM</base-button>
+          <base-button
+            type="primary"
+            full
+            :blod="600"
+            @click="handleConfirm"
+            id="button_confirm_3"
+            >CONFIRM</base-button
+          >
         </base-col>
       </base-row>
       <custom-files
@@ -124,14 +137,23 @@ export default {
   setup(props, context) {
     const { config, skin } = props;
 
+    // fabric实例
     let fabricInstance = null;
 
     const state = reactive({
       loading: false,
       layerList: [],
-      currentAvatar: {},
+      singleAvatar: {
+        avatar: {
+          chin: null,
+          url: "",
+        },
+        rawFile: "",
+        rawAvatarURL: "",
+      },
     });
 
+    // 最大的头像数量，等同于配置的头像数组长度
     const filesMax = computed(() => {
       if (config.faceList) {
         return config.faceList.length;
@@ -141,17 +163,21 @@ export default {
     });
 
     onMounted(() => {
-      // if (filesMax.value === 1) {
-      //   for (let i = props.selectFiles.length - 1; i >= 0; i--) {
-      //     if (i === props.selectFiles.length - 1) {
-      //       continue;
-      //     }
-      //     props.selectFiles.splice(i, 1);
-      //   }
-      // }
+      // 如果是单头，则单独创建一个头部对象，用于亮度调节
+      if (filesMax.value === 1) {
+        const firstItem = props.selectFiles[0];
+        state.singleAvatar = {
+          avatar: {
+            ...firstItem.avatar,
+          },
+          rawFile: firstItem.rawFile,
+          rawAvatarURL: firstItem.avatar.url,
+        };
+      }
       renderer();
     });
 
+    // 文件发生变化的时候重新渲染
     watch(
       () => props.selectFiles,
       () => {
@@ -175,12 +201,13 @@ export default {
     }
 
     // 渲染器
-    const renderer = debounce(function() {
+    const renderer = debounce(function () {
       setCanvasInstance();
-      config.faceList = config.faceList ? config.faceList : [config.face, config.face, config.face];
+
+      // 如果头像数量===1，则用singleAvatar来生成layers，否则用selectFiles
       const layers = getLayers({
         config,
-        files: props.selectFiles,
+        files: filesMax.value === 1 ? [state.singleAvatar] : props.selectFiles,
         skin,
       });
 
@@ -193,7 +220,7 @@ export default {
           context.emit("selectFile");
         },
       });
-    }, 300)
+    }, 300);
 
     // 渲染图层
     function renderLayer(items) {
@@ -224,7 +251,7 @@ export default {
 
     // 修改头像
     function changeAvatar(url) {
-      state.currentAvatar.url = url;
+      state.singleAvatar.avatar.url = url;
       renderer();
     }
 

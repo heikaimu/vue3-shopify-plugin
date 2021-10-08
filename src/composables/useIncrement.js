@@ -4,20 +4,21 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-07 14:21:41
+ * @LastEditTime: 2021-10-08 16:32:42
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
 
 import { CombineImage } from "../utils/combineImage";
 
-export default function useIncrement(props, previewBody) {
+export default function useIncrement(config, previewBody) {
 
   const combineImage = new CombineImage();
   
   const state = reactive({
     productOptionsValue: {},
     previewWidthBackground: null,
+    textRenderParams: null,
     queue: [],
     index: -1,
     sizeList: [],
@@ -27,9 +28,9 @@ export default function useIncrement(props, previewBody) {
   // 设置初始化值
   onMounted(() => {
     // 初始化商品选项
-    state.productOptionsValue = props.config.productOptionsValue || {};
+    state.productOptionsValue = config.productOptionsValue || {};
     // 增量
-    const { slides, publish, background, text, relatedProduct, vip } = props.config.currentProductTypeConfig;
+    const { slides, publish, background, text, relatedProduct, vip } = config.currentProductTypeConfig;
     // 单双面
     initSlides(slides);
     // 背景
@@ -57,7 +58,6 @@ export default function useIncrement(props, previewBody) {
     if (state.index === -1) {
       return null;
     }
-
     return state.queue[state.index];
   })
 
@@ -90,6 +90,7 @@ export default function useIncrement(props, previewBody) {
 
   // ===============推荐===============
   function initPublish(publish) {
+    console.log('publish',publish)
     if (publish && publish.visible) {
       state.queue.push({
         name: "publish",
@@ -104,7 +105,7 @@ export default function useIncrement(props, previewBody) {
   // 修改推荐值如果是尺寸，并且插件内有可选尺寸，需要重新渲染预览图
   function changePublish(data) {
     if (data.key === 'Size') {
-      const currentSize = props.config.sizeList.find(item => {
+      const currentSize = config.sizeList.find(item => {
         return item.label === data.sku.title;
       })
 
@@ -121,7 +122,9 @@ export default function useIncrement(props, previewBody) {
   const layerImage = computed(() => {
     return previewBody.value;
   })
+  
   async function renderPreview(size) {
+    // TODO
     const background = state.queue.find(item => item.name === 'background');
     if (background) {
       const params = {
@@ -133,7 +136,7 @@ export default function useIncrement(props, previewBody) {
       state.publishLoading = true;
       const { url, id } = await combineImage.getURL(params, 'renderAgain');
       state.publishLoading = false;
-      state.previewWidthBackground = url;
+      setPreviewWidthBackground(url);
     }
   }
 
@@ -177,7 +180,9 @@ export default function useIncrement(props, previewBody) {
     return currentIncrement.value && currentIncrement.value.name === 'background';
   })
   function changeBackground(val) {
-    state.previewWidthBackground = val.preview;
+    setPreviewWidthBackground(val.preview);
+
+    state.textRenderParams = val.textRenderParams;
     
     // 修改背景
     _changeValue('background', val.params);
@@ -186,10 +191,13 @@ export default function useIncrement(props, previewBody) {
     _changeProductOptionsValue('Color', val.params.background.title);
 
     // 只有当尺寸属于SKU中的一个的情况才能修改SKU
-    const sizeIndex = props.config.skuList.findIndex(item => item.options.Size === val.params.size.title);
+    const sizeIndex = config.skuList.findIndex(item => item.options.Size === val.params.size.title);
     if (sizeIndex > -1) {
       _changeProductOptionsValue('Size', val.params.size.title)
     };
+  }
+  function setPreviewWidthBackground(url) {
+    state.previewWidthBackground = url;
   }
   // ===============背景 END===============
 
@@ -199,7 +207,7 @@ export default function useIncrement(props, previewBody) {
       state.queue.push({
         name: "text",
         data: toRaw(text.data),
-        value: ''
+        value: {}
       });
     }
   }
@@ -257,11 +265,6 @@ export default function useIncrement(props, previewBody) {
     state.index = index;
   }
 
-  // 关闭增量
-  function closeIncrement() {
-    state.index = -1;
-  }
-
   // 下一个增量
   function next() {
     state.index += 1;
@@ -297,10 +300,10 @@ export default function useIncrement(props, previewBody) {
     changeVip,
     changeRelatedProduct,
     changeBackground,
+    setPreviewWidthBackground,
     changeText,
     changePublish,
     setIncrementIndex,
-    closeIncrement,
     next
   }
 }

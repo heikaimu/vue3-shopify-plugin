@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-23 13:24:29
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-24 11:28:35
+ * @LastEditTime: 2021-10-01 11:47:31
  */
 
 import { fabric } from 'fabric';
@@ -108,7 +108,7 @@ export default class CanvasRenderer {
   }
 
   // 渲染
-  async render({ layers, success, replacePhoto}) {
+  async render({ layers, success, replacePhoto }) {
     // 图层
     this.layers = layers || [];
     // 点击切换图片按钮回调
@@ -141,69 +141,148 @@ export default class CanvasRenderer {
   // 添加图层
   _addLayerItem(item) {
     return new Promise((resolve) => {
-      const { url, type } = item;
-      if (type === 'svg') {
-        fabric.loadSVGFromURL(url, (objects, options) => {
-          const mask = fabric.util.groupSVGElements(objects, options);
-          mask.scale(this.scale).set({
-            left: mask.left * this.scale,
-            top: mask.top * this.scale,
-            fill: 'black',
-            selectable: false,
-            name: type
-          });
-          this.fabricInstance.add(mask);
-          resolve();
-        });
-      } else {
-        fabric.Image.fromURL(url, img => {
-          this._setLayer(img, item);
-          if (type === 'overlay') {
-            this.fabricInstance.setOverlayImage(img, this.fabricInstance.renderAll.bind(this.fabricInstance));
-          } else if (type === 'background') {
-            this.fabricInstance.setBackgroundImage(img, this.fabricInstance.renderAll.bind(this.fabricInstance));
-          } else {
-            this.fabricInstance.add(img);
-          }
-          resolve();
-        }, {
-          crossOrigin: 'Anonymous'
-        })
+      const { type } = item;
+      switch (type) {
+        case 'svg':
+          this._addSVG(item, resolve);
+          break;
+
+        case 'text':
+          this._addText(item, resolve);
+          break;
+
+        case 'background':
+          this._addBackground(item, resolve);
+          break;
+
+        case 'overlay':
+          this._addOverlay(item, resolve);
+          break;
+
+        default:
+          this._addNormalImage(item, resolve);
+          break;
       }
+
+    })
+  }
+
+  // 添加SVG
+  _addSVG(config, resolve) {
+    const { url } = config;
+    fabric.loadSVGFromURL(url, (objects, options) => {
+      const mask = fabric.util.groupSVGElements(objects, options);
+      mask.scale(this.scale).set({
+        left: mask.left * this.scale,
+        top: mask.top * this.scale,
+        fill: 'black',
+        selectable: false,
+        name: type
+      });
+      this.fabricInstance.add(mask);
+      resolve();
+    });
+  }
+
+  // 添加文字
+  _addText(config, resolve) {
+    const { fontSize, left, top, angle, text, color, fontFamily, selectable, stroke='#ffffff', strokeWidth=0 } = config;
+    var t = new fabric.Text(text, {
+      fontSize: fontSize * this.scale,
+      fill: color,
+      fontFamily,
+      stroke,
+      strokeWidth,
+      left: left * this.scale,
+      top: top * this.scale,
+      angle,
+      selectable,
+      transparentCorners: false,
+      textAlign: 'center',
+      originX: 'center',
+      originY: 'center',
+      type: 'text'
+    });
+    this.fabricInstance.add(t);
+    resolve();
+  }
+
+  // 背景
+  _addBackground(config, resolve) {
+    const { url } = config;
+    fabric.Image.fromURL(url, img => {
+      const targetWidth = this.canvasSize.width;
+      const scale = targetWidth / img.width;
+      img.scale(scale).set({
+        left: 0,
+        top: 0
+      })
+      this.fabricInstance.setBackgroundImage(img, this.fabricInstance.renderAll.bind(this.fabricInstance));
+      resolve();
+    }, {
+      crossOrigin: 'Anonymous'
+    })
+  }
+
+  // 背景
+  _addOverlay(config, resolve) {
+    const { url } = config;
+    fabric.Image.fromURL(url, img => {
+      const targetWidth = this.canvasSize.width;
+      const scale = targetWidth / img.width;
+      img.scale(scale).set({
+        left: 0,
+        top: 0
+      })
+      this.fabricInstance.setOverlayImage(img, this.fabricInstance.renderAll.bind(this.fabricInstance));
+      resolve();
+    }, {
+      crossOrigin: 'Anonymous'
     })
   }
 
   // 设置图层的缩放以及位置
-  _setLayer(img, data) {
-    const { type, top, left, width, angle, offset, originX = 'left', originY = 'top', selectable = true, customControls = false, globalCompositeOperation } = data;
-    const targetWidth = width * this.scale;
-    const scale = type === 'svg' ? this.scale : targetWidth / img.width;
+  _addNormalImage(config, resolve) {
+    const { url, id, type, top, left, width, angle, offset, originX = 'left', originY = 'top', selectable = true, customControls = false, globalCompositeOperation } = config;
 
-    let offsetX = 0;
-    let offsetY = 0;
-    if (offset) {
-      // const chinLeft = offset[0] * scale;
-      const chinTop = offset[1] * scale;
-      // const centerX = avatar.width * scale / 2;
-      const bottomY = img.height * scale;
-      // offsetX = centerX - chinLeft; 注释调X轴偏移
-      offsetY = bottomY - chinTop;
-    }
+    fabric.Image.fromURL(url, img => {
 
-    img.scale(scale).set({
-      top: top * this.scale + offsetY,
-      left: left * this.scale + offsetX,
-      angle,
-      originX,
-      originY,
-      selectable,
-      globalCompositeOperation,
-      name: type
+      const targetWidth = width * this.scale;
+      const scale = targetWidth / img.width;
+      let offsetX = 0;
+      let offsetY = 0;
+      if (offset) {
+        // const chinLeft = offset[0] * scale;
+        const chinTop = offset[1] * scale;
+        // const centerX = avatar.width * scale / 2;
+        const bottomY = img.height * scale;
+        // offsetX = centerX - chinLeft; 注释调X轴偏移
+        offsetY = bottomY - chinTop;
+      }
+
+      img.scale(scale).set({
+        top: top * this.scale + offsetY,
+        left: left * this.scale + offsetX,
+        angle,
+        originX,
+        originY,
+        selectable,
+        globalCompositeOperation,
+        name: type,
+        type,
+        id
+      })
+
+      if (customControls) {
+        this._controlStyleOne(img, type);
+      }
+
+      this.fabricInstance.add(img);
+
+      resolve();
+    }, {
+      crossOrigin: 'Anonymous'
     })
-
-    if (customControls) {
-      this._controlStyleOne(img, type);
-    }
   }
 
   // 获取当前配置
@@ -217,8 +296,22 @@ export default class CanvasRenderer {
     this.fabricInstance.renderAll();
   }
 
+  getObjects() {
+    return this.fabricInstance.getObjects();
+  }
+
+  renderAll() {
+    this.fabricInstance.renderAll();
+  }
+  
   // 获取渲染预览图
-  toDataURL() {
+  toDataURL(targetWidth) {
+    if (targetWidth) {
+      const targetHeight = this.canvasSize.height / this.canvasSize.width * targetWidth;
+      this.fabricInstance.setWidth(targetWidth);
+      this.fabricInstance.setHeight(targetHeight);
+      this.fabricInstance.setZoom(targetWidth / this.canvasSize.width);
+    }
     return this.fabricInstance.toDataURL({
       format: 'png',
       quality: 1

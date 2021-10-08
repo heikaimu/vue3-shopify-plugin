@@ -4,14 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 15:03:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-15 17:53:32
+ * @LastEditTime: 2021-09-27 16:19:53
  */
 import { reactive, toRefs, onMounted } from "vue";
 import { fabric } from 'fabric';
 
 const HEIGHT = 260;
 
-export default function useCombineImage(props) {
+export default function useCombineImage(props, id = 'bgCombineCanvas') {
   let _params = {};
   let _scale = 1;
   let _overlayImage = '';
@@ -45,7 +45,7 @@ export default function useCombineImage(props) {
       _renderCanvas(params);
     } else {
       // 没有canvas的情况走完整流程
-      _canvasLive = new fabric.Canvas('bgCombineCanvas');
+      _canvasLive = new fabric.Canvas(id);
       _renderCanvas(params);
     }
 
@@ -53,12 +53,12 @@ export default function useCombineImage(props) {
 
   // 渲染所有图层
   async function _renderCanvas(params) {
-    const { size, backgroundImage, layerList, layerImage } = params;
+    const { size, backgroundImage, layerList, layerImage, customText } = params;
     const queue = [];
     await _setCanvasSize({ canvas: _canvasLive, size, scale: _scale });
     _setBackgroundAndOverlay(_canvasLive, queue, backgroundImage, _scale);
     if (layerList && layerList.length > 0) {
-      _addLayerList({ canvas: _canvasLive, list: layerList, url: layerImage, scale: _scale })
+      _addLayerList({ canvas: _canvasLive, list: layerList, url: layerImage, text: customText, scale: _scale })
     }
   }
 
@@ -119,21 +119,18 @@ export default function useCombineImage(props) {
   }
 
   // 添加图层集合
-  function _addLayerList({ canvas, list, url, scale = 1 }) {
-    return new Promise((reolve, reject) => {
-      const queue = [];
-      for (const item of list) {
-        queue.push(_addLayer({ canvas, item, url, scale }));
+  async function _addLayerList({ canvas, list, url, text, scale = 1 }) {
+    for (const item of list) {
+      if (item.type === 'text') {
+        await _addText({ canvas, item, text, scale })
+      } else {
+        await _addImage({ canvas, item, url, scale })
       }
-
-      Promise.all(queue).then(() => {
-        reolve();
-      });
-    });
+    }
   }
 
-  // 添加图层
-  function _addLayer({ canvas, item, url, scale = 1 }) {
+  // 添加图片
+  function _addImage({ canvas, item, url, scale = 1 }) {
     const { angle, left, top, width } = item;
     return new Promise((resolve) => {
       fabric.Image.fromURL(url, (img) => {
@@ -151,6 +148,26 @@ export default function useCombineImage(props) {
       }, {
         crossOrigin: 'Anonymous'
       });
+    });
+  }
+
+  function _addText({ canvas, item, text, scale }) {
+    const { fontSize, left, top, angle } = item;
+    return new Promise((resolve) => {
+      var t = new fabric.Text(text, {
+        fontSize: fontSize * scale,
+        left: left * scale,
+        top: top * scale,
+        angle,
+        transparentCorners: false,
+        textAlign: 'center',
+        originX: 'center',
+        originY: 'center',
+        type: 'text',
+        selectable: false
+      });
+      canvas.add(t);
+      resolve();
     });
   }
 
