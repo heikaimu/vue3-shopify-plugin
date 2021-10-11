@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-02 15:51:31
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-26 10:32:05
+ * @LastEditTime: 2021-10-09 15:12:24
  */
 import RequestDecorator from './requestDecorator';
 import Minime from './canvasRenderer';
@@ -46,11 +46,8 @@ function renderImage(layers) {
     if (minime) {
       minime.renderer.render({
         layers,
-        success: () => {
-          const url = minime.renderer.toDataURL({
-            format: 'png',
-            quality: 1
-          });
+        success: (items) => {
+          const url = minime.renderer.toDataURL();
           minime.free = true;
           resolve(url);
         }

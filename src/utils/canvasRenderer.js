@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-23 13:24:29
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-01 11:47:31
+ * @LastEditTime: 2021-10-11 10:13:56
  */
 
 import { fabric } from 'fabric';
@@ -40,9 +40,8 @@ export default class CanvasRenderer {
     fabric.Canvas.prototype.customiseControls({
       tl: {
         action: (e, target) => {
-          if (typeof this.replacePhoto === 'function') {
-            this.replacePhoto();
-          }
+          const item = this.fabricInstance.getActiveObject();
+          typeof this.replacePhoto === 'function' && this.replacePhoto(item);
         },
         cursor: 'pointer'
       },
@@ -108,11 +107,13 @@ export default class CanvasRenderer {
   }
 
   // 渲染
-  async render({ layers, success, replacePhoto }) {
+  async render({ layers, success, replacePhoto, singleClick }) {
     // 图层
     this.layers = layers || [];
     // 点击切换图片按钮回调
     typeof replacePhoto === 'function' ? this.replacePhoto = replacePhoto : null;
+    // 单次点击
+    typeof singleClick === 'function' ? this.singleClick = singleClick : null;
     //清空画布
     this._clear();
     // 加载资源
@@ -151,6 +152,10 @@ export default class CanvasRenderer {
           this._addText(item, resolve);
           break;
 
+        case 'vBox':
+          this._addVBox(item, resolve);
+          break;
+
         case 'background':
           this._addBackground(item, resolve);
           break;
@@ -169,7 +174,7 @@ export default class CanvasRenderer {
 
   // 添加SVG
   _addSVG(config, resolve) {
-    const { url } = config;
+    const { url, type, name } = config;
     fabric.loadSVGFromURL(url, (objects, options) => {
       const mask = fabric.util.groupSVGElements(objects, options);
       mask.scale(this.scale).set({
@@ -177,7 +182,7 @@ export default class CanvasRenderer {
         top: mask.top * this.scale,
         fill: 'black',
         selectable: false,
-        name: type
+        name: name || type
       });
       this.fabricInstance.add(mask);
       resolve();
@@ -186,7 +191,7 @@ export default class CanvasRenderer {
 
   // 添加文字
   _addText(config, resolve) {
-    const { fontSize, left, top, angle, text, color, fontFamily, selectable, stroke='#ffffff', strokeWidth=0 } = config;
+    const { fontSize, left, top, angle, text, color, fontFamily, selectable, stroke = '#ffffff', strokeWidth = 0 } = config;
     var t = new fabric.Text(text, {
       fontSize: fontSize * this.scale,
       fill: color,
@@ -207,15 +212,43 @@ export default class CanvasRenderer {
     resolve();
   }
 
+  // 添加文字
+  _addVBox(config, resolve) {
+    const { left, top, angle, originX = 'left', originY = 'top', selectable = true, name, type } = config;
+    const rect = new fabric.Rect({
+      left: left * this.scale,
+      top: top * this.scale,
+      angle,
+      originX,
+      originY,
+      selectable,
+      name: name || type,
+      fill: 'red',//填充的颜色
+      width: 100,//方形的宽度
+      height: 100//方形的高度
+    });
+
+    rect.on('mousedown', () => {
+      typeof this.singleClick === 'function' && this.singleClick({
+        layer: rect,
+        config: config
+      });
+    })
+
+    this.fabricInstance.add(rect);
+    resolve();
+  }
+
   // 背景
   _addBackground(config, resolve) {
-    const { url } = config;
+    const { url, globalCompositeOperation } = config;
     fabric.Image.fromURL(url, img => {
       const targetWidth = this.canvasSize.width;
       const scale = targetWidth / img.width;
       img.scale(scale).set({
         left: 0,
-        top: 0
+        top: 0,
+        globalCompositeOperation
       })
       this.fabricInstance.setBackgroundImage(img, this.fabricInstance.renderAll.bind(this.fabricInstance));
       resolve();
@@ -226,13 +259,14 @@ export default class CanvasRenderer {
 
   // 背景
   _addOverlay(config, resolve) {
-    const { url } = config;
+    const { url, globalCompositeOperation } = config;
     fabric.Image.fromURL(url, img => {
       const targetWidth = this.canvasSize.width;
       const scale = targetWidth / img.width;
       img.scale(scale).set({
         left: 0,
-        top: 0
+        top: 0,
+        globalCompositeOperation
       })
       this.fabricInstance.setOverlayImage(img, this.fabricInstance.renderAll.bind(this.fabricInstance));
       resolve();
@@ -243,7 +277,7 @@ export default class CanvasRenderer {
 
   // 设置图层的缩放以及位置
   _addNormalImage(config, resolve) {
-    const { url, id, type, top, left, width, angle, offset, originX = 'left', originY = 'top', selectable = true, customControls = false, globalCompositeOperation } = config;
+    const { url, id, type, name, top, left, width, angle, offset, originX = 'left', originY = 'top', selectable = true, customControls = false, globalCompositeOperation } = config;
 
     fabric.Image.fromURL(url, img => {
 
@@ -268,7 +302,7 @@ export default class CanvasRenderer {
         originY,
         selectable,
         globalCompositeOperation,
-        name: type,
+        name: name || type,
         type,
         id
       })
@@ -296,6 +330,56 @@ export default class CanvasRenderer {
     this.fabricInstance.renderAll();
   }
 
+  // 新增
+  async add(item) {
+    await this._addLayerItem(item);
+    this.fabricInstance.renderAll();
+  }
+
+  // 更新
+  update({ type, name, layer, options }) {
+
+    if (layer) {
+      layer.set({ ...options });
+      alert();
+    } else {
+      const items = this.fabricInstance.getObjects();
+      for (const item of items) {
+        if (name && item.name === name) {
+          item.set({ ...options });
+        } else if (type && item.type === type) {
+          item.set({ ...options });
+        }
+      }
+    }
+
+    this.fabricInstance.renderAll();
+  }
+
+  // 刷新
+  refresh() {
+    this.fabricInstance.renderAll();
+  }
+
+  // 删除图层
+  remove({ name, type, layer }) {
+
+    if (layer) {
+      this.fabricInstance.remove(layer);
+    } else {
+      const items = this.fabricInstance.getObjects();
+      for (const item of items) {
+        if (name && item.name === name) {
+          this.fabricInstance.remove(item);
+        } else if (type && item.type === type) {
+          this.fabricInstance.remove(item);
+        }
+      }
+    }
+
+    this.fabricInstance.renderAll();
+  }
+
   getObjects() {
     return this.fabricInstance.getObjects();
   }
@@ -303,7 +387,7 @@ export default class CanvasRenderer {
   renderAll() {
     this.fabricInstance.renderAll();
   }
-  
+
   // 获取渲染预览图
   toDataURL(targetWidth) {
     if (targetWidth) {

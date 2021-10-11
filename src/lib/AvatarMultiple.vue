@@ -1,36 +1,15 @@
 <template>
   <div class="plugin-dialog">
     <div class="plugin-dialog__content">
-      <!-- 扩展头像弹出窗 -->
-      <div class="image-extend-selector-dialog" v-if="extendSelectorVisible">
-        <image-select-plugin
-          :isCustomBody="isCustomBody"
-          @close="closeImageExtendSelector"
-          @complete="handleCompleteExtendSelect"
-        />
-      </div>
 
       <!-- 主流程 -->
-      <transition name="slide-left-fade" mode="out-in">
-        <!-- 文件选择 -->
-        <image-select-plugin
-          v-if="currentStep === 'fileSelect'"
-          :isCustomBody="isCustomBody"
-          @close="closePlugin"
-          @complete="handleCompleteImageSelect"
-        />
-
-        <!-- 身体定制 -->
-        <body-custom
-          v-else-if="currentStep === 'bodyCustom'"
-          :selectFiles="selectFiles"
-          :config="config"
-          @selectBody="setBodyConfig"
-          @confirm="confirmCustom"
-          @setStep="setStep"
-          @openImageExtendSelector="openImageExtendSelector"
-        />
-      </transition>
+      <avatar-custom-multiple
+        :config="config"
+        :selectFiles="selectFiles"
+        @saveFileAndAvatar="saveFileAndAvatar"
+        @close="closePlugin"
+        @save="saveCustom"
+      />
 
       <!-- 增量服务 -->
       <increment-services
@@ -48,19 +27,17 @@
         :website="config.website"
         @complete="completeUpload"
       />
-
     </div>
   </div>
 </template>
 
 <script>
-import { nextTick, toRaw, ref } from "vue";
+import { nextTick, toRaw } from "vue";
 
-import ImageSelectPlugin from "./image-select-plugin/ImageSelectPlugin.vue";
-import BodyCustom from "./body-custom/BodyCustom.vue";
 import FilesUploader from "../components/files-uploader/FilesUploader.vue";
 import IncrementServices from "./increment/IncrementServices.vue";
 import BaseLoadingDot from "../base/BaseLoadingDot.vue";
+import AvatarCustomMultiple from "./avatar-custom-multiple/AvatarCustomMultiple.vue";
 
 import useBodyMain from "../composables/useBodyMain";
 import useUpload from "../composables/useUpload";
@@ -69,11 +46,10 @@ export default {
   name: "MinimePillow",
 
   components: {
-    ImageSelectPlugin,
-    BodyCustom,
     FilesUploader,
     IncrementServices,
     BaseLoadingDot,
+    AvatarCustomMultiple,
   },
 
   props: {
@@ -110,41 +86,12 @@ export default {
     const { uploadFiles, uploadVisible, startUpload } = useUpload();
 
     /*
-    保存文件处理后的图片
-    如果有身体定制则走定制流程
-    没有身体直接走增量服务
-    */
-    function handleCompleteImageSelect(data) {
-      saveFileAndAvatar(data);
-      if (isCustomBody.value) {
-        setStep("bodyCustom");
-      } else {
-        confirmCustom(data.avatar.url);
-      }
-    }
-
-    // 扩展图片
-    const extendSelectorVisible = ref(false);
-    function openImageExtendSelector() {
-      setImageExtendSelectorVisible(true);
-    }
-    function closeImageExtendSelector() {
-      setImageExtendSelectorVisible(false);
-    }
-    function handleCompleteExtendSelect(data) {
-      saveFileAndAvatar(data);
-      setImageExtendSelectorVisible(false);
-    }
-    function setImageExtendSelectorVisible(flag) {
-      extendSelectorVisible.value = flag;
-    }
-
-    /*
     保存定制主人物图
     修改主定制状态
     */
-    async function confirmCustom(url) {
+    async function saveCustom({url, config}) {
       setPreview(url);
+      setBodyConfig(config);
       await nextTick();
       setCustomState(true);
     }
@@ -172,16 +119,15 @@ export default {
           url: preview,
         },
       ];
-      const { faceNum } = getBodyConfig();
-      selectFiles.value.slice(faceNum - 1).forEach((item, index) => {
+      selectFiles.value.forEach((item, index) => {
         files.push(
           {
             name: `Original_${index}`,
-            url: item.rawFile,
+            url: item.data.rawFile,
           },
           {
             name: `Ai_${index}`,
-            url: item.avatar.url,
+            url: item.data.avatar.url,
           }
         );
       });
@@ -213,20 +159,15 @@ export default {
       selectFiles,
       previewBody,
       customState,
-      setBodyConfig,
       setStep,
       setCustomState,
       saveIncrement,
       uploadFiles,
       uploadVisible,
-      extendSelectorVisible,
-      openImageExtendSelector,
-      handleCompleteExtendSelect,
-      closeImageExtendSelector,
-      confirmCustom,
+      saveCustom,
       closePlugin,
       completeUpload,
-      handleCompleteImageSelect,
+      saveFileAndAvatar
     };
   },
 };
@@ -249,11 +190,6 @@ export default {
     overflow: hidden;
     background-color: #ffffff;
     position: relative;
-
-    .image-extend-selector-dialog {
-      @include pos-absolute(0, 0, 0, 0, 2020);
-      background-color: #ffffff;
-    }
   }
 }
 

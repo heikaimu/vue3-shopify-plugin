@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-08 16:26:41
+ * @LastEditTime: 2021-10-11 11:15:54
 -->
 <!--
  * @Description: 
@@ -65,6 +65,7 @@ export default {
     });
 
     function complete(data) {
+      console.log(data)
       window.open(data.files.Preview);
     }
 

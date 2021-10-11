@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-01 11:13:24
+ * @LastEditTime: 2021-10-11 11:19:13
 -->
 <template>
   <div class="increment-wrapper">
@@ -41,7 +41,7 @@
 
       <div class="add-to-cart">
         <base-button type="primary" size="large" @click="handleNext(true)" id="button_add_to_cart_10"
-          >Sure & Add To Cart</base-button
+          >Add To Cart</base-button
         >
       </div>
     </div>

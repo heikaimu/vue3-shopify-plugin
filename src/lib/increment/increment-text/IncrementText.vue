@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-01 12:18:19
+ * @LastEditTime: 2021-10-09 14:42:11
 -->
 <template>
   <div class="increment-wrapper">
@@ -211,18 +211,14 @@ export default {
     }, 300);
 
     const rendererText = debounce(function () {
-      const items = fabricInstance.getObjects();
-      items.forEach((item) => {
-        if (item.type === "text") {
-          item.set({
-            text: state.customText.text,
-            fontFamily: state.customText.fontFamily,
-            fill: state.customText.color,
-          });
-        }
+      fabricInstance.update({
+        type: "text",
+        options: {
+          text: state.customText.text,
+          fontFamily: state.customText.fontFamily,
+          fill: state.customText.color,
+        },
       });
-
-      fabricInstance.renderAll();
     });
 
     // 关闭
