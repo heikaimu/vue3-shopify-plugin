@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-26 10:43:28
+ * @LastEditTime: 2021-10-11 14:13:46
 -->
 <template>
   <div class="body-wrapper" ref="bodyContainer">
@@ -31,10 +31,11 @@
 <script>
 import { reactive, toRefs, ref, onMounted, watch, nextTick } from "vue";
 
-import BaseRow from "../../../base/BaseRow.vue";
-import BaseCol from "../../../base/BaseCol.vue";
+import BaseRow from "../../../../base/BaseRow.vue";
+import BaseCol from "../../../../base/BaseCol.vue";
 import BodyCard from "./BodyCard.vue";
-import { clearRenderer } from "../../../utils/minimeRenderer";
+
+import { clearRenderer } from "../../../../utils/minimeRenderer";
 import { debounce, throttle } from "lodash";
 
 export default {

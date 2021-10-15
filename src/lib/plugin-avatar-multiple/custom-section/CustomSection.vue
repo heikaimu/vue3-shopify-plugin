@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 17:35:23
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-09 17:21:48
+ * @LastEditTime: 2021-10-12 17:09:13
 -->
 <template>
   <div>
@@ -28,7 +28,7 @@ import { cloneDeep } from "lodash";
 
 export default {
   components: {
-    CustomBoard
+    CustomBoard,
   },
 
   props: {
@@ -49,7 +49,7 @@ export default {
 
   setup(props, context) {
     const state = reactive({
-      currentIndex: 1,
+      currentIndex: 0,
       currentConfig: null,
       faceList: [],
       skin: "white",
@@ -70,7 +70,11 @@ export default {
     function setCurrentConfig() {
       const groupList = props.config.miniMeData;
       if (groupList && groupList.length > 0) {
-        state.currentConfig = groupList[0].images[state.currentIndex];
+        let firstConfig = groupList[0].images[state.currentIndex];
+        if (!firstConfig.id) {
+          firstConfig = groupList[0].images[state.currentIndex + 1];
+        }
+        state.currentConfig = firstConfig;
         state.faceList = cloneDeep(state.currentConfig.faceList);
       }
     }
@@ -95,5 +99,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 </style>

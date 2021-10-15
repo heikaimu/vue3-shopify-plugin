@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-22 15:57:24
+ * @LastEditTime: 2021-10-11 14:13:06
 -->
 <template>
   <div class="custom-list">
@@ -40,13 +40,13 @@
 <script>
 import { reactive, toRefs, onMounted, computed, watch } from "vue";
 
-import BaseHeader from "../../../base/BaseHeader.vue";
+import BaseHeader from "../../../../base/BaseHeader.vue";
 import SkinSelector from "./SkinSelector.vue";
 import SideNavigation from "./SideNavigation.vue";
 import BodyList from "./BodyList.vue";
 
-import useSkin from "../../../composables/useSkin";
-import useBodyNavigation from "../../../composables/useBodyNavigation";
+import useSkin from "../../../../composables/useSkin";
+import useBodyNavigation from "../../../../composables/useBodyNavigation";
 
 export default {
   components: {

@@ -2,11 +2,14 @@
  * @Description: 
  * @Version: 2.0
  * @Author: Yaowen Liu
- * @Date: 2021-07-19 09:42:00
+ * @Date: 2021-10-09 15:20:54
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 11:28:42
+ * @LastEditTime: 2021-10-12 16:21:03
  */
-import MinimePillow from './MinimePillow.vue';
-// import MinimePillow from './AvatarMultiple.vue';
+// 普通异性抱枕
+// import PluginModule from './plugin-minime/MinimePillow.vue';
 
-export default MinimePillow;
+// 多头插件
+import PluginModule from './PluginMain.vue';
+
+export default PluginModule;

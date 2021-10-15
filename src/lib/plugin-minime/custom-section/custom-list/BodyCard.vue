@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-26 10:52:25
+ * @LastEditTime: 2021-10-11 14:13:33
 -->
 <template>
   <div class="body-card" @click="handleClick">
@@ -39,11 +39,11 @@
 <script>
 import { reactive, toRefs, watch, computed, onMounted } from "vue";
 
-import BaseIcon from "../../../base/BaseIcon.vue";
+import BaseIcon from "../../../../base/BaseIcon.vue";
 
-import { renderer } from "../../../utils/minimeRenderer";
-import { loadImage } from "../../../utils/image";
-import { getLayers } from "../../../utils/layers";
+import { renderer } from "../../../../utils/minimeRenderer";
+import { loadImage } from "../../../../utils/image";
+import { getLayers } from "../../../../utils/layers";
 import { stubTrue } from "lodash";
 
 export default {

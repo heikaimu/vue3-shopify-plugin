@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 11:01:15
+ * @LastEditTime: 2021-10-13 10:15:16
 -->
 <template>
   <div class="custom-board">
@@ -15,23 +15,32 @@
         :subText="title"
         icon="close"
         @close="handleClose"
-      >
-        <base-button
-          type="primary"
-          full
-          :blod="600"
-          class="custom-board__button--confirm"
-          @click="handleSave"
-          id="button_confirm_3"
-          >CONFIRM</base-button
-        >
-      </base-header>
+      />
     </div>
     <div class="custom-board__medium">
       <!-- fabric -->
       <div class="custom-board__canvas-box" ref="canvasBox">
         <canvas id="customBoard"></canvas>
       </div>
+    </div>
+    <div class="custom-board__bottom">
+      <base-row :gutter="10">
+        <!-- <base-col :span="8">
+          <base-button plain id="button_replace_2"
+            >Replace</base-button
+          >
+        </base-col> -->
+        <base-col :span="24">
+          <base-button
+            type="primary"
+            full
+            :blod="600"
+            @click="handleSave"
+            id="button_confirm_3"
+            >CONFIRM</base-button
+          >
+        </base-col>
+      </base-row>
     </div>
 
     <!-- loading -->
@@ -54,26 +63,30 @@
 <script>
 import { reactive, toRefs, toRaw, ref, computed, onMounted, watch } from "vue";
 
-import BaseHeader from "../../../base/BaseHeader.vue";
-import BaseButton from "../../../base/BaseButton.vue";
-import BaseIcon from "../../../base/BaseIcon.vue";
-import ImageSelectPlugin from "../../image-select-plugin/ImageSelectPlugin.vue";
+import BaseHeader from "../../../../base/BaseHeader.vue";
+import BaseButton from "../../../../base/BaseButton.vue";
+import BaseIcon from "../../../../base/BaseIcon.vue";
+import BaseRow from "../../../../base/BaseRow.vue";
+import BaseCol from "../../../../base/BaseCol.vue";
+import ImageSelectPlugin from "../../../../components/image-select-plugin/ImageSelectPlugin.vue";
 
-import CanvasRenderer from "../../../utils/canvasRenderer";
+import CanvasRenderer from "../../../../utils/canvasRenderer";
 import {
   getSVG,
   getAnnexList,
   getBody,
   getAvatar,
-} from "../../../utils/layers";
+} from "../../../../utils/layers";
 import { debounce } from "lodash";
-import { getRandomID } from "../../../utils/image";
+import { getRandomID } from "../../../../utils/image";
 
 export default {
   components: {
     BaseHeader,
     BaseButton,
     BaseIcon,
+    BaseRow,
+    BaseCol,
     ImageSelectPlugin,
   },
 
@@ -132,15 +145,6 @@ export default {
       renderer();
     });
 
-    // 文件发生变化的时候重新渲染
-    // watch(
-    //   () => props.selectFiles,
-    //   () => {
-    //     renderer();
-    //   },
-    //   { deep: true }
-    // );
-
     // 实力化插件
     const canvasBox = ref(null);
     function setCanvasInstance() {
@@ -157,19 +161,24 @@ export default {
 
     // 渲染器
     const renderer = debounce(function () {
+      // 实列化插件
       setCanvasInstance();
 
+      // 添加底板图
       const body = getBody(config, skin);
       state.layerList.push(body);
 
+      // 添加附件图
       const annexList = getAnnexList(config, skin);
       state.layerList.push(...annexList);
 
+      // 如果是hood模式，添加svg蒙版层
       if (config.type === "hood") {
         const svg = getSVG(config);
         state.layerList.push(svg);
       }
 
+      // 根据当前头的数量添加虚拟头
       const avatarList = config.faceList.map((item, index) => {
         const { left, top, angle, width } = item;
         return {
@@ -188,18 +197,23 @@ export default {
           name: `vBox${index}`,
         };
       });
-
       state.layerList.push(...avatarList);
 
+      // 渲染
+      state.loading = true;
       fabricInstance.render({
         layers: state.layerList,
-        success: () => {},
+        success: () => {
+          state.loading = false;
+        },
         replacePhoto: (layer) => {
+          // 替换头像
           state.actionType = "replace";
           state.currentActiveAvatar = layer;
           openImageSelector();
         },
         singleClick: (data) => {
+          // 新增头像
           state.actionType = "add";
           state.currentVBox = data;
           openImageSelector();
@@ -213,9 +227,9 @@ export default {
       if (layer && layer.name) {
         fabricInstance.remove({ name: layer.name });
       }
-
+      config.configType = props.config.type;
       const avatarLayer = getAvatar(config, avatar.avatar);
-      fabricInstance.add(avatarLayer);
+      fabricInstance.add(avatarLayer, true);
 
       const id = avatarLayer.id;
       props.selectFiles.push({
@@ -226,23 +240,29 @@ export default {
 
     // update:替换头像
     function replaceAvatar(avatar) {
-      const { left, top, width, angle, scaleX, id } = state.currentActiveAvatar;
+      const { left, top, width, angle, scaleX, id, offset } =
+        state.currentActiveAvatar;
       const scale = fabricInstance.scale;
 
-      // 删除当前的
+      // 删除当前头像
       fabricInstance.remove({
         layer: toRaw(state.currentActiveAvatar),
       });
 
-      // 添加新的
+      // 获取当前头像的定位，如果之前有偏移，在计算位置的时候先减去偏移量
+      const offsetX = offset.left || 0;
+      const offsetY = offset.top || 0;
       const config = {
-        left: left / scale,
-        top: top / scale,
+        left: (left - offsetX) / scale,
+        top: (top - offsetY) / scale,
         width: (width * scaleX) / scale,
         angle,
+        configType: props.config.type,
       };
+
+      // 添加新头像
       const avatarLayer = getAvatar(config, avatar.avatar, id);
-      fabricInstance.add(avatarLayer);
+      fabricInstance.add(avatarLayer, true);
 
       // 替换掉selectFiles里对应的元素文件
       const currentFile = props.selectFiles.find((item) => item.id === id);
@@ -254,6 +274,11 @@ export default {
     // 保存数据
     function handleSave() {
       if (!fabricInstance) {
+        return;
+      }
+
+      if(props.selectFiles.length !== config.faceList.length) {
+        alert('Try again after fill all avatar');
         return;
       }
 

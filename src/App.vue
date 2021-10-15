@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 11:15:54
+ * @LastEditTime: 2021-10-13 11:07:36
 -->
 <!--
  * @Description: 
@@ -43,7 +43,7 @@ import axios from "axios";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
 const WEBSITE = "M";
-import { product } from "../shopifyBlanketConfig";
+import { product } from "../shopifyPuzzleConfig";
 
 export default {
   components: {
@@ -57,7 +57,7 @@ export default {
       backgroundActiveIndex: 0,
       composingActiveIndex: 0,
       sizeActiveName: '30" x 40"',
-      backgroundActiveName: "Yellow",
+      backgroundActiveName: "Green",
     });
 
     onMounted(async () => {

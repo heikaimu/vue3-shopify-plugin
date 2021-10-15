@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-22 16:26:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-26 10:13:20
+ * @LastEditTime: 2021-10-11 14:15:12
 -->
 <template>
   <draggable
@@ -45,7 +45,7 @@
 import { reactive, toRefs } from "vue";
 
 import draggable from "vuedraggable";
-import BaseIcon from "../../../base/BaseIcon.vue";
+import BaseIcon from "../../../../base/BaseIcon.vue";
 
 export default {
   components: {

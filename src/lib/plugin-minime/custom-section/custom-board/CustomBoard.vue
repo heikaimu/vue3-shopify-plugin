@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-09 15:01:55
+ * @LastEditTime: 2021-10-12 10:58:10
 -->
 <template>
   <div class="custom-board">
@@ -79,17 +79,17 @@
 <script>
 import { reactive, toRefs, ref, computed, onMounted, watch } from "vue";
 
-import BaseHeader from "../../../base/BaseHeader.vue";
-import BaseRow from "../../../base/BaseRow.vue";
-import BaseCol from "../../../base/BaseCol.vue";
-import BaseButton from "../../../base/BaseButton.vue";
-import BaseIcon from "../../../base/BaseIcon.vue";
+import BaseHeader from "../../../../base/BaseHeader.vue";
+import BaseRow from "../../../../base/BaseRow.vue";
+import BaseCol from "../../../../base/BaseCol.vue";
+import BaseButton from "../../../../base/BaseButton.vue";
+import BaseIcon from "../../../../base/BaseIcon.vue";
 import BrightnessBar from "./BrightnessBar.vue";
 import CanvasLayer from "./CanvasLayers.vue";
 import CustomFiles from "./CustomFiles.vue";
 
-import CanvasRenderer from "../../../utils/canvasRenderer";
-import { getLayers } from "../../../utils/layers";
+import CanvasRenderer from "../../../../utils/canvasRenderer";
+import { getLayers } from "../../../../utils/layers";
 import { debounce } from "lodash";
 
 export default {

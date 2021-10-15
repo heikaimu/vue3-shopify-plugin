@@ -4,12 +4,12 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-24 11:03:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 10:27:16
+ * @LastEditTime: 2021-10-12 14:35:52
  */
 import { getRandomID } from './image';
 
 function getLayers({ config, files, skin }) {
-  let layers = [];
+  const layers = [];
 
   const body = getBody(config, skin);
   layers.push(body);
@@ -25,14 +25,14 @@ function getLayers({ config, files, skin }) {
     layers.push(svg);
   }
 
-  return layers
+  return layers;
 }
 
 /**
  * 获取身体
- * @param {Object} config 
- * @param {String} skin 
- * @returns 
+ * @param {Object} config
+ * @param {String} skin
+ * @returns
  */
 function getBody(config, skin, id) {
   const currentBody = config.images.find((item) => item.color === skin);
@@ -42,20 +42,20 @@ function getBody(config, skin, id) {
     top: 0,
     width: config.width,
     sort: 1,
-    globalCompositeOperation: config.type === "hood" ? "destination-over" : "",
-    type: config.type === "normal" ? "background" : "overlay",
+    globalCompositeOperation: config.type === 'hood' ? 'destination-over' : '',
+    type: config.type === 'normal' ? 'background' : 'overlay',
     id: id || getRandomID()
-  }
+  };
 }
 
 /**
  * 获取附件
- * @param {Object} config 
- * @param {String} skin 
- * @returns 
+ * @param {Object} config
+ * @param {String} skin
+ * @returns
  */
 function getAnnexList(config, skin, id) {
-  let list = [];
+  const list = [];
   if (config.annex && config.annex.length) {
     for (const item of config.annex) {
       const currentAnnex = item.images.find(
@@ -69,7 +69,7 @@ function getAnnexList(config, skin, id) {
         width: item.width,
         sort: 4,
         customControls: true,
-        type: "annex",
+        type: 'annex',
         id: id || getRandomID()
       });
     }
@@ -79,9 +79,9 @@ function getAnnexList(config, skin, id) {
 
 /**
  * 获取头像列表
- * @param {Object} config 
- * @param {String} skin 
- * @returns 
+ * @param {Object} config
+ * @param {String} skin
+ * @returns
  */
 function getAvatarList(config, files) {
   if (files.length === 0) {
@@ -91,18 +91,19 @@ function getAvatarList(config, files) {
   const list = config.faceList;
   return list.map((item, index) => {
     const avatar = files[index % files.length].avatar;
+    item.configType = config.type;
     return getAvatar(item, avatar);
-  })
+  });
 }
 
 /**
  * 获取头像
- * @param {Object} config 
- * @param {String} skin 
- * @returns 
+ * @param {Object} config
+ * @param {String} skin
+ * @returns
  */
 function getAvatar(config, avatar, id) {
-  const { left, top, angle, width } = config;
+  const { left, top, angle, width, configType } = config;
   return {
     left,
     top,
@@ -110,21 +111,21 @@ function getAvatar(config, avatar, id) {
     width,
     url: avatar.url,
     offset: avatar.chin,
-    originX: "center",
-    originY: "bottom",
+    originX: 'center',
+    originY: 'bottom',
     sort: 3,
     customControls: true,
-    globalCompositeOperation: config.type === "hood" ? "source-atop" : "",
-    type: "avatar",
+    globalCompositeOperation: configType === 'hood' ? 'source-atop' : '',
+    type: 'avatar',
     id: id || getRandomID()
-  }
+  };
 }
 
 /**
  * 获取SVG遮盖
- * @param {Object} config 
- * @param {String} skin 
- * @returns 
+ * @param {Object} config
+ * @param {String} skin
+ * @returns
  */
 function getSVG(config, id) {
   return {
@@ -134,9 +135,9 @@ function getSVG(config, id) {
     width: config.avatar.width,
     sort: 2,
     selectable: false,
-    type: "svg",
+    type: 'svg',
     id: id || getRandomID()
-  }
+  };
 }
 
 export {
@@ -146,4 +147,4 @@ export {
   getAvatar,
   getAvatarList,
   getSVG
-}
+};

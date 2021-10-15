@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-09 14:42:11
+ * @LastEditTime: 2021-10-13 11:02:29
 -->
 <template>
   <div class="increment-wrapper">
@@ -278,7 +278,8 @@ export default {
         padding-bottom: 15px;
         .text-canvas-box {
           @include card-shadow-lg;
-          // padding: 5px;
+          margin-top: -50px;
+          padding: 5px;
           background-color: #ffffff;
           // overflow: hidden;
           img {

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-28 16:55:16
+ * @LastEditTime: 2021-10-11 14:49:33
 -->
 <template>
   <div class="increment-wrapper">
@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { watch, toRaw, onMounted, nextTick } from "vue";
+import { watch, toRaw } from "vue";
 
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";

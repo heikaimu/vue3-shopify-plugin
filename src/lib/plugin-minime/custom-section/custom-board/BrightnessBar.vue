@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 17:23:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-01 11:07:02
+ * @LastEditTime: 2021-10-11 14:14:45
 -->
 <template>
   <div class="brightness-bar" :class="{ active: active }">
@@ -52,11 +52,11 @@
 <script>
 import { reactive, toRefs, computed } from "vue";
 
-import BaseIcon from "../../../base/BaseIcon.vue";
+import BaseIcon from "../../../../base/BaseIcon.vue";
 import "element-plus/lib/theme-chalk/index.css";
 import { ElSlider } from "element-plus";
 
-import { colorMatrix } from "../../../utils/image";
+import { colorMatrix } from "../../../../utils/image";
 
 export default {
   components: {

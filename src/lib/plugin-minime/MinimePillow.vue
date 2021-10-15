@@ -1,21 +1,43 @@
 <template>
   <div class="plugin-dialog">
     <div class="plugin-dialog__content">
+      <!-- 扩展头像弹出窗 -->
+      <div class="image-extend-selector-dialog" v-if="extendSelectorVisible">
+        <image-select-plugin
+          :isCustomBody="isCustomBody"
+          @close="closeImageExtendSelector"
+          @complete="handleCompleteExtendSelect"
+        />
+      </div>
 
       <!-- 主流程 -->
-      <avatar-custom-multiple
-        :config="config"
-        :selectFiles="selectFiles"
-        @saveFileAndAvatar="saveFileAndAvatar"
-        @close="closePlugin"
-        @save="saveCustom"
-      />
+      <transition name="slide-left-fade" mode="out-in">
+        <!-- 文件选择 -->
+        <image-select-plugin
+          v-if="currentStep === 'fileSelect'"
+          :isCustomBody="isCustomBody"
+          @close="closePlugin"
+          @complete="handleCompleteImageSelect"
+        />
+
+        <!-- 身体定制 -->
+        <body-custom
+          v-else-if="currentStep === 'bodyCustom'"
+          :selectFiles="selectFiles"
+          :config="config"
+          @selectBody="setBodyConfig"
+          @confirm="confirmCustom"
+          @setStep="setStep"
+          @openImageExtendSelector="openImageExtendSelector"
+        />
+      </transition>
 
       <!-- 增量服务 -->
       <increment-services
         :customState="customState"
         :config="config"
         :previewBody="previewBody"
+        v-bind="$attrs"
         @save="saveIncrement"
         @close="setCustomState"
       />
@@ -27,29 +49,32 @@
         :website="config.website"
         @complete="completeUpload"
       />
+
     </div>
   </div>
 </template>
 
 <script>
-import { nextTick, toRaw } from "vue";
+import { nextTick, toRaw, ref } from "vue";
 
-import FilesUploader from "../components/files-uploader/FilesUploader.vue";
-import IncrementServices from "./increment/IncrementServices.vue";
-import BaseLoadingDot from "../base/BaseLoadingDot.vue";
-import AvatarCustomMultiple from "./avatar-custom-multiple/AvatarCustomMultiple.vue";
+import BodyCustom from "./custom-section/BodyCustom.vue";
+import ImageSelectPlugin from "../../components/image-select-plugin/ImageSelectPlugin.vue";
+import FilesUploader from "../../components/files-uploader/FilesUploader.vue";
+import IncrementServices from "../../components/increment/IncrementServices.vue";
+import BaseLoadingDot from "../../base/BaseLoadingDot.vue";
 
-import useBodyMain from "../composables/useBodyMain";
-import useUpload from "../composables/useUpload";
+import useBodyMain from "../../composables/useBodyMain";
+import useUpload from "../../composables/useUpload";
 
 export default {
   name: "MinimePillow",
 
   components: {
+    ImageSelectPlugin,
+    BodyCustom,
     FilesUploader,
     IncrementServices,
     BaseLoadingDot,
-    AvatarCustomMultiple,
   },
 
   props: {
@@ -86,12 +111,41 @@ export default {
     const { uploadFiles, uploadVisible, startUpload } = useUpload();
 
     /*
+    保存文件处理后的图片
+    如果有身体定制则走定制流程
+    没有身体直接走增量服务
+    */
+    function handleCompleteImageSelect(data) {
+      saveFileAndAvatar(data);
+      if (isCustomBody.value) {
+        setStep("bodyCustom");
+      } else {
+        confirmCustom(data.avatar.url);
+      }
+    }
+
+    // 扩展图片
+    const extendSelectorVisible = ref(false);
+    function openImageExtendSelector() {
+      setImageExtendSelectorVisible(true);
+    }
+    function closeImageExtendSelector() {
+      setImageExtendSelectorVisible(false);
+    }
+    function handleCompleteExtendSelect(data) {
+      saveFileAndAvatar(data);
+      setImageExtendSelectorVisible(false);
+    }
+    function setImageExtendSelectorVisible(flag) {
+      extendSelectorVisible.value = flag;
+    }
+
+    /*
     保存定制主人物图
     修改主定制状态
     */
-    async function saveCustom({url, config}) {
+    async function confirmCustom(url) {
       setPreview(url);
-      setBodyConfig(config);
       await nextTick();
       setCustomState(true);
     }
@@ -119,15 +173,16 @@ export default {
           url: preview,
         },
       ];
-      selectFiles.value.forEach((item, index) => {
+      const { faceNum } = getBodyConfig();
+      selectFiles.value.slice(faceNum - 1).forEach((item, index) => {
         files.push(
           {
             name: `Original_${index}`,
-            url: item.data.rawFile,
+            url: item.rawFile,
           },
           {
             name: `Ai_${index}`,
-            url: item.data.avatar.url,
+            url: item.avatar.url,
           }
         );
       });
@@ -159,15 +214,20 @@ export default {
       selectFiles,
       previewBody,
       customState,
+      setBodyConfig,
       setStep,
       setCustomState,
       saveIncrement,
       uploadFiles,
       uploadVisible,
-      saveCustom,
+      extendSelectorVisible,
+      openImageExtendSelector,
+      handleCompleteExtendSelect,
+      closeImageExtendSelector,
+      confirmCustom,
       closePlugin,
       completeUpload,
-      saveFileAndAvatar
+      handleCompleteImageSelect,
     };
   },
 };
@@ -190,6 +250,11 @@ export default {
     overflow: hidden;
     background-color: #ffffff;
     position: relative;
+
+    .image-extend-selector-dialog {
+      @include pos-absolute(0, 0, 0, 0, 2020);
+      background-color: #ffffff;
+    }
   }
 }
 

@@ -6,7 +6,7 @@ export const product = {
   "published_at": "2021-07-16T03:57:06-04:00",
   "created_at": "2021-07-16T03:57:14-04:00",
   "vendor": "Makemesurprise",
-  "type": "blanket",
+  "type": "Wooden Frame Painting test",
   "tags": [
     "All Available on google ALL",
     "Custom-Blanket",
