@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-08 16:32:42
+ * @LastEditTime: 2021-10-20 15:50:39
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -12,9 +12,8 @@ import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
 import { CombineImage } from "../utils/combineImage";
 
 export default function useIncrement(config, previewBody) {
-
   const combineImage = new CombineImage();
-  
+
   const state = reactive({
     productOptionsValue: {},
     previewWidthBackground: null,
@@ -35,10 +34,20 @@ export default function useIncrement(config, previewBody) {
     initSlides(slides);
     // 背景
     initBackground(background);
-    // 推荐
-    initPublish(publish);
-    // 文字
-    initText(text);
+
+    // 如果有背景并且有文字
+    if (background.visible && text.visible) {
+      // 推荐
+      initPublish(publish);
+      // 文字
+      initText(text);
+    } else if (!background.visible && text.visible) {
+      // 文字
+      initText(text);
+      // 推荐
+      initPublish(publish);
+    }
+
     // 关联产品
     initRelatedProduct(relatedProduct);
     // VIP
@@ -90,7 +99,6 @@ export default function useIncrement(config, previewBody) {
 
   // ===============推荐===============
   function initPublish(publish) {
-    console.log('publish',publish)
     if (publish && publish.visible) {
       state.queue.push({
         name: "publish",
@@ -122,7 +130,7 @@ export default function useIncrement(config, previewBody) {
   const layerImage = computed(() => {
     return previewBody.value;
   })
-  
+
   async function renderPreview(size) {
     // TODO
     const background = state.queue.find(item => item.name === 'background');
@@ -145,7 +153,7 @@ export default function useIncrement(config, previewBody) {
     if (!item) {
       return [];
     }
-    
+
     const background = item.list.find(item => item.size === size.label);
     return background ? background.url : '';
   }
@@ -155,7 +163,7 @@ export default function useIncrement(config, previewBody) {
     if (!item) {
       return [];
     }
-    
+
     const composing = item.list.find(item => item.name === size.label);
     return composing ? composing.position : [];
   }
@@ -183,7 +191,7 @@ export default function useIncrement(config, previewBody) {
     setPreviewWidthBackground(val.preview);
 
     state.textRenderParams = val.textRenderParams;
-    
+
     // 修改背景
     _changeValue('background', val.params);
 

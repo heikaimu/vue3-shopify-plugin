@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-12 16:20:07
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-12 16:43:57
+ * @LastEditTime: 2021-10-20 09:35:59
 -->
 <template>
   <component v-bind="$attrs" :config="config" :is="currentElementComponent" />
@@ -35,16 +35,20 @@ export default {
     });
 
     onMounted(() => {
-      const firstConfig = props.config.miniMeData[0].images[1];
-      if (firstConfig.faceList) {
-        const faceLength = firstConfig.faceList.length;
-        if (faceLength > 1) {
-          state.currentElementComponent = "PluginAvatarMultiple";
+      if (props.config.miniMeData.length === 0) {
+        state.currentElementComponent = "PluginMinime";
+      } else {
+        const firstConfig = props.config.miniMeData[0].images[1];
+        if (firstConfig.faceList) {
+          const faceLength = firstConfig.faceList.length;
+          if (faceLength > 1) {
+            state.currentElementComponent = "PluginAvatarMultiple";
+          } else {
+            state.currentElementComponent = "PluginMinime";
+          }
         } else {
           state.currentElementComponent = "PluginMinime";
         }
-      } else {
-        state.currentElementComponent = "PluginMinime";
       }
     });
 

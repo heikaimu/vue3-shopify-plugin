@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 17:08:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-09 15:39:05
+ * @LastEditTime: 2021-10-18 14:30:46
  */
 import { reactive, toRefs, onMounted } from "vue";
 import { getRandomID } from '../utils/image'
@@ -37,11 +37,13 @@ export default function useBodyMain(props, context) {
   // 保存头像和源文件
   function saveFileAndAvatar(data) {
     const { avatar, rawFile } = data;
-    state.selectFiles.unshift({
-      avatar,
-      rawFile,
-      id: getRandomID()
-    })
+    state.selectFiles = [
+      {
+        avatar,
+        rawFile,
+        id: getRandomID()
+      }
+    ]
   }
 
   // 设置当前选中的身体配置
@@ -72,7 +74,7 @@ export default function useBodyMain(props, context) {
         name: state.bodyConfig.name,
         groupName: state.bodyConfig.groupName,
         url: state.bodyConfig.images[0].url,
-        faceNum: state.bodyConfig.faceList.length
+        faceNum: 1
       }
     } else {
       return {

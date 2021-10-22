@@ -6,7 +6,7 @@ export const product = {
   "published_at": "2021-08-10T05:22:17-04:00",
   "created_at": "2021-08-10T05:22:24-04:00",
   "vendor": "Makemesurprise",
-  "type": "Puzzle",
+  "type": "Wooden Frame Painting",
   "tags": [
     "_pic1",
     "_text1_10",

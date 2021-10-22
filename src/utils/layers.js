@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-24 11:03:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-12 14:35:52
+ * @LastEditTime: 2021-10-20 13:52:19
  */
 import { getRandomID } from './image';
 
@@ -67,7 +67,7 @@ function getAnnexList(config, skin, id) {
         top: item.top,
         angle: item.angle,
         width: item.width,
-        sort: 4,
+        sort: 10,
         customControls: true,
         type: 'annex',
         id: id || getRandomID()

@@ -1,49 +1,35 @@
-<!--
- * @Description: 
- * @Version: 2.0
- * @Author: Yaowen Liu
- * @Date: 2021-07-19 09:42:00
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-13 11:07:36
--->
-<!--
- * @Description: 
- * @Version: 2.0
- * @Author: Yaowen Liu
- * @Date: 2021-07-19 09:42:00
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-29 10:40:45
--->
 <template>
-  <div>
-    <MinimePillow
-      :config="config"
-      :sizeActiveName="sizeActiveName"
-      :backgroundActiveName="backgroundActiveName"
-      v-if="visible"
-      @close="visible = false"
-      @complete="complete"
-    />
-    <el-button @click="handleOpen">打开</el-button>
-    <el-button @click="handleChangeColor">变色</el-button>
-
-    <input
-      type="file"
-      class="hide-input"
-      accept="image/*"
-      @change="handleSelectFile"
-    />
+  <div class="wrapper">
+    <div class="left">
+      <ul class="nav__list">
+        <li class="nav__item" v-for="item in products" :key="item.id">
+          <p class="text" :class="{active:item.type===activeType}" @click="openProductPlugin(item)">{{item.type}}</p>
+        </li>
+      </ul>
+    </div>
+    <div class="right">
+      <MinimePillow
+        :config="config"
+        :sizeActiveName="sizeActiveName"
+        :backgroundActiveName="backgroundActiveName"
+        v-if="visible"
+        @close="visible = false"
+        @complete="complete"
+      />
+    </div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, onMounted } from "vue";
+import { reactive, toRefs } from "vue";
 import MinimePillow from "./lib";
 import axios from "axios";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
-const WEBSITE = "M";
-import { product } from "../shopifyPuzzleConfig";
+const WEBSITE = "FT";
+const SIZE = '6\" x 8\"';
+
+import products from "../products/index";
 
 export default {
   components: {
@@ -56,65 +42,32 @@ export default {
       visible: false,
       backgroundActiveIndex: 0,
       composingActiveIndex: 0,
-      sizeActiveName: '30" x 40"',
+      sizeActiveName: SIZE,
       backgroundActiveName: "Green",
-    });
-
-    onMounted(async () => {
-      state.config = await getConfig();
+      products: products,
+      activeType: ''
     });
 
     function complete(data) {
-      console.log(data)
       window.open(data.files.Preview);
     }
 
-    async function handleOpen() {
+    async function openProductPlugin(item) {
+      state.activeType = item.type;
+      state.config = await getConfig(item);
       state.visible = true;
-    }
-
-    function handleChangeColor() {
-      state.config.defaultSkin = "black";
-    }
-
-    function handleSelectFile(e) {
-      const input = e.target;
-      const files = input.files;
-      const file = files ? files[0] : null;
-
-      const url =
-        "https://faceonboxer.s3.us-west-1.amazonaws.com/customerpics/11111.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20210818T023607Z&X-Amz-SignedHeaders=host&X-Amz-Expires=1799&X-Amz-Credential=AKIAW6ATM4SRCICTIFIS%2F20210818%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Signature=d0c6de575898c1f3d31b56145ba5fa27a69517297de1fd154ecdb1007f9a9ee3";
-
-      const header = {
-        headers: {
-          "Content-Type": file.type,
-          // "X-Amz-Acl": "public-read",
-          "X-Amz-Server-Side-Encryption": "AES256",
-        },
-      };
-
-      axios
-        .put(url, file, header)
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
     }
 
     return {
       ...toRefs(state),
       complete,
-      handleOpen,
-      handleChangeColor,
-      handleSelectFile,
+      openProductPlugin
     };
   },
 };
 
 // 获取配置参数
-function getConfig() {
+function getConfig(product) {
   let config = {};
   const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
 
@@ -131,7 +84,7 @@ function getConfig() {
         config.defaultSkin = "yellow";
         config.skuList = getSKUlist(product);
         config.productOptionsValue = {
-          Size: '30" x 40"',
+          Size: SIZE,
         };
 
         getProductConfig(config, product.type);
@@ -255,4 +208,16 @@ function getTagID() {
 </script>
 
 <style>
+.nav__list {
+
+}
+.nav__item {
+
+}
+.nav__item .text {
+  cursor: pointer;
+}
+.nav__item .text.active {
+  color: red;
+}
 </style>

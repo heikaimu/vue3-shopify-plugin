@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-13 10:15:16
+ * @LastEditTime: 2021-10-20 16:54:31
 -->
 <template>
   <div class="custom-board">
@@ -21,15 +21,15 @@
       <!-- fabric -->
       <div class="custom-board__canvas-box" ref="canvasBox">
         <canvas id="customBoard"></canvas>
+        <canvas-layers
+          :list="layersFileList"
+          :activeID="activeID"
+          @change="handleChangeActiveID"
+        ></canvas-layers>
       </div>
     </div>
     <div class="custom-board__bottom">
       <base-row :gutter="10">
-        <!-- <base-col :span="8">
-          <base-button plain id="button_replace_2"
-            >Replace</base-button
-          >
-        </base-col> -->
         <base-col :span="24">
           <base-button
             type="primary"
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, toRaw, ref, computed, onMounted, watch } from "vue";
+import { reactive, toRefs, toRaw, ref, computed, onMounted } from "vue";
 
 import BaseHeader from "../../../../base/BaseHeader.vue";
 import BaseButton from "../../../../base/BaseButton.vue";
@@ -69,6 +69,7 @@ import BaseIcon from "../../../../base/BaseIcon.vue";
 import BaseRow from "../../../../base/BaseRow.vue";
 import BaseCol from "../../../../base/BaseCol.vue";
 import ImageSelectPlugin from "../../../../components/image-select-plugin/ImageSelectPlugin.vue";
+import CanvasLayers from "./CanvasLayers.vue";
 
 import CanvasRenderer from "../../../../utils/canvasRenderer";
 import {
@@ -88,6 +89,7 @@ export default {
     BaseRow,
     BaseCol,
     ImageSelectPlugin,
+    CanvasLayers,
   },
 
   props: {
@@ -131,6 +133,9 @@ export default {
       currentVBox: {}, // 当前的虚拟box
       currentActiveAvatar: null,
     });
+
+    // 当前激活的图层ID
+    const activeID = ref("");
 
     // 最大的头像数量，等同于配置的头像数组长度
     const filesMax = computed(() => {
@@ -213,13 +218,55 @@ export default {
           openImageSelector();
         },
         singleClick: (data) => {
-          // 新增头像
-          state.actionType = "add";
-          state.currentVBox = data;
-          openImageSelector();
+          const { type } = data.layer;
+          if (type === "vBox") {
+            // 新增头像
+            state.actionType = "add";
+            state.currentVBox = data;
+            openImageSelector();
+          } else if (type === "avatar") {
+            data.layer.bringForward();
+            frontAnnex();
+            renderLayerNav();
+          }
         },
       });
     }, 300);
+
+    // 图层导航
+    const layersFileList = ref([]);
+    function renderLayerNav() {
+      const activeObject = fabricInstance.getActiveObject();
+      activeID.value = activeObject.id;
+      layersFileList.value = props.selectFiles.map((item) => {
+        return {
+          id: item.id,
+          url: item.data.avatar.url,
+        };
+      });
+    }
+
+    // 修改激活图层
+    function handleChangeActiveID(data) {
+      const items = fabricInstance.getObjects();
+      const obj = items.find(item => item.id === data.id);
+      if (obj) {
+        obj.bringForward();
+        fabricInstance.setActiveObject(obj);
+        frontAnnex();
+        renderLayerNav();
+      }
+    }
+
+    // 置顶帽子
+    function frontAnnex() {
+      const items = fabricInstance.getObjects();
+      const annexList = items.filter((item) => item.name === "annex");
+      annexList.forEach((annex) => {
+        annex.bringToFront();
+        fabricInstance.refresh();
+      });
+    }
 
     // add:添加头像替换虚拟BOX
     function addAvatarReplaceVbox(avatar) {
@@ -229,8 +276,13 @@ export default {
       }
       config.configType = props.config.type;
       const avatarLayer = getAvatar(config, avatar.avatar);
-      fabricInstance.add(avatarLayer, true);
+      avatarLayer.zIndex = avatarLayer.sort;
+      fabricInstance.add(avatarLayer, true).then(() => {
+        frontAnnex();
+        renderLayerNav();
+      });
 
+      // 添加文件
       const id = avatarLayer.id;
       props.selectFiles.push({
         id,
@@ -262,7 +314,10 @@ export default {
 
       // 添加新头像
       const avatarLayer = getAvatar(config, avatar.avatar, id);
-      fabricInstance.add(avatarLayer, true);
+      fabricInstance.add(avatarLayer, true).then(() => {
+        frontAnnex();
+        renderLayerNav();
+      });
 
       // 替换掉selectFiles里对应的元素文件
       const currentFile = props.selectFiles.find((item) => item.id === id);
@@ -277,8 +332,8 @@ export default {
         return;
       }
 
-      if(props.selectFiles.length !== config.faceList.length) {
-        alert('Try again after fill all avatar');
+      if (props.selectFiles.length !== config.faceList.length) {
+        alert("Try again after fill all avatar");
         return;
       }
 
@@ -332,6 +387,9 @@ export default {
       openImageSelector,
       closeImageSelector,
       handleCompleteSelect,
+      layersFileList,
+      activeID,
+      handleChangeActiveID,
     };
   },
 };

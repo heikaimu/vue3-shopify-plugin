@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 17:35:23
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-12 17:09:13
+ * @LastEditTime: 2021-10-20 16:59:50
 -->
 <template>
   <div>
@@ -13,6 +13,8 @@
       :config="currentConfig"
       :selectFiles="selectFiles"
       :skin="skin"
+      :title="config.productTitle"
+      :price="config.productPrice"
       @close="closePlugin"
       @save="handleSave"
     />

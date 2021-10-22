@@ -45,5 +45,11 @@
     "style-loader": "^2.0.0",
     "style-resources-loader": "^1.4.1",
     "vite": "^2.4.2"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    }
   }
 }

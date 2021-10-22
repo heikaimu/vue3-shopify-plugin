@@ -174,7 +174,7 @@ export default {
         },
       ];
       const { faceNum } = getBodyConfig();
-      selectFiles.value.slice(faceNum - 1).forEach((item, index) => {
+      selectFiles.value.slice().forEach((item, index) => {
         files.push(
           {
             name: `Original_${index}`,

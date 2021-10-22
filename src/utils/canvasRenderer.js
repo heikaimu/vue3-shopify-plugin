@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-23 13:24:29
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-14 15:07:10
+ * @LastEditTime: 2021-10-20 15:25:35
  */
 
 import { fabric } from 'fabric';
@@ -232,7 +232,8 @@ export default class CanvasRenderer {
         originY,
         selectable,
         name: name || type,
-        globalCompositeOperation
+        globalCompositeOperation,
+        type: "vBox"
       });
 
       img.on('mousedown', () => {
@@ -293,7 +294,6 @@ export default class CanvasRenderer {
   _addNormalImage(config, resolve, active) {
 
     const { url, id, type, name, top, left, width, angle = 0, offset, originX = 'left', originY = 'top', selectable = true, customControls = false, globalCompositeOperation } = config;
-
     fabric.Image.fromURL(url, img => {
 
       const targetWidth = width * this.scale;
@@ -324,6 +324,13 @@ export default class CanvasRenderer {
         name: name || type,
         type,
         id
+      })
+
+      img.on('mousedown', () => {
+        typeof this.singleClick === 'function' && this.singleClick({
+          layer: img,
+          config: config
+        });
       })
 
       // 是否自定义控制器
@@ -409,21 +416,22 @@ export default class CanvasRenderer {
    * @param {*} active - 是否设置新增的图层为激活状态
    * @returns 
    */
-  async add(item, active = false) {
-    if (!item) {
-      return;
-    }
-
-    await this._addLayerItem(item, active);
-    this.fabricInstance.renderAll();
+  add(item, active = false) {
+    return new Promise(async (resolve, reject) => {
+      if (!item) {
+        reject();
+      } else {
+        await this._addLayerItem(item, active);
+        this.fabricInstance.renderAll();
+        resolve();
+      }
+    })
   }
 
   // 更新
   update({ type, name, layer, options }) {
-
     if (layer) {
       layer.set({ ...options });
-      alert();
     } else {
       const items = this.fabricInstance.getObjects();
       for (const item of items) {
@@ -465,6 +473,11 @@ export default class CanvasRenderer {
   // 获取图层
   getObjects() {
     return this.fabricInstance.getObjects();
+  }
+
+  // 获取激活图层
+  getActiveObject() {
+    return this.fabricInstance.getActiveObject();
   }
 
   // 重新渲染
