@@ -1,4 +1,5 @@
-export default {
+export const publishSize = "30\" x 40\"";
+export const product = {
   "id": 6742115680462,
   "title": "Custom Blankets Personalized Photo Superhero Blanket Fleece Cartoon Iron Man Blanket, Painting Style",
   "handle": "custom-blankets-personalized-photo-superhero-blanket-fleece-cartoon-iron-man-blanket-painting-style",

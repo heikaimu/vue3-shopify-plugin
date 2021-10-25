@@ -1,4 +1,5 @@
-export default {
+export const publishSize = "6\" x 8\"";
+export const product = {
   "id": 6742086615246,
   "title": "Custom Face Photo Wooden Frame Painting Personalized Cape Superman Wooden Wall Art",
   "handle": "custom-pace-photo-wooden-frame-painting-personalized-cape-superman-wooden-wall-art",

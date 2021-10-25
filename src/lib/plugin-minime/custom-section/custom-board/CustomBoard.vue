@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-12 10:58:10
+ * @LastEditTime: 2021-10-25 16:33:19
 -->
 <template>
   <div class="custom-board">
@@ -32,7 +32,11 @@
       <!-- fabric -->
       <div class="custom-board__canvas-box" ref="canvasBox">
         <canvas id="customBoard"></canvas>
-        <canvas-layer :list="layerList" @change="changeActiveLayer" />
+        <canvas-layer
+          :list="layerList"
+          :activeID="activeID"
+          @change="changeActiveLayer"
+        />
       </div>
       <!-- 色彩饱和度调整，单头的时候出现 -->
       <brightness-bar
@@ -77,7 +81,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref, computed, onMounted, watch } from "vue";
+import { reactive, toRefs, ref, toRaw, computed, onMounted, watch } from "vue";
 
 import BaseHeader from "../../../../base/BaseHeader.vue";
 import BaseRow from "../../../../base/BaseRow.vue";
@@ -141,8 +145,6 @@ export default {
     let fabricInstance = null;
 
     const state = reactive({
-      loading: false,
-      layerList: [],
       singleAvatar: {
         avatar: {
           chin: null,
@@ -200,7 +202,55 @@ export default {
       }
     }
 
+    // 改变left值隐藏附件，记录隐藏之前的left方便之后恢复
+    const annexRecords = ref({});
+    const HIDDEN_LEFT = 10;
+    function hideAnnex(canvas, layer) {
+      const { id, left } = layer;
+      annexRecords.value[id] = left;
+      layer.set({
+        left: 10,
+      });
+      // canvas.update({
+      //   layer: layer,
+      //   options: {
+      //     left: HIDDEN_LEFT,
+      //   },
+      // });
+
+      setTimeout(() => {
+        layer.set({
+          left: 200,
+        });
+        // canvas.update({
+        //   layer: layer,
+        //   options: {
+        //     left: 200,
+        //   },
+        // });
+      }, 1000);
+    }
+
+    // 恢复left
+    function revertAnnex(canvas, layer) {
+      const { id } = layer;
+      const recordLeft = annexRecords.value[id];
+
+      if (!recordLeft) {
+        return;
+      }
+      canvas.update({
+        layer: layer,
+        options: {
+          left: 200,
+        },
+      });
+
+      annexRecords.value[id] = null;
+    }
+
     // 渲染器
+    const loading = ref(false);
     const renderer = debounce(function () {
       setCanvasInstance();
 
@@ -211,42 +261,54 @@ export default {
         skin,
       });
 
+      loading.value = true;
       fabricInstance.render({
         layers,
         success: (items) => {
+          loading.value = false;
           renderLayer(items);
         },
-        replacePhoto: () => {
-          context.emit("selectFile");
+        replacePhoto: (item) => {
+          const { type } = item;
+          if (type === "avatar") {
+            context.emit("selectFile");
+          } else if (type === "annex") {
+            hideAnnex(fabricInstance, item);
+          }
         },
       });
     }, 300);
 
     // 渲染图层
+    const layerList = ref([]);
+    const activeID = ref("");
     function renderLayer(items) {
       const availableItems = items.filter((item) => {
         return item.name !== "svg";
       });
-      state.layerList = availableItems.map((item, index) => {
-        item.active = index === 0;
+
+      layerList.value = availableItems.map((item) => {
         return {
-          obj: item,
+          id: item.id,
           url: item.getSrc(),
         };
       });
-      fabricInstance.setActiveObject(availableItems[0]);
+
+      if (availableItems.length > 0) {
+        activeID.value = availableItems[0].id;
+        fabricInstance.setActiveObject(availableItems[0]);
+      }
     }
 
     // 修改激活图层
-    function changeActiveLayer(item, index) {
-      fabricInstance.setActiveObject(item.obj);
-      for (let i = 0; i < state.layerList.length; i++) {
-        if (i === index) {
-          state.layerList[i].obj.active = true;
-        } else {
-          state.layerList[i].obj.active = false;
-        }
+    function changeActiveLayer(data) {
+      const items = fabricInstance.getObjects();
+      const obj = items.find((item) => item.id === data.id);
+      if (obj) {
+        fabricInstance.setActiveObject(obj);
       }
+      activeID.value = data.id;
+      revertAnnex(fabricInstance, obj);
     }
 
     // 修改头像
@@ -273,6 +335,9 @@ export default {
 
     return {
       ...toRefs(state),
+      loading,
+      layerList,
+      activeID,
       canvasBox,
       filesMax,
       backToList,

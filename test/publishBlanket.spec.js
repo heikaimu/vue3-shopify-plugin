@@ -4,10 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-13 10:29:16
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-17 11:25:53
+ * @LastEditTime: 2021-10-25 13:52:55
  */
 import { getSKUList, publishSKU } from '../src/utils/productSKU';
-import { product } from '../shopifyBlanketConfig';
+import product from '../products/blanket';
 test('30" x 40"', () => {
   const list = getSKUList(product);
   const options = {

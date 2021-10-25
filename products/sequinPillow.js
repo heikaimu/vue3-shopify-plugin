@@ -1,4 +1,4 @@
-export default {
+export const product = {
   "id": 6742101885134,
   "title": "Custom Cute Baby Face Spiderman Style Magic Sequins Pillow Multicolor Shiny Pillow, Surprise Gift, 16\"x16\"(40cmx40cm)",
   "handle": "custom-cute-baby-face-spiderman-style-magic-sequins-pillow-multicolor-shiny-mermaid-pillow-surprise-gift-16x1640cmx40cm",

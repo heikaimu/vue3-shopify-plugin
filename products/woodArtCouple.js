@@ -1,4 +1,5 @@
-export default {
+export const publishSize = "6\" x 8\"";
+export const product = {
   "id": 6774126510286,
   "title": "Custom Face Photo Wooden Frame Painting Personalized BBQ Couple Wooden Wall Art",
   "handle": "custom-face-photo-wooden-frame-painting-personalized-bbq-couple-wooden-wall-art",

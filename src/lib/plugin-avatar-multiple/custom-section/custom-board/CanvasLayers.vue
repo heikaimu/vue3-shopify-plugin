@@ -4,14 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-26 09:47:20
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-20 15:29:10
+ * @LastEditTime: 2021-10-25 16:12:18
 -->
 <template>
   <div class="canvas-layer">
     <div
       v-for="(item, index) in list"
       class="layer-img"
-      :class="{active:activeID===item.id}"
+      :class="{ active: activeID === item.id }"
       :key="index"
       @click="handleClick(item, index)"
     >
@@ -24,20 +24,19 @@
 import { reactive, toRefs } from "vue";
 
 export default {
-
   props: {
     list: {
       type: Array,
-      deafult: () => []
+      deafult: () => [],
     },
     activeID: {
       type: String,
-      deafult: ""
-    }
+      deafult: "",
+    },
   },
 
   emits: {
-    change: null
+    change: null,
   },
 
   setup(props, context) {
@@ -46,12 +45,12 @@ export default {
     });
 
     function handleClick(item, index) {
-      context.emit('change', item, index);
+      context.emit("change", item, index);
     }
 
     return {
       ...toRefs(state),
-      handleClick
+      handleClick,
     };
   },
 };

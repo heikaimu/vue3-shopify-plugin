@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-20 15:50:39
+ * @LastEditTime: 2021-10-25 14:38:44
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -35,18 +35,23 @@ export default function useIncrement(config, previewBody) {
     // 背景
     initBackground(background);
 
-    // 如果有背景并且有文字
-    if (background.visible && text.visible) {
-      // 推荐
-      initPublish(publish);
-      // 文字
-      initText(text);
-    } else if (!background.visible && text.visible) {
-      // 文字
-      initText(text);
-      // 推荐
-      initPublish(publish);
-    }
+    // // 如果有背景并且有文字
+    // if (background.visible && text.visible) {
+    //   // 推荐
+    //   initPublish(publish);
+    //   // 文字
+    //   initText(text);
+    // } else if (!background.visible && text.visible) {
+    //   // 文字
+    //   initText(text);
+    //   // 推荐
+    //   initPublish(publish);
+    // }
+
+    // 文字
+    initText(text);
+    // 推荐
+    initPublish(publish);
 
     // 关联产品
     initRelatedProduct(relatedProduct);
@@ -118,7 +123,7 @@ export default function useIncrement(config, previewBody) {
       })
 
       if (currentSize) {
-        renderPreview(currentSize);
+        // renderPreview(currentSize);
       }
     }
 

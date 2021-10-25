@@ -3,7 +3,7 @@
     <div class="left">
       <ul class="nav__list">
         <li class="nav__item" v-for="item in products" :key="item.id">
-          <p class="text" :class="{active:item.type===activeType}" @click="openProductPlugin(item)">{{item.type}}</p>
+          <p class="text" :class="{active:item.product.type===activeType}" @click="openProductPlugin(item)">{{item.product.type}}</p>
         </li>
       </ul>
     </div>
@@ -26,8 +26,7 @@ import MinimePillow from "./lib";
 import axios from "axios";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
-const WEBSITE = "FT";
-const SIZE = '6\" x 8\"';
+const WEBSITE = "M";
 
 import products from "../products/index";
 
@@ -42,7 +41,7 @@ export default {
       visible: false,
       backgroundActiveIndex: 0,
       composingActiveIndex: 0,
-      sizeActiveName: SIZE,
+      sizeActiveName: '',
       backgroundActiveName: "Green",
       products: products,
       activeType: ''
@@ -53,8 +52,8 @@ export default {
     }
 
     async function openProductPlugin(item) {
-      state.activeType = item.type;
-      state.config = await getConfig(item);
+      state.activeType = item.product.type;
+      state.config = await getConfig(item.product, item.publishSize);
       state.visible = true;
     }
 
@@ -67,7 +66,7 @@ export default {
 };
 
 // 获取配置参数
-function getConfig(product) {
+function getConfig(product, publishSize) {
   let config = {};
   const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
 
@@ -84,7 +83,7 @@ function getConfig(product) {
         config.defaultSkin = "yellow";
         config.skuList = getSKUlist(product);
         config.productOptionsValue = {
-          Size: SIZE,
+          Size: publishSize,
         };
 
         getProductConfig(config, product.type);

@@ -1,4 +1,5 @@
-export default {
+export const publishSize = "35pcs";
+export const product = {
   "id": 6747153825998,
   "title": "Custom Face Photo Halloween Puzzle Purple Fatty Style Personalized Jigsaw Puzzle - 35-1000 pieces",
   "handle": "custom-face-photo-halloween-puzzle-purple-fatty-style-personalized-jigsaw-puzzle-35-1000-pieces",

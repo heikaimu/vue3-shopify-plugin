@@ -1,4 +1,5 @@
-export default {
+export const publishSize = "20cm-8\"";
+export const product = {
   "id": 6996627980449,
   "title": "My Face Pillow, Custom Pillow, Personalized Photo Pillow Gift Pillow Toy, Superhero, Captain America with Shield, Throw Pillow,  MiniMe Pillow",
   "handle": "my-face-pillow-custom-pillow-personalized-photo-pillow-gift-pillow-toy-superhero-captain-america-with-shield-throw-pillow-minime-pillow-0918",

@@ -1,4 +1,5 @@
-export default {
+export const publishSize = "27.6\" x 59\"";
+export const product = {
   "id": 6742116368590,
   "title": "Custom Photo Beach Towel, Quick Dry Bath Towel,Summer Swimming Towel,  Red Swimsuit Girl Style",
   "handle": "custom-photo-beach-towel-quick-dry-bath-towel-summer-swimming-towel-red-swimsuit-girl-style",

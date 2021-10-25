@@ -4,10 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-13 10:29:16
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-17 13:36:40
+ * @LastEditTime: 2021-10-25 13:52:50
  */
 import { getSKUList, publishSKU } from '../src/utils/productSKU';
-import { product } from '../shopifyBeachConfig';
+import product from '../products/beachTowel';
 test('测试尺寸27.6\" x 59\"', () => {
   const list = getSKUList(product);
   const options = {

@@ -1,4 +1,4 @@
-export default {
+export const product = {
   "id": 6742380183758,
   "title": "Family Custom Photo Magic Sequins Pillow Multicolor Shiny Gift 15.75\"*15.75\"",
   "handle": "custom-photo-magic-sequins-pillow-multicolor-shiny-gift-15-75-15-83",

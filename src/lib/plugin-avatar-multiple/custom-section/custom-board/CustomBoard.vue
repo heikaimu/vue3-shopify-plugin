@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-20 16:54:31
+ * @LastEditTime: 2021-10-25 16:23:22
 -->
 <template>
   <div class="custom-board">
@@ -134,9 +134,6 @@ export default {
       currentActiveAvatar: null,
     });
 
-    // 当前激活的图层ID
-    const activeID = ref("");
-
     // 最大的头像数量，等同于配置的头像数组长度
     const filesMax = computed(() => {
       if (config.faceList) {
@@ -235,6 +232,7 @@ export default {
 
     // 图层导航
     const layersFileList = ref([]);
+    const activeID = ref("");
     function renderLayerNav() {
       const activeObject = fabricInstance.getActiveObject();
       activeID.value = activeObject.id;
