@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-23 11:12:37
+ * @LastEditTime: 2021-10-26 11:22:00
 -->
 <template>
   <div class="body-custom-wrapper">
@@ -24,7 +24,7 @@
         :skin="skin"
         v-bind="$attrs"
         @back="customBoardVisible = false"
-        @selectFile="backToFileSelect"
+        @selectFile="selectFile"
         @confirm="confirmCustom"
       ></custom-board>
     </transition>
@@ -54,6 +54,7 @@ export default {
     selectBody: null,
     setStep: null,
     confirm: null,
+    openImageExtendSelector: null
   },
 
   setup(props, context) {
@@ -66,6 +67,11 @@ export default {
     // 返回文件选择
     function backToFileSelect() {
       context.emit("setStep", "fileSelect");
+    }
+
+    // 打开文件选择
+    function selectFile() {
+      context.emit("openImageExtendSelector");
     }
 
     // 卡片选择
@@ -89,7 +95,8 @@ export default {
       selectCard,
       backToFileSelect,
       confirmCustom,
-      changeColor
+      changeColor,
+      selectFile
     };
   },
 };

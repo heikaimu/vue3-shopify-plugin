@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-25 16:33:19
+ * @LastEditTime: 2021-10-26 11:28:26
 -->
 <template>
   <div class="custom-board">
@@ -15,18 +15,7 @@
         :subText="title"
         icon="arrowDown"
         @close="backToList"
-      >
-        <base-button
-          v-if="filesMax > 1"
-          type="primary"
-          full
-          :blod="600"
-          class="custom-board__button--confirm"
-          @click="handleConfirm"
-          id="button_confirm_3"
-          >CONFIRM</base-button
-        >
-      </base-header>
+      />
     </div>
     <div class="custom-board__medium">
       <!-- fabric -->
@@ -39,14 +28,10 @@
         />
       </div>
       <!-- 色彩饱和度调整，单头的时候出现 -->
-      <brightness-bar
-        v-if="filesMax === 1"
-        :url="singleAvatar.rawAvatarURL"
-        @change="changeAvatar"
-      />
+      <brightness-bar :url="singleAvatar.rawAvatarURL" @change="changeAvatar" />
     </div>
     <div class="custom-board__bottom">
-      <base-row :gutter="10" v-if="filesMax === 1">
+      <base-row :gutter="10">
         <base-col :span="8">
           <base-button plain @click="backToList" id="button_replace_2"
             >Replace</base-button
@@ -63,12 +48,6 @@
           >
         </base-col>
       </base-row>
-      <custom-files
-        v-else
-        :list="selectFiles"
-        :max="filesMax"
-        @open="handleOpenImageExtendSelector"
-      ></custom-files>
     </div>
 
     <!-- loading -->
@@ -81,7 +60,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref, toRaw, computed, onMounted, watch } from "vue";
+import { reactive, toRefs, ref, nextTick, onMounted, watch } from "vue";
 
 import BaseHeader from "../../../../base/BaseHeader.vue";
 import BaseRow from "../../../../base/BaseRow.vue";
@@ -90,7 +69,6 @@ import BaseButton from "../../../../base/BaseButton.vue";
 import BaseIcon from "../../../../base/BaseIcon.vue";
 import BrightnessBar from "./BrightnessBar.vue";
 import CanvasLayer from "./CanvasLayers.vue";
-import CustomFiles from "./CustomFiles.vue";
 
 import CanvasRenderer from "../../../../utils/canvasRenderer";
 import { getLayers } from "../../../../utils/layers";
@@ -105,7 +83,6 @@ export default {
     BaseIcon,
     BrightnessBar,
     CanvasLayer,
-    CustomFiles,
   },
 
   props: {
@@ -155,27 +132,8 @@ export default {
       },
     });
 
-    // 最大的头像数量，等同于配置的头像数组长度
-    const filesMax = computed(() => {
-      if (config.faceList) {
-        return config.faceList.length;
-      } else {
-        return 1;
-      }
-    });
-
     onMounted(() => {
-      // 如果是单头，则单独创建一个头部对象，用于亮度调节
-      if (filesMax.value === 1) {
-        const firstItem = props.selectFiles[0];
-        state.singleAvatar = {
-          avatar: {
-            ...firstItem.avatar,
-          },
-          rawFile: firstItem.rawFile,
-          rawAvatarURL: firstItem.avatar.url,
-        };
-      }
+      setAvatar();
       renderer();
     });
 
@@ -183,6 +141,7 @@ export default {
     watch(
       () => props.selectFiles,
       () => {
+        setAvatar();
         renderer();
       },
       { deep: true }
@@ -202,51 +161,97 @@ export default {
       }
     }
 
-    // 改变left值隐藏附件，记录隐藏之前的left方便之后恢复
+    // 记录删除的annex
     const annexRecords = ref({});
-    const HIDDEN_LEFT = 10;
-    function hideAnnex(canvas, layer) {
-      const { id, left } = layer;
-      annexRecords.value[id] = left;
-      layer.set({
-        left: 10,
-      });
-      // canvas.update({
-      //   layer: layer,
-      //   options: {
-      //     left: HIDDEN_LEFT,
-      //   },
-      // });
+    const activeID = ref("");
+    async function hideAnnex(canvas, layer) {
+      const { id, left, top, width, angle, scaleX } = layer;
+      const scale = canvas.scale;
 
-      setTimeout(() => {
-        layer.set({
-          left: 200,
-        });
-        // canvas.update({
-        //   layer: layer,
-        //   options: {
-        //     left: 200,
-        //   },
-        // });
-      }, 1000);
+      annexRecords.value[id] = {
+        left: left / scale,
+        top: top / scale,
+        width: (width * scaleX) / scale,
+        angle,
+      };
+      canvas.remove(layer);
+
+      await nextTick();
+      activeID.value = "";
     }
 
-    // 恢复left
-    function revertAnnex(canvas, layer) {
-      const { id } = layer;
-      const recordLeft = annexRecords.value[id];
+    // 还原annex
+    function revertAnnex(canvas, data) {
+      const { url, id } = data;
+      const record = annexRecords.value[id];
 
-      if (!recordLeft) {
+      if (!record) {
         return;
       }
-      canvas.update({
-        layer: layer,
-        options: {
-          left: 200,
-        },
+
+      const { left, top, width, angle } = record;
+      const layerInfo = {
+        url,
+        id,
+        left,
+        top,
+        width,
+        angle,
+        sort: 10,
+        customControls: true,
+        type: "annex",
+      };
+
+      canvas.add(layerInfo, true);
+    }
+
+    // 渲染图层
+    const layerList = ref([]);
+    function renderLayer(items) {
+      const availableItems = items.filter((item) => {
+        return item.name !== "svg";
       });
 
-      annexRecords.value[id] = null;
+      if (availableItems.length === 0) {
+        return;
+      }
+
+      layerList.value = availableItems.map((item) => {
+        return {
+          id: item.id,
+          url: item.getSrc(),
+        };
+      });
+
+      activeID.value = availableItems[0].id;
+      fabricInstance.setActiveObject(availableItems[0]);
+    }
+
+    // 修改激活图层
+    function changeActiveLayer(data) {
+      activeID.value = data.id;
+      const items = fabricInstance.getObjects();
+      const obj = items.find((item) => item.id === data.id);
+
+      if (obj) {
+        // 存在则激活
+        fabricInstance.setActiveObject(obj);
+      } else {
+        // 不存在则还原
+        revertAnnex(fabricInstance, data);
+      }
+    }
+
+    // 设置头部
+    function setAvatar() {
+      const firstItem = props.selectFiles[0];
+      state.singleAvatar = {
+        avatar: {
+          ...firstItem.avatar,
+        },
+        rawFile: firstItem.rawFile,
+        rawAvatarURL: firstItem.avatar.url,
+      };
     }
 
     // 渲染器
@@ -257,7 +262,7 @@ export default {
       // 如果头像数量===1，则用singleAvatar来生成layers，否则用selectFiles
       const layers = getLayers({
         config,
-        files: filesMax.value === 1 ? [state.singleAvatar] : props.selectFiles,
+        files: [state.singleAvatar],
         skin,
       });
 
@@ -276,40 +281,14 @@ export default {
             hideAnnex(fabricInstance, item);
           }
         },
+        singleClick: (data) => {
+          const { type, id } = data.layer;
+          if (type === "annex" || type === "avatar") {
+            activeID.value = id;
+          }
+        },
       });
     }, 300);
-
-    // 渲染图层
-    const layerList = ref([]);
-    const activeID = ref("");
-    function renderLayer(items) {
-      const availableItems = items.filter((item) => {
-        return item.name !== "svg";
-      });
-
-      layerList.value = availableItems.map((item) => {
-        return {
-          id: item.id,
-          url: item.getSrc(),
-        };
-      });
-
-      if (availableItems.length > 0) {
-        activeID.value = availableItems[0].id;
-        fabricInstance.setActiveObject(availableItems[0]);
-      }
-    }
-
-    // 修改激活图层
-    function changeActiveLayer(data) {
-      const items = fabricInstance.getObjects();
-      const obj = items.find((item) => item.id === data.id);
-      if (obj) {
-        fabricInstance.setActiveObject(obj);
-      }
-      activeID.value = data.id;
-      revertAnnex(fabricInstance, obj);
-    }
 
     // 修改头像
     function changeAvatar(url) {
@@ -339,7 +318,6 @@ export default {
       layerList,
       activeID,
       canvasBox,
-      filesMax,
       backToList,
       changeActiveLayer,
       changeAvatar,

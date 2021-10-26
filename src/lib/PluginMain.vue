@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-12 16:20:07
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-20 09:35:59
+ * @LastEditTime: 2021-10-26 13:15:09
 -->
 <template>
   <component v-bind="$attrs" :config="config" :is="currentElementComponent" />
@@ -31,7 +31,7 @@ export default {
 
   setup(props) {
     const state = reactive({
-      currentElementComponent: "",
+      currentElementComponent: "PluginMinime",
     });
 
     onMounted(() => {

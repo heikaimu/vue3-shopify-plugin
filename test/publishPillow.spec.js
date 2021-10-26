@@ -4,10 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-13 10:29:16
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-25 13:53:04
+ * @LastEditTime: 2021-10-26 11:00:52
  */
 import { getSKUList, publishSKU } from '../src/utils/productSKU';
-import product from '../products/minimePillow';
+import { product } from '../products/minimePillow';
 test('异性抱枕尺寸1，单面', () => {
   const list = getSKUList(product);
   const options = {

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 14:13:33
+ * @LastEditTime: 2021-10-26 14:45:13
 -->
 <template>
   <div class="body-card" @click="handleClick">
@@ -16,6 +16,7 @@
         :key="index"
         :src="item.url"
         :style="item.style"
+        :class="[item.type]"
         class="body-card__avatar-img"
       />
     </div>
@@ -144,6 +145,7 @@ export default {
         skin,
       }).filter((item) => ["avatar", "annex"].includes(item.type));
       state.layerList = await getLayerList(layers, e.target.width);
+      console.log(state.layerList);
     }
 
     function getLayerList(layers, targetWidth) {
@@ -170,6 +172,7 @@ export default {
 
           list.push({
             url: url,
+            type,
             style: {
               width: `${currentWidth}px`,
               height: `${currentHeight}px`,
@@ -226,6 +229,8 @@ export default {
 .body-card__avatar-img {
   display: block;
   position: absolute;
+}
+.body-card__avatar-img.avatar {
   transform-origin: bottom;
 }
 .body-card__edit-tag {
