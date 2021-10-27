@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-26 14:45:13
+ * @LastEditTime: 2021-10-26 14:54:19
 -->
 <template>
   <div class="body-card" @click="handleClick">
@@ -229,6 +229,9 @@ export default {
 .body-card__avatar-img {
   display: block;
   position: absolute;
+}
+.body-card__avatar-img.annex {
+  transform-origin: left top;
 }
 .body-card__avatar-img.avatar {
   transform-origin: bottom;
