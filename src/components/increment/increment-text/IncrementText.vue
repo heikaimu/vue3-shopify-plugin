@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-13 11:02:29
+ * @LastEditTime: 2021-10-29 10:38:57
 -->
 <template>
   <div class="increment-wrapper">
@@ -32,7 +32,10 @@
 
           <template v-if="activeValue === 'yes'">
             <!-- 输入 -->
-            <text-input v-model:text="customText.text"></text-input>
+            <text-input
+              v-model:text="customText.text"
+              :size="data.size"
+            ></text-input>
 
             <base-tabs v-if="shouldRender" v-model:activeName="activeName">
               <!-- 字体选择 -->
@@ -210,15 +213,25 @@ export default {
       });
     }, 300);
 
+    // 更新文字
     const rendererText = debounce(function () {
-      fabricInstance.update({
-        type: "text",
-        options: {
-          text: state.customText.text,
-          fontFamily: state.customText.fontFamily,
-          fill: state.customText.color,
-        },
-      });
+      const items = fabricInstance.getObjects();
+      const textItems = items.filter((item) => item.type === "text");
+      const {text, fontFamily, color} = state.customText;
+      for (const item of textItems) {
+        const inputMaxSize = props.data.size ? Number(props.data.size) : 15;
+        const length = Math.max(Math.floor(inputMaxSize / 2), text.length);
+        const fontSize = (2.5 * item.cacheWidth) / length * fabricInstance.scale;
+        fabricInstance.update({
+          layer: item,
+          options: {
+            fontSize,
+            text: text,
+            fontFamily: fontFamily,
+            fill: color,
+          },
+        });
+      }
     });
 
     // 关闭

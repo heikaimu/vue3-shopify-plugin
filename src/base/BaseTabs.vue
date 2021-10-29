@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-29 13:44:58
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-30 10:41:47
+ * @LastEditTime: 2021-10-28 16:46:26
 -->
 <template>
   <div class="base-tabs">
@@ -12,79 +12,58 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, provide, onMounted } from "vue";
 
-export default {
-  name: "BaseTabs",
-
-  props: {
-    activeName: {
-      type: String,
-      default: "",
-    },
+const props = defineProps({
+  activeName: {
+    type: String,
+    default: "",
   },
+});
 
-  setup(props, context) {
-    const currentName = ref(props.activeName || "0");
+const emit = defineEmits(["update:activeName"]);
 
-    provide("changeTabName", changeTabName);
+const currentName = ref(props.activeName || "0");
 
-    provide("rootTabs", {
-      props,
-      currentName,
-    });
+provide("changeTabName", changeTabName);
 
-    onMounted(() => {
-      document.addEventListener("click", calcVisible);
-    });
+provide("rootTabs", {
+  props,
+  currentName,
+});
 
-    function calcVisible(e) {
-      const activeClassNames = [
-        "font__text",
-        "font__list",
-        "base-tab-pane__title",
-        "color__text",
-        "color__item",
-        "color__list",
-        "state-icon"
-      ];
-      const classList =
-        typeof e.target.className === "string"
-          ? e.target.className.split(/\s+/)
-          : [];
-      const isExist = activeClassNames.some((activeName) => {
-        return classList.includes(activeName);
-      });
-      if (isExist) {
-        return;
-      }
-      currentName.value = "";
-    }
+onMounted(() => {
+  document.addEventListener("click", calcVisible);
+});
 
-    function changeTabName(val) {
-      currentName.value = val;
-      context.emit("update:activeName", val);
-    }
+function calcVisible(e) {
+  const activeClassNames = [
+    "font__text",
+    "font__list",
+    "base-tab-pane__title",
+    "color__text",
+    "color__item",
+    "color__list",
+    "state-icon",
+  ];
+  const classList =
+    typeof e.target.className === "string"
+      ? e.target.className.split(/\s+/)
+      : [];
+  const isExist = activeClassNames.some((activeName) => {
+    return classList.includes(activeName);
+  });
+  if (isExist) {
+    return;
+  }
+  currentName.value = "";
+}
 
-    // function calcPaneInstances() {
-    //   const defaultSlots = context.slots.default();
-    //   if (defaultSlots) {
-    //     const paneSlots = defaultSlots.filter(
-    //       (vnode) => vnode.type.name === "BaseTabPane"
-    //     );
-    //     const panes = paneSlots.map(({ type }) => type);
-    //     state.panes = panes;
-    //   } else {
-    //     state.panes = [];
-    //   }
-    // }
-
-    return {
-      currentName,
-    };
-  },
-};
+function changeTabName(val) {
+  currentName.value = val;
+  emit("update:activeName", val);
+}
 </script>
 
 <style lang="scss" scoped>

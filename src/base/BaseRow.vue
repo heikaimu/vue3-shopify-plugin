@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 10:15:02
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-19 10:40:43
+ * @LastEditTime: 2021-10-28 16:40:59
 -->
 <template>
   <div class="base-row" :style="rowStyle">
@@ -12,35 +12,26 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { computed, provide } from "vue";
 
-export default {
-  name: "BaseRow",
-
-  props: {
-    gutter: {
-      type: Number,
-      default: 0,
-    },
+const props = defineProps({
+  gutter: {
+    type: Number,
+    default: 0,
   },
+});
 
-  setup(props) {
-    const { gutter } = props;
-    provide("gutter", gutter);
+const { gutter } = props;
 
-    const rowStyle = computed(() => {
-      return {
-        marginLeft: `${-gutter / 2}px`,
-        marginRight: `${-gutter / 2}px`,
-      };
-    });
+provide("gutter", gutter);
 
-    return {
-      rowStyle,
-    };
-  },
-};
+const rowStyle = computed(() => {
+  return {
+    marginLeft: `${-gutter / 2}px`,
+    marginRight: `${-gutter / 2}px`,
+  };
+});
 </script>
 
 <style lang="scss" scoped>

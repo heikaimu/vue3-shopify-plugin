@@ -4,16 +4,16 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:16:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-30 13:18:31
+ * @LastEditTime: 2021-10-28 17:58:52
 -->
 <template>
   <!-- 输入框 -->
   <div class="input-wrapper">
-    <p class="text-length">Text Title {{ text.length }} | 15</p>
+    <p class="text-length">Text Title {{ text.length }} | {{ size }}</p>
     <input
       type="text"
       class="text-input"
-      maxlength="15"
+      :maxlength="size"
       placeholder="custom text"
       v-model="value"
       @input="handleInput"
@@ -29,6 +29,10 @@ export default {
     text: {
       type: String,
       default: "",
+    },
+    size: {
+      type: String,
+      default: "15",
     },
   },
 
@@ -75,7 +79,7 @@ export default {
     font-size: 14px;
     color: $context-color;
     outline: none;
-    -webkit-appearance: none; 
+    -webkit-appearance: none;
   }
   .text-length {
     @include pos-absolute(50%, 10px, auto, auto);

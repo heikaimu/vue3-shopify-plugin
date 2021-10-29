@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-29 17:15:39
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-30 11:05:35
+ * @LastEditTime: 2021-10-28 16:41:16
 -->
 <template>
   <div class="base-tab-pane">
@@ -20,54 +20,40 @@
   </div>
 </template>
 
-<script>
-import { ref, toRefs, inject, computed } from "vue";
+<script setup>
+import { ref, inject, computed } from "vue";
 
 import BaseIcon from "./BaseIcon.vue";
 
-export default {
-  name: "BaseTabPane",
-
-  components: {
-    BaseIcon,
+const props = defineProps({
+  label: {
+    type: String,
+    default: "",
   },
-
-  props: {
-    label: {
-      type: String,
-      default: "",
-    },
-    name: {
-      type: String,
-      default: "",
-    },
+  name: {
+    type: String,
+    default: "",
   },
+});
 
-  setup(props) {
-    const index = ref(null);
-    const rootTabs = inject("rootTabs");
+const rootTabs = inject("rootTabs");
 
-    const active = computed(() => {
-      const active = rootTabs.currentName.value === (props.name || index.value);
-      return active;
-    });
+const index = ref(null);
 
-    const changeTabName = inject("changeTabName");
+const active = computed(() => {
+  const active = rootTabs.currentName.value === (props.name || index.value);
+  return active;
+});
 
-    function handleClick() {
-      if (active.value) {
-        changeTabName("");
-      } else {
-        changeTabName(props.name || index.value);
-      }
-    }
+const changeTabName = inject("changeTabName");
 
-    return {
-      active,
-      handleClick,
-    };
-  },
-};
+function handleClick() {
+  if (active.value) {
+    changeTabName("");
+  } else {
+    changeTabName(props.name || index.value);
+  }
+}
 </script>
 
 <style lang="scss" scoped>

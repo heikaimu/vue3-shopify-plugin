@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 10:15:02
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-19 10:38:05
+ * @LastEditTime: 2021-10-28 16:37:43
 -->
 <template>
   <div class="base-col" :style="colStyle">
@@ -12,34 +12,25 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { inject, computed } from "vue";
 
-export default {
-  name: "BaseCol",
-
-  props: {
-    span: {
-      type: Number,
-      deafult: 24,
-    },
+const props = defineProps({
+  span: {
+    type: Number,
+    deafult: 24,
   },
+});
 
-  setup(props) {
-    const gutter = inject("gutter");
-    const colStyle = computed(() => {
-      return {
-        paddingLeft: `${gutter / 2}px`,
-        paddingRight: `${gutter / 2}px`,
-        width: `${(props.span / 24) * 100}%`,
-      };
-    });
+const gutter = inject("gutter");
 
-    return {
-      colStyle,
-    };
-  },
-};
+const colStyle = computed(() => {
+  return {
+    paddingLeft: `${gutter / 2}px`,
+    paddingRight: `${gutter / 2}px`,
+    width: `${(props.span / 24) * 100}%`,
+  };
+});
 </script>
 
 <style lang="scss" scoped>

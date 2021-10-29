@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-30 10:44:39
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-30 10:46:44
+ * @LastEditTime: 2021-10-28 16:40:17
 -->
 <template>
   <div class="dot-loading">
@@ -16,22 +16,8 @@
   </div>
 </template>
 
-<script>
-import { reactive, toRefs } from "vue";
+<script setup>
 
-export default {
-  name: "BaseLoadingDot",
-
-  setup() {
-    const state = reactive({
-      count: 0,
-    });
-
-    return {
-      ...toRefs(state),
-    };
-  },
-};
 </script>
 
 <style lang="scss" scoped>

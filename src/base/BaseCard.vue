@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 10:49:23
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-10 10:21:34
+ * @LastEditTime: 2021-10-28 16:34:43
 -->
 <template>
   <div class="base-card" @click.stop="handleClick">
@@ -22,51 +22,34 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { computed } from "vue";
-
 import BaseIcon from "./BaseIcon.vue";
 
-export default {
-  components: {
-    BaseIcon,
+const props = defineProps({
+  src: {
+    type: String,
+    deafult: "",
   },
-
-  props: {
-    src: {
-      type: String,
-      deafult: "",
-    },
-    title: {
-      type: String,
-      deafult: "",
-    },
-    closeable: {
-      type: Boolean,
-      deafult: false,
-    },
+  title: {
+    type: String,
+    deafult: "",
   },
-
-  emits: {
-    click: null,
-    close: null,
+  closeable: {
+    type: Boolean,
+    deafult: false,
   },
+});
 
-  setup(props, context) {
-    function handleClick() {
-      context.emit("click");
-    }
+const emit = defineEmits(["click", "close"]);
 
-    function handleClose() {
-      context.emit("close");
-    }
+function handleClick() {
+  emit("click");
+}
 
-    return {
-      handleClick,
-      handleClose,
-    };
-  },
-};
+function handleClose() {
+  emit("close");
+}
 </script>
 
 <style lang="scss" scoped>

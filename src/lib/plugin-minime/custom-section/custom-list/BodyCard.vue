@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-26 14:54:19
+ * @LastEditTime: 2021-10-28 16:45:30
 -->
 <template>
   <div class="body-card" @click="handleClick">
@@ -145,7 +145,6 @@ export default {
         skin,
       }).filter((item) => ["avatar", "annex"].includes(item.type));
       state.layerList = await getLayerList(layers, e.target.width);
-      console.log(state.layerList);
     }
 
     function getLayerList(layers, targetWidth) {

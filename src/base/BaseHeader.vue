@@ -4,14 +4,18 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-16 14:28:55
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-01 11:13:55
+ * @LastEditTime: 2021-10-28 16:38:46
 -->
 <template>
   <div class="base-header">
-    <div class="base-header__close" @click="$emit('close')" id="icon_header_close">
+    <div
+      class="base-header__close"
+      @click="$emit('close')"
+      id="icon_header_close"
+    >
       <base-icon :icon="icon" />
     </div>
-    <div class="base-header__title" :class="{center:center}">
+    <div class="base-header__title" :class="{ center: center }">
       <p class="main-text">{{ mainText }}</p>
       <p class="sub-text">{{ subText }}</p>
     </div>
@@ -21,35 +25,27 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import BaseIcon from "./BaseIcon.vue";
 
-export default {
-  name: "BaseHeader",
-
-  components: {
-    BaseIcon,
+const props = defineProps({
+  mainText: {
+    type: String,
+    default: "",
   },
-
-  props: {
-    mainText: {
-      type: String,
-      default: "",
-    },
-    subText: {
-      type: String,
-      default: "",
-    },
-    icon: {
-      type: String,
-      default: "close",
-    },
-    center: {
-      type: Boolean,
-      default: true
-    }
+  subText: {
+    type: String,
+    default: "",
   },
-};
+  icon: {
+    type: String,
+    default: "close",
+  },
+  center: {
+    type: Boolean,
+    default: true,
+  },
+});
 </script>
 
 <style lang="scss" scoped>

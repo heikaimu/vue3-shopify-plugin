@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-16 17:26:28
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-30 15:28:27
+ * @LastEditTime: 2021-10-28 16:40:26
 -->
 <template>
   <p class="base-notice">
@@ -13,10 +13,7 @@
   </p>
 </template>
 
-<script>
-export default {
-  name: "BaseNotice",
-};
+<script setup>
 </script>
 
 <style lang="scss" scoped>

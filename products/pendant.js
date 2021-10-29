@@ -6,7 +6,7 @@ export const product = {
   "published_at": "2021-08-25T06:36:31-04:00",
   "created_at": "2021-08-25T06:36:38-04:00",
   "vendor": "makemesurprise",
-  "type": "pendant",
+  "type": "Ornament",
   "tags": [
     "All Available on google ALL",
     "All Available on google sequin pillow",

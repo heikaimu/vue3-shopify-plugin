@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-27 17:47:24
+ * @LastEditTime: 2021-10-28 16:45:35
 -->
 <template>
   <div class="custom-board">
@@ -165,7 +165,6 @@ export default {
     const annexRecords = ref({});
     const activeID = ref("");
     async function hideAnnex(canvas, layer) {
-      console.log(layer)
       const { id, left, top, width, angle, scaleX } = layer;
       const scale = canvas.scale;
 

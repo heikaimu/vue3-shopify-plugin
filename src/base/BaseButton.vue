@@ -8,59 +8,50 @@
   </div>
 </template>
 
-<script>
-import { toRaw, computed } from "vue";
-export default {
-  name: "BaseButton",
+<script setup>
+import { computed } from "vue";
 
-  props: {
-    type: {
-      type: String,
-      default: "info",
-    },
-    plain: {
-      type: Boolean,
-      default: false,
-    },
-    size: {
-      type: String,
-      default: "normal",
-    },
-    full: {
-      type: Boolean,
-      default: false,
-    },
-    blod: {
-      type: Number,
-      default: 400
-    }
+const props = defineProps({
+  type: {
+    type: String,
+    default: "info",
   },
+  plain: {
+    type: Boolean,
+    default: false,
+  },
+  size: {
+    type: String,
+    default: "normal",
+  },
+  full: {
+    type: Boolean,
+    default: false,
+  },
+  blod: {
+    type: Number,
+    default: 400,
+  },
+});
 
-  setup(props) {
-    const sizeMap = {
-      normal: {
-        height: "36px",
-        borderRadius: "4px",
-        fontSize: "14px",
-        fontWeight: props.blod
-      },
-      large: {
-        height: "60px",
-        borderRadius: "6px",
-        fontSize: "18px",
-        fontWeight: props.blod
-      },
-    };
-
-    const sizeStyle = computed(() => {
-      return sizeMap[props.size];
-    });
-
-    return {
-      sizeStyle,
-    };
+const sizeMap = {
+  normal: {
+    height: "36px",
+    borderRadius: "4px",
+    fontSize: "14px",
+    fontWeight: props.blod,
+  },
+  large: {
+    height: "60px",
+    borderRadius: "6px",
+    fontSize: "18px",
+    fontWeight: props.blod,
   },
 };
+
+const sizeStyle = computed(() => {
+  return sizeMap[props.size];
+});
 </script>
 
 <style lang="scss" scoped>
