@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 14:27:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 14:50:05
+ * @LastEditTime: 2021-10-29 13:23:20
  */
 import { reactive, toRefs, onMounted, nextTick, computed } from "vue";
 import { debounce } from "lodash";
@@ -23,7 +23,7 @@ export default function useBackground(props) {
 
   onMounted(async() => {
     // 通过传入的背景色名称来获取索引，如果是背景(bg-xx)直接匹配，如果是颜色Color:xxx只匹配前面部分
-    state.backgroundList = props.data.backgroundList.map(item => {
+    state.backgroundList = props.data.backgroundList.filter(item => Boolean(item)).map(item => {
       const { list, title } = item;
       return {
         list: list,

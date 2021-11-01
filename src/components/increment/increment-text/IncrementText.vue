@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-29 10:38:57
+ * @LastEditTime: 2021-10-29 11:29:07
 -->
 <template>
   <div class="increment-wrapper">
@@ -218,10 +218,14 @@ export default {
       const items = fabricInstance.getObjects();
       const textItems = items.filter((item) => item.type === "text");
       const {text, fontFamily, color} = state.customText;
+      
       for (const item of textItems) {
         const inputMaxSize = props.data.size ? Number(props.data.size) : 15;
+        
         const length = Math.max(Math.floor(inputMaxSize / 2), text.length);
-        const fontSize = (2.5 * item.cacheWidth) / length * fabricInstance.scale;
+        
+        const fontSize = (2.5 * item.originalWidth) / length * fabricInstance.scale;
+        
         fabricInstance.update({
           layer: item,
           options: {

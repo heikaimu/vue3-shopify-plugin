@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-23 13:24:29
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-29 10:29:16
+ * @LastEditTime: 2021-11-01 17:04:53
  */
 
 import { fabric } from 'fabric';
@@ -195,7 +195,7 @@ export default class CanvasRenderer {
 
   // 添加文字
   _addText(config, resolve) {
-    const { fontSize, left, top, angle = 0, text, color, fontFamily, selectable, stroke = '#ffffff', strokeWidth = 0 } = config;
+    const { fontSize, width, left, top, angle = 0, text, color, fontFamily, selectable, stroke = '#ffffff', strokeWidth = 0 } = config;
     var t = new fabric.Text(text, {
       fontSize: fontSize * this.scale,
       fill: color,
@@ -210,7 +210,8 @@ export default class CanvasRenderer {
       textAlign: 'center',
       originX: 'center',
       originY: 'center',
-      type: 'text'
+      type: 'text',
+      originalWidth: width
     });
     this.fabricInstance.add(t);
     resolve();
@@ -374,9 +375,11 @@ export default class CanvasRenderer {
     const { left, top, angle = 0, width, offset, type, name, scaleX } = item;
 
     // 当前的配置
+    const offsetLeft = offset ? offset.left : 0;
+    const offsetTop = offset ? offset.top : 0;
     const current = {
-      left: left - offset.left,
-      top: top - offset.top,
+      left: left - offsetLeft,
+      top: top - offsetTop,
       width: width * scaleX,
       angle,
       type,
@@ -385,8 +388,8 @@ export default class CanvasRenderer {
 
     // 原始尺寸的配置
     const original = {
-      left: (left - offset.left) / this.scale,
-      top: (top - offset.top) / this.scale,
+      left: (left - offsetLeft) / this.scale,
+      top: (top - offsetTop) / this.scale,
       width: (width * scaleX) / this.scale,
       angle,
       type,

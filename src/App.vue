@@ -3,7 +3,13 @@
     <div class="left">
       <ul class="nav__list">
         <li class="nav__item" v-for="item in products" :key="item.id">
-          <p class="text" :class="{active:item.product.type===activeType}" @click="openProductPlugin(item)">{{item.product.type}}</p>
+          <p
+            class="text"
+            :class="{ active: item.product.type === activeType }"
+            @click="openProductPlugin(item)"
+          >
+            {{ item.product.type }}
+          </p>
         </li>
       </ul>
     </div>
@@ -24,6 +30,7 @@
 import { reactive, toRefs } from "vue";
 import MinimePillow from "./lib";
 import axios from "axios";
+import { configMock } from "./mock/config";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
 const WEBSITE = "M";
@@ -41,13 +48,14 @@ export default {
       visible: false,
       backgroundActiveIndex: 0,
       composingActiveIndex: 0,
-      sizeActiveName: '',
+      sizeActiveName: "",
       backgroundActiveName: "Green",
       products: products,
-      activeType: ''
+      activeType: "",
     });
 
     function complete(data) {
+      console.log(data)
       window.open(data.files.Preview);
     }
 
@@ -60,13 +68,29 @@ export default {
     return {
       ...toRefs(state),
       complete,
-      openProductPlugin
+      openProductPlugin,
     };
   },
 };
 
 // 获取配置参数
 function getConfig(product, publishSize) {
+  // return new Promise((resolve, reject) => {
+  //        let config = JSON.parse(configMock[0].configure);
+  //       config.website = WEBSITE;
+  //       config.defaultSkin = "yellow";
+  //       config.skuList = getSKUlist(product);
+  //       config.productOptionsValue = {
+  //         Size: publishSize,
+  //       };
+
+  //       getProductConfig(config, product.type);
+  //       topBodyCard(config);
+
+  //       resolve(config);
+  // })
+
+
   let config = {};
   const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
 
@@ -208,10 +232,8 @@ function getTagID() {
 
 <style>
 .nav__list {
-
 }
 .nav__item {
-
 }
 .nav__item .text {
   cursor: pointer;

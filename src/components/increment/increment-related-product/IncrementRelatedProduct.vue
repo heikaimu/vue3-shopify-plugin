@@ -1,123 +1,80 @@
 <!--
- * @Description: 
+ * @Description: 关联产品
  * @Version: 2.0
  * @Author: Yaowen Liu
- * @Date: 2021-07-22 17:48:57
+ * @Date: 2021-10-25 16:36:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-01 11:11:10
+ * @LastEditTime: 2021-11-01 16:14:57
 -->
 <template>
   <div class="increment-wrapper">
     <div class="increment-blank" @click="handleClose"></div>
+
     <div class="increment-related-product">
+      
       <span class="close-icon">
         <base-icon icon="close" @click="handleClose" />
       </span>
+      
+      <!-- 单个产品 -->
+      <product-single
+        v-if="data.length === 1"
+        :data="data[0]"
+        :checkedList="checkedList"
+        @next="handleNext"
+      ></product-single>
 
-      <div class="product-wrapper">
-        <div class="single-product-card" v-if="isSingle">
-          <img
-            class="single-product__img"
-            :src="product.url"
-            alt=""
-            srcset=""
-          />
-          <p class="single-product__title">
-            Would You Like To Add A Same Design Doll Keychain?
-          </p>
-          <p class="single-product__price">+ ${{ product.price }}</p>
-        </div>
-      </div>
+      <!-- 多个产品 -->
+      <product-multiple
+        v-else-if="data.length > 1"
+        :list="data"
+        :checkedList="checkedList"
+        @next="handleNext"
+      ></product-multiple>
 
-      <div class="add-to-cart">
-        <div class="item">
-          <base-button type="primary" size="large" @click="handleNext(true)" id="button_add_to_cart_3"
-            >Sure & Add To Cart</base-button
-          >
-        </div>
-        <div class="item">
-          <div class="divider">
-            <span class="text">or</span>
-          </div>
-        </div>
-        <div class="item">
-          <base-button
-            type="primary"
-            size="large"
-            plain
-            @click="handleNext(false)"
-            id="button_add_to_cart_4"
-            >No Thanks & Add To Cart</base-button
-          >
-        </div>
-      </div>
+      <!-- 没有产品 -->
+      <p v-else>empty</p>
     </div>
   </div>
 </template>
 
-<script>
-import { reactive, toRefs, toRaw, onMounted, nextTick } from "vue";
+<script setup>
+import { onMounted, ref, watch } from "vue";
 
-import BaseButton from "../../../base/BaseButton.vue";
+import ProductSingle from "./ProductSingle.vue";
+import ProductMultiple from "./ProductMultiple.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
 
-export default {
-  components: {
-    BaseButton,
-    BaseIcon,
+const props = defineProps({
+  data: {
+    type: Array,
+    default: () => [],
   },
+});
 
-  props: {
-    data: {
-      type: Array,
-      default: () => [],
-    },
+const emit = defineEmits(["change", "close", "next"]);
+
+// 已选产品
+const checkedList = ref(props.data && props.data.length > 1 ? [props.data[0].id] : []);
+
+// 勾选内容变化时出发修改函数
+watch(
+  checkedList,
+  (val) => {
+    emit("change", val);
   },
+  { deep: true }
+);
 
-  emits: {
-    change: null,
-    close: null,
-    next: null,
-  },
+// 关闭
+function handleClose() {
+  emit("close");
+}
 
-  setup(props, context) {
-    const state = reactive({
-      isSingle: false,
-      product: {},
-    });
-
-    onMounted(async () => {
-      state.isSingle = props.data.length === 1;
-      await nextTick();
-      if (state.isSingle) {
-        state.product = props.data[0];
-      } else {
-        state.product = null;
-      }
-    });
-
-    // 关闭
-    function handleClose() {
-      context.emit("close");
-    }
-
-    // 前往下一步
-    function handleNext(flag) {
-      if (flag) {
-        context.emit("change", [state.product.id]);
-      } else {
-        context.emit("change", []);
-      }
-      context.emit("next");
-    }
-
-    return {
-      ...toRefs(state),
-      handleClose,
-      handleNext,
-    };
-  },
-};
+// 前往下一步
+function handleNext() {
+  emit("next");
+}
 </script>
 
 <style lang="scss" scoped>
@@ -140,67 +97,6 @@ export default {
     .close-icon {
       @include pos-absolute(20px, auto, auto, 20px, 1004);
       cursor: pointer;
-    }
-
-    .product-wrapper {
-      height: 250px;
-      position: relative;
-      .single-product-card {
-        width: 100%;
-        @include flex-col-center;
-        @include pos-absolute(-120px, auto, auto, 50%, 1003);
-        transform: translate3d(-50%, 0, 0);
-        .single-product__img {
-          @include card-shadow-lg;
-          display: block;
-          width: 240px;
-          height: 240px;
-          padding: 2px;
-          background: #fff;
-          border-radius: 10px;
-        }
-        .single-product__title {
-          padding: 20px 20px 10px 20px;
-          font-size: 18px;
-          line-height: 1.6;
-          color: $title-color;
-          text-align: center;
-          margin-bottom: 0;
-        }
-        .single-product__price {
-          font-size: 16px;
-          color: $theme-color;
-          font-weight: 600;
-        }
-      }
-    }
-
-    .add-to-cart {
-      padding: 0 20px 20px 20px;
-      .item {
-        & + .item {
-          margin-top: 10px;
-        }
-        .divider {
-          @include flex-row-center;
-          width: 100%;
-          .text {
-            @include flex-row-center;
-            font-size: 14px;
-            font-weight: 600;
-            color: $context-color;
-            &::after,
-            &::before {
-              display: block;
-              content: "";
-              width: 60px;
-              height: 1px;
-              background-color: currentColor;
-              margin: 0 5px;
-            }
-          }
-        }
-      }
     }
   }
 }

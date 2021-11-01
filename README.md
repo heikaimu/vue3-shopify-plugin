@@ -1,13 +1,5 @@
-<!--
- * @Description: 
- * @Version: 2.0
- * @Author: Yaowen Liu
- * @Date: 2021-07-19 09:42:00
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-01 10:46:03
--->
-# vue3-shopify-plugin
-
-icon_crop
-icon_rotate_left
-icon_rotate_right
+<!-- TODO -->
+1.批量选择文件
+2.提交所有文件名字集合到验证接口，获取不需要上传的文件，并在上传队列里移除
+3.走OBS上传流程
+4.将返回的地址提交给保存接口
