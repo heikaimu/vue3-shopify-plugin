@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-08 16:27:20
+ * @LastEditTime: 2021-11-04 15:46:00
 -->
 <template>
   <div class="increment-wrapper">
@@ -135,7 +135,7 @@ export default {
         return "";
       }
 
-      return `+ $${number(currentItem.value.sku.addPrice / 100, 2)}`;
+      return `+ ${number(currentItem.value.sku.addPrice / 100, 2)}`;
     });
 
     // 关闭

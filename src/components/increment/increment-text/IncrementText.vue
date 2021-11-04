@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-29 11:29:07
+ * @LastEditTime: 2021-11-04 15:46:16
 -->
 <template>
   <div class="increment-wrapper">
@@ -136,7 +136,7 @@ export default {
 
     const addToCartText = computed(() => {
       if (state.activeValue === "yes" && state.customText.text !== "") {
-        return `Add To Cart +$${props.data.price}`;
+        return `Add To Cart +${props.data.price}`;
       } else {
         return `Add To Cart`;
       }

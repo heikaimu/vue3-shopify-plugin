@@ -17,7 +17,7 @@
       :class="{ active: item.value === value }"
       @click="handleSwitch(item.value)"
     >
-      {{ index === 0 ? `${item.label} +$${price}` : item.label }}
+      {{ index === 0 ? `${item.label} +${price}` : item.label }}
     </p>
   </div>
 </template>

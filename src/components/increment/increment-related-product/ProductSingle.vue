@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-01 10:45:12
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-01 15:51:06
+ * @LastEditTime: 2021-11-04 15:46:10
 -->
 <template>
   <div>
@@ -14,7 +14,7 @@
         <p class="single-product__title">
           {{ data.title }}
         </p>
-        <p class="single-product__price">+ ${{ data.price }}</p>
+        <p class="single-product__price">+ {{ data.price }}</p>
       </div>
     </div>
 

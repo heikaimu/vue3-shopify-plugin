@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 11:19:13
+ * @LastEditTime: 2021-11-04 15:44:47
 -->
 <template>
   <div class="increment-wrapper">
@@ -30,7 +30,7 @@
                 color="#fbe4a4"
               ></base-icon>
             </div>
-            <div class="button-content">VIP SERVICE + ${{data.price}}</div>
+            <div class="button-content">VIP SERVICE + {{data.price}}</div>
             <div class="crown"></div>
             <div class="light"></div>
           </div>
