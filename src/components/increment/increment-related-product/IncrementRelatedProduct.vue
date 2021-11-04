@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-25 16:36:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-01 16:14:57
+ * @LastEditTime: 2021-11-04 16:07:52
 -->
 <template>
   <div class="increment-wrapper">
@@ -21,6 +21,7 @@
         v-if="data.length === 1"
         :data="data[0]"
         :checkedList="checkedList"
+        :dollarSign="dollarSign"
         @next="handleNext"
       ></product-single>
 
@@ -29,6 +30,7 @@
         v-else-if="data.length > 1"
         :list="data"
         :checkedList="checkedList"
+        :dollarSign="dollarSign"
         @next="handleNext"
       ></product-multiple>
 
@@ -50,6 +52,9 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  dollarSign: {
+    type: String
+  }
 });
 
 const emit = defineEmits(["change", "close", "next"]);

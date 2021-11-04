@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-04 15:44:47
+ * @LastEditTime: 2021-11-04 16:01:37
 -->
 <template>
   <div class="increment-wrapper">
@@ -30,7 +30,7 @@
                 color="#fbe4a4"
               ></base-icon>
             </div>
-            <div class="button-content">VIP SERVICE + {{data.price}}</div>
+            <div class="button-content">VIP SERVICE + {{dollarSign}}{{ data.price }}</div>
             <div class="crown"></div>
             <div class="light"></div>
           </div>
@@ -40,7 +40,11 @@
       </div>
 
       <div class="add-to-cart">
-        <base-button type="primary" size="large" @click="handleNext(true)" id="button_add_to_cart_10"
+        <base-button
+          type="primary"
+          size="large"
+          @click="handleNext(true)"
+          id="button_add_to_cart_10"
           >Add To Cart</base-button
         >
       </div>
@@ -69,6 +73,9 @@ export default {
       type: Boolean,
       default: false,
     },
+    dollarSign: {
+      type: String,
+    },
   },
 
   emits: {
@@ -79,7 +86,7 @@ export default {
 
   setup(props, context) {
     const state = reactive({
-      active: false
+      active: false,
     });
 
     onMounted(() => {

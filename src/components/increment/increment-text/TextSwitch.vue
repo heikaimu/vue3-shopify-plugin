@@ -17,7 +17,7 @@
       :class="{ active: item.value === value }"
       @click="handleSwitch(item.value)"
     >
-      {{ index === 0 ? `${item.label} +${price}` : item.label }}
+      {{ index === 0 ? `${item.label} +${dollarSign}${price}` : item.label }}
     </p>
   </div>
 </template>
@@ -33,6 +33,9 @@ export default {
     },
     price: {
       type: [Number, String]
+    },
+    dollarSign: {
+      type: String
     }
   },
 

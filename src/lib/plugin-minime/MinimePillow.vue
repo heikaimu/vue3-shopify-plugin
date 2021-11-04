@@ -37,6 +37,7 @@
         :customState="customState"
         :config="config"
         :previewBody="previewBody"
+        :dollarSign="dollarSign"
         v-bind="$attrs"
         @save="saveIncrement"
         @close="setCustomState"
@@ -49,7 +50,6 @@
         :website="config.website"
         @complete="completeUpload"
       />
-
     </div>
   </div>
 </template>
@@ -83,6 +83,10 @@ export default {
       deafult: () => ({
         increment: {},
       }),
+    },
+    dollarSign: {
+      type: String,
+      default: "$",
     },
   },
 

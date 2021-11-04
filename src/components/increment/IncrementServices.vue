@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-08 15:15:18
+ * @LastEditTime: 2021-11-04 16:00:40
 -->
 <template>
   <!-- 增量服务 -->
@@ -15,6 +15,7 @@
       :data="incrementData.data"
       :value="incrementData.value"
       :customBodyPreviewURL="previewBody"
+      :dollarSign="dollarSign"
       @change="changeSlides"
       @close="handleClose"
       @next="nextIncrement"
@@ -26,6 +27,7 @@
       :data="incrementData"
       :customBodyPreviewURL="previewBody"
       :sizeList="config.sizeList"
+      :dollarSign="dollarSign"
       v-bind="$attrs"
       @change="changeBackground"
       @close="handleClose"
@@ -39,6 +41,7 @@
       :value="incrementData.value"
       :previewWidthBackground="previewWidthBackground"
       :textRenderParams="textRenderParams"
+      :dollarSign="dollarSign"
       @change="changeText"
       @close="handleClose"
       @next="nextIncrement"
@@ -52,6 +55,7 @@
       :value="incrementData.value"
       :productOptionsValue="productOptionsValue"
       :skuList="config.skuList"
+      :dollarSign="dollarSign"
       @change="changePublish"
       @close="handleClose"
       @next="nextIncrement"
@@ -62,6 +66,7 @@
       v-else-if="relatedProductVisible"
       :data="incrementData.data"
       :value="incrementData.value"
+      :dollarSign="dollarSign"
       @change="changeRelatedProduct"
       @close="handleClose"
       @next="nextIncrement"
@@ -72,6 +77,7 @@
       v-else-if="vipVisible"
       :data="incrementData.data"
       :value="incrementData.value"
+      :dollarSign="dollarSign"
       @change="changeVip"
       @close="handleClose"
       @next="nextIncrement"
@@ -117,6 +123,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    // 货币符号
+    dollarSign: {
+      type: String
+    }
   },
 
   emits: {

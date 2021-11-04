@@ -4,10 +4,15 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-12 16:20:07
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-26 13:15:09
+ * @LastEditTime: 2021-11-04 15:58:13
 -->
 <template>
-  <component v-bind="$attrs" :config="config" :is="currentElementComponent" />
+  <component
+    v-bind="$attrs"
+    :config="config"
+    :dollarSign="dollarSign"
+    :is="currentElementComponent"
+  />
 </template>
 
 <script>
@@ -26,6 +31,10 @@ export default {
     config: {
       type: Object,
       deafult: null,
+    },
+    dollarSign: {
+      type: String,
+      default: "$",
     },
   },
 

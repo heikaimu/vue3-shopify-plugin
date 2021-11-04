@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-04 15:46:00
+ * @LastEditTime: 2021-11-04 16:12:21
 -->
 <template>
   <div class="increment-wrapper">
@@ -77,6 +77,9 @@ export default {
       type: Object,
       default: () => {},
     },
+    dollarSign: {
+      type: String
+    }
   },
 
   emits: {
@@ -135,7 +138,7 @@ export default {
         return "";
       }
 
-      return `+ ${number(currentItem.value.sku.addPrice / 100, 2)}`;
+      return `+${props.dollarSign}${number(currentItem.value.sku.addPrice / 100, 2)}`;
     });
 
     // 关闭

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-01 10:45:38
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-04 15:46:06
+ * @LastEditTime: 2021-11-04 16:05:01
 -->
 <template>
   <div>
@@ -20,7 +20,7 @@
         <swiper-slide v-for="(item, index) in list" :key="index">
           <div class="related-product__card">
             <img class="related-product__bg" :src="item.url" alt="" />
-            <p class="related-product__price">{{ item.price }}</p>
+            <p class="related-product__price">{{dollarSign}}{{ item.price }}</p>
             <p class="related-product__text">{{ item.title }}</p>
             <div class="check-icon">
               <base-icon
@@ -87,6 +87,9 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  dollarSign: {
+    type: String
+  }
 });
 
 const emit = defineEmits(["next"]);

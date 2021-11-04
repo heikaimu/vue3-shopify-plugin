@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-10 11:09:38
+ * @LastEditTime: 2021-11-04 16:18:34
 -->
 <template>
   <div class="increment-wrapper">
@@ -17,7 +17,7 @@
         <img :src="customBodyPreviewURL" alt="" />
       </div>
       <p class="custom-title">Print back side？<br/>
-add your design mirrored on back side for only <strong>+$5.00</strong></p>
+add your design mirrored on back side for only <strong>+{{dollarSign}}5.00</strong></p>
       <div class="slides-selector">
         <div
           v-for="(item, index) in data"
@@ -28,7 +28,7 @@ add your design mirrored on back side for only <strong>+$5.00</strong></p>
           @click="handleSelect(item)"
         >
           <span class="text">{{ item.title }}</span>
-          <span class="price" v-if="item.price">{{ item.price }}</span>
+          <span class="price" v-if="item.price">+{{dollarSign}}{{ item.price }}</span>
           <span class="icon" v-if="item.active">
             <base-icon icon="check" color="#ff533a" />
           </span>
@@ -68,6 +68,9 @@ export default {
       type: String,
       default: "",
     },
+    dollarSign: {
+      type: String
+    }
   },
 
   emits: {
@@ -138,7 +141,7 @@ export default {
     }
 
     .custom-title {
-      padding-bottom: 0 20px 20px 20px;
+      padding: 0 10px 10px 10px;
       text-align: center;
       font-size: 16px;
       color: $title-color;

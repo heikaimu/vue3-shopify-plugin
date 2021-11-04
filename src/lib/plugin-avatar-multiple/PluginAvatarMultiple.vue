@@ -16,6 +16,7 @@
         :customState="customState"
         :config="config"
         :previewBody="previewBody"
+        :dollarSign="dollarSign"
         v-bind="$attrs"
         @save="saveIncrement"
         @close="setCustomState"
@@ -60,6 +61,9 @@ export default {
         increment: {},
       }),
     },
+    dollarSign: {
+      type: String
+    }
   },
 
   emits: {

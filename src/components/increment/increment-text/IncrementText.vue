@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-04 15:46:16
+ * @LastEditTime: 2021-11-04 16:11:50
 -->
 <template>
   <div class="increment-wrapper">
@@ -28,6 +28,7 @@
           <text-switch
             v-model:activeValue="activeValue"
             :price="data.price"
+            :dollarSign="dollarSign"
           ></text-switch>
 
           <template v-if="activeValue === 'yes'">
@@ -113,6 +114,9 @@ export default {
     textRenderParams: {
       type: Object,
     },
+    dollarSign: {
+      type: String
+    }
   },
 
   emits: {
@@ -136,7 +140,7 @@ export default {
 
     const addToCartText = computed(() => {
       if (state.activeValue === "yes" && state.customText.text !== "") {
-        return `Add To Cart +${props.data.price}`;
+        return `Add To Cart +${props.dollarSign}${props.data.price}`;
       } else {
         return `Add To Cart`;
       }
