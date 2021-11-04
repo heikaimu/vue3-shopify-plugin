@@ -12,6 +12,8 @@
           </p>
         </li>
       </ul>
+
+      <BaseImages :list="images" />
     </div>
     <div class="right">
       <MinimePillow
@@ -27,19 +29,23 @@
 </template>
 
 <script>
-import { reactive, toRefs } from "vue";
+import { reactive, toRefs, onMounted } from "vue";
 import MinimePillow from "./lib";
+import BaseImages from "./base/BaseImages.vue";
 import axios from "axios";
 import { configMock } from "./mock/config";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
-const WEBSITE = "M";
+const WEBSITE = "FT";
 
 import products from "../products/index";
+
+import { getList } from "./api/images";
 
 export default {
   components: {
     MinimePillow,
+    BaseImages
   },
 
   setup() {
@@ -52,10 +58,15 @@ export default {
       backgroundActiveName: "Green",
       products: products,
       activeType: "",
+      images: []
     });
 
+    onMounted(() => {
+      state.images = getList(3);
+    })
+
     function complete(data) {
-      console.log(data)
+      console.log(data);
       window.open(data.files.Preview);
     }
 
@@ -89,7 +100,6 @@ function getConfig(product, publishSize) {
 
   //       resolve(config);
   // })
-
 
   let config = {};
   const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;

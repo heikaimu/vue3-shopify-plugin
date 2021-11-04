@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-25 16:23:22
+ * @LastEditTime: 2021-11-02 16:46:24
 -->
 <template>
   <div class="custom-board">
@@ -172,6 +172,7 @@ export default {
 
       // 添加附件图
       const annexList = getAnnexList(config, skin);
+      console.log(annexList)
       state.layerList.push(...annexList);
 
       // 如果是hood模式，添加svg蒙版层

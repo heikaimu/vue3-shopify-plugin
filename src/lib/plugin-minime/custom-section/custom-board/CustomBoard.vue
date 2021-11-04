@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-28 16:45:35
+ * @LastEditTime: 2021-11-02 16:31:25
 -->
 <template>
   <div class="custom-board">
@@ -209,7 +209,7 @@ export default {
     const layerList = ref([]);
     function renderLayer(items) {
       const availableItems = items.filter((item) => {
-        return item.name !== "svg";
+        return item.name !== "svg" && item.selectable;
       });
 
       if (availableItems.length === 0) {

@@ -1,8 +1,68 @@
-<!--
- * @Description: 
- * @Version: 2.0
- * @Author: Yaowen Liu
- * @Date: 2021-08-18 10:50:01
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-18 10:50:02
--->
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body>
+
+  <form action="https://shopify-guest-manage.obs.cn-southwest-2.myhuaweicloud.com/" method="post"
+    enctype="multipart/form-data">
+
+    Object key
+    <!-- Object name -->
+    <input type="hidden" name="key" value="objectkey" />
+    <p>
+      ACL
+      <!-- Object ACL -->
+      <input type="hidden" name="x-obs-acl" value="public-read" />
+    <p>
+      Content-Type
+      <!-- Object MIME type -->
+      <input type="hidden" name="content-type" value="text/plain" />
+    <p>
+      <!-- Base64 code of the policy -->
+      <input type="hidden" name="policy"
+        value="eyJleHBpcmF0aW9uIjoiMjAyMS0xMS0wMlQwNzowMjo1Mi4zMTFaIiwiY29uZGl0aW9ucyI6W3siY29udGVudC10eXBlIjoidGV4dC9wbGFpbiJ9LHsieC1vYnMtYWNsIjoicHVibGljLXJlYWQifSxbInN0YXJ0cy13aXRoIiwgIiRidWNrZXQiLCAiIl0sWyJzdGFydHMtd2l0aCIsICIka2V5IiwgIiJdLF19" />
+      <!-- AK+Short date+Region+/s3/aws4_request -->
+      <input type="hidden" name="AccessKeyId" value="HMRI3UHSCBTOAKAZL1S9" />
+      <!-- Signature information -->
+      <input type="hidden" name="signature" value="ZlOx4fFV9e/njas2AC3erDtxZ+Q=" />
+
+
+
+  </form>
+
+  <input name="file" type="file" multiple id="file" />
+
+
+  <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+  <script>
+    $("#file").change(function (e) {
+      const formData = new FormData();
+      // formData.append("policy", "eyJleHBpcmF0aW9uIjoiMjAyMS0xMS0wMlQwNzowMjo1Mi4zMTFaIiwiY29uZGl0aW9ucyI6W3siY29udGVudC10eXBlIjoidGV4dC9wbGFpbiJ9LHsieC1vYnMtYWNsIjoicHVibGljLXJlYWQifSxbInN0YXJ0cy13aXRoIiwgIiRidWNrZXQiLCAiIl0sWyJzdGFydHMtd2l0aCIsICIka2V5IiwgIiJdLF19")
+      // formData.append("AccessKeyId", "HMRI3UHSCBTOAKAZL1S9");
+      // formData.append("signature", "ZlOx4fFV9e/njas2AC3erDtxZ+Q=");
+      formData.append("file", e.target.files[0]);
+
+      const url = "https://shopify-guest-manage.obs.cn-southwest-2.myhuaweicloud.com:443/2021-11-02/2c91cb4b-a05b-4a4d-932b-8a2844f374b6.png?AccessKeyId=HMRI3UHSCBTOAKAZL1S9&Expires=1635850169&Signature=xrVq6kUK87LcfgPqeLHlAROCbzc%3D";
+
+      $.ajax({
+        method: "PUT",
+        url: url,
+        headers:
+        {
+          "Content-Type": "text/plain",
+        },
+        responseType: "text",
+        data: formData,
+        processData: false
+      })
+    })
+  </script>
+
+
+
+</body>
+
+</html>

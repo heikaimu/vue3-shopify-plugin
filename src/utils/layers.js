@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-24 11:03:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-20 13:52:19
+ * @LastEditTime: 2021-11-02 16:13:15
  */
 import { getRandomID } from './image';
 
@@ -61,6 +61,9 @@ function getAnnexList(config, skin, id) {
       const currentAnnex = item.images.find(
         (item) => item.color === skin
       );
+
+      const selectable = item.selectable === undefined || item.selectable === null ? true : item.selectable;
+
       list.push({
         url: currentAnnex.url,
         left: item.left,
@@ -70,6 +73,7 @@ function getAnnexList(config, skin, id) {
         sort: 10,
         customControls: true,
         type: 'annex',
+        selectable,
         id: id || getRandomID()
       });
     }
