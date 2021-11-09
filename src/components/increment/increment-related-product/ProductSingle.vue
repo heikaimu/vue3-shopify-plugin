@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-01 10:45:12
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-04 16:04:28
+ * @LastEditTime: 2021-11-09 13:27:14
 -->
 <template>
   <div>
@@ -127,7 +127,7 @@ function removeID(newID) {
     }
     .single-product__title {
       padding: 20px 20px 10px 20px;
-      font-size: 18px;
+      font-size: 16px;
       line-height: 1.6;
       color: $title-color;
       text-align: center;

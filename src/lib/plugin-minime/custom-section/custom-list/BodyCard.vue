@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-28 16:45:30
+ * @LastEditTime: 2021-11-09 13:22:56
 -->
 <template>
   <div class="body-card" @click="handleClick">
@@ -239,7 +239,7 @@ export default {
   @include flex-row-center;
   @include pos-absolute(auto, auto, -15px, 50%);
   @include card-shadow-lg(#ff533a);
-  width: 100px;
+  padding: 0 8px;
   height: 30px;
   border-radius: 15px;
   font-size: 14px;
@@ -250,6 +250,7 @@ export default {
   font-family: var(--text-family);
   filter: grayscale(0);
   opacity: 1;
+  white-space: nowrap;
   &.disabled {
     filter: grayscale(1);
     opacity: 0.3;

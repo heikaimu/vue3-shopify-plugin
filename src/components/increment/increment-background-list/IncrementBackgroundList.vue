@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 14:49:33
+ * @LastEditTime: 2021-11-09 13:26:18
 -->
 <template>
   <div class="increment-wrapper">
@@ -350,7 +350,7 @@ export default {
     .custom-title {
       padding-bottom: 20px;
       text-align: center;
-      font-size: 18px;
+      font-size: 16px;
       color: $theme-color;
       margin-bottom: 0;
     }
