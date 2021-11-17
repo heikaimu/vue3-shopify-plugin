@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 17:08:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-18 14:30:46
+ * @LastEditTime: 2021-11-16 16:46:34
  */
 import { reactive, toRefs, onMounted } from "vue";
 import { getRandomID } from '../utils/image'
@@ -39,8 +39,10 @@ export default function useBodyMain(props, context) {
     const { avatar, rawFile } = data;
     state.selectFiles = [
       {
-        avatar,
-        rawFile,
+        data: {
+          avatar,
+          rawFile,
+        },
         id: getRandomID()
       }
     ]

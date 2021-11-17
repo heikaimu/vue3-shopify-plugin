@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-02 16:46:24
+ * @LastEditTime: 2021-11-16 15:42:44
 -->
 <template>
   <div class="custom-board">
@@ -22,9 +22,9 @@
       <div class="custom-board__canvas-box" ref="canvasBox">
         <canvas id="customBoard"></canvas>
         <canvas-layers
-          :list="layersFileList"
+          :list="layerNavList"
           :activeID="activeID"
-          @change="handleChangeActiveID"
+          @change="handleActiveLayerNav"
         ></canvas-layers>
       </div>
     </div>
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, toRaw, ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 
 import BaseHeader from "../../../../base/BaseHeader.vue";
 import BaseButton from "../../../../base/BaseButton.vue";
@@ -69,17 +69,11 @@ import BaseIcon from "../../../../base/BaseIcon.vue";
 import BaseRow from "../../../../base/BaseRow.vue";
 import BaseCol from "../../../../base/BaseCol.vue";
 import ImageSelectPlugin from "../../../../components/image-select-plugin/ImageSelectPlugin.vue";
-import CanvasLayers from "./CanvasLayers.vue";
+import CanvasLayers from "../../../../components/CanvasLayers.vue";
 
-import CanvasRenderer from "../../../../utils/canvasRenderer";
-import {
-  getSVG,
-  getAnnexList,
-  getBody,
-  getAvatar,
-} from "../../../../utils/layers";
 import { debounce } from "lodash";
-import { getRandomID } from "../../../../utils/image";
+
+import useMultipleAvatarDIY from "../../../../composables/useMultipleAvatarDIY";
 
 export default {
   components: {
@@ -121,209 +115,70 @@ export default {
   },
 
   setup(props, context) {
-    const { config, skin } = props;
+    const { config } = props;
 
-    // fabric实例
+    const {
+      canvasBox,
+      createCanvas,
+      createRenderLayerList,
+      layerNavList,
+      activeID,
+      createLayerNav,
+      handleActiveLayerNav,
+      removeAnnex,
+      beforeSelectAvatar,
+      replaceActionLayer,
+      bringForwardLayer,
+    } = useMultipleAvatarDIY(props, context);
+
     let fabricInstance = null;
 
-    const state = reactive({
-      loading: false,
-      layerList: [],
-      actionType: "", // 操作方式，新增或者替换
-      currentVBox: {}, // 当前的虚拟box
-      currentActiveAvatar: null,
-    });
-
-    // 最大的头像数量，等同于配置的头像数组长度
-    const filesMax = computed(() => {
-      if (config.faceList) {
-        return config.faceList.length;
-      } else {
-        return 1;
-      }
-    });
-
     onMounted(() => {
+      // fabric实例
+      fabricInstance = createCanvas("customBoard");
+      // 渲染
       renderer();
     });
 
-    // 实力化插件
-    const canvasBox = ref(null);
-    function setCanvasInstance() {
-      if (!fabricInstance) {
-        const { width, height } = canvasBox.value.getBoundingClientRect();
-        const normalHeight = (width / 500) * 660;
-        fabricInstance = new CanvasRenderer("customBoard", {
-          width,
-          height: Math.min(normalHeight, height),
-          scale: width / config.width,
-        });
-      }
-    }
-
     // 渲染器
+    const loading = ref(false);
     const renderer = debounce(function () {
-      // 实列化插件
-      setCanvasInstance();
+      loading.value = true;
+      const list = createRenderLayerList();
 
-      // 添加底板图
-      const body = getBody(config, skin);
-      state.layerList.push(body);
-
-      // 添加附件图
-      const annexList = getAnnexList(config, skin);
-      console.log(annexList)
-      state.layerList.push(...annexList);
-
-      // 如果是hood模式，添加svg蒙版层
-      if (config.type === "hood") {
-        const svg = getSVG(config);
-        state.layerList.push(svg);
-      }
-
-      // 根据当前头的数量添加虚拟头
-      const avatarList = config.faceList.map((item, index) => {
-        const { left, top, angle, width } = item;
-        return {
-          left,
-          top,
-          angle,
-          width,
-          originX: "center",
-          originY: "bottom",
-          sort: 3,
-          customControls: true,
-          globalCompositeOperation: config.type === "hood" ? "source-atop" : "",
-          type: "vBox",
-          id: getRandomID(),
-          selectable: false,
-          name: `vBox${index}`,
-        };
-      });
-      state.layerList.push(...avatarList);
-
-      // 渲染
-      state.loading = true;
       fabricInstance.render({
-        layers: state.layerList,
+        layers: list,
         success: () => {
-          state.loading = false;
+          loading.value = false;
+          createLayerNav();
         },
         replacePhoto: (layer) => {
-          // 替换头像
-          state.actionType = "replace";
-          state.currentActiveAvatar = layer;
-          openImageSelector();
+          // 添加一个延迟，先执行click再执行replace
+          setTimeout(() => {
+            const { type } = layer;
+            if (type === "avatar") {
+              beforeSelectAvatar(layer);
+              openImageSelector();
+            } else if (type === "annex") {
+              removeAnnex(layer);
+            }
+          }, 300);
         },
         singleClick: (data) => {
-          const { type } = data.layer;
+          const { layer } = data;
+          const { type, selectable } = layer;
+
           if (type === "vBox") {
-            // 新增头像
-            state.actionType = "add";
-            state.currentVBox = data;
+            // 如果点击的是虚拟box则打开头像文件选择窗口
+            beforeSelectAvatar(layer);
             openImageSelector();
-          } else if (type === "avatar") {
-            data.layer.bringForward();
-            frontAnnex();
-            renderLayerNav();
+          } else if (type === "avatar" || (type === "annex" && selectable)) {
+            // 如果点击的是头像或者附件，则向上移动一层
+            bringForwardLayer(layer);
           }
         },
       });
     }, 300);
-
-    // 图层导航
-    const layersFileList = ref([]);
-    const activeID = ref("");
-    function renderLayerNav() {
-      const activeObject = fabricInstance.getActiveObject();
-      activeID.value = activeObject.id;
-      layersFileList.value = props.selectFiles.map((item) => {
-        return {
-          id: item.id,
-          url: item.data.avatar.url,
-        };
-      });
-    }
-
-    // 修改激活图层
-    function handleChangeActiveID(data) {
-      const items = fabricInstance.getObjects();
-      const obj = items.find(item => item.id === data.id);
-      if (obj) {
-        obj.bringForward();
-        fabricInstance.setActiveObject(obj);
-        frontAnnex();
-        renderLayerNav();
-      }
-    }
-
-    // 置顶帽子
-    function frontAnnex() {
-      const items = fabricInstance.getObjects();
-      const annexList = items.filter((item) => item.name === "annex");
-      annexList.forEach((annex) => {
-        annex.bringToFront();
-        fabricInstance.refresh();
-      });
-    }
-
-    // add:添加头像替换虚拟BOX
-    function addAvatarReplaceVbox(avatar) {
-      const { layer, config } = state.currentVBox;
-      if (layer && layer.name) {
-        fabricInstance.remove({ name: layer.name });
-      }
-      config.configType = props.config.type;
-      const avatarLayer = getAvatar(config, avatar.avatar);
-      avatarLayer.zIndex = avatarLayer.sort;
-      fabricInstance.add(avatarLayer, true).then(() => {
-        frontAnnex();
-        renderLayerNav();
-      });
-
-      // 添加文件
-      const id = avatarLayer.id;
-      props.selectFiles.push({
-        id,
-        data: avatar,
-      });
-    }
-
-    // update:替换头像
-    function replaceAvatar(avatar) {
-      const { left, top, width, angle, scaleX, id, offset } =
-        state.currentActiveAvatar;
-      const scale = fabricInstance.scale;
-
-      // 删除当前头像
-      fabricInstance.remove({
-        layer: toRaw(state.currentActiveAvatar),
-      });
-
-      // 获取当前头像的定位，如果之前有偏移，在计算位置的时候先减去偏移量
-      const offsetX = offset.left || 0;
-      const offsetY = offset.top || 0;
-      const config = {
-        left: (left - offsetX) / scale,
-        top: (top - offsetY) / scale,
-        width: (width * scaleX) / scale,
-        angle,
-        configType: props.config.type,
-      };
-
-      // 添加新头像
-      const avatarLayer = getAvatar(config, avatar.avatar, id);
-      fabricInstance.add(avatarLayer, true).then(() => {
-        frontAnnex();
-        renderLayerNav();
-      });
-
-      // 替换掉selectFiles里对应的元素文件
-      const currentFile = props.selectFiles.find((item) => item.id === id);
-      if (currentFile) {
-        currentFile.data = avatar;
-      }
-    }
 
     // 保存数据
     function handleSave() {
@@ -365,20 +220,15 @@ export default {
     }
     function handleCompleteSelect(data) {
       setImageSelectorVisible(false);
-      if (state.actionType === "add") {
-        addAvatarReplaceVbox(data);
-      } else if (state.actionType === "replace") {
-        replaceAvatar(data);
-      }
+      replaceActionLayer(data);
     }
     function setImageSelectorVisible(flag) {
       selectorVisible.value = flag;
     }
 
     return {
-      ...toRefs(state),
+      loading,
       canvasBox,
-      filesMax,
       handleClose,
       handleSave,
       handleOpenImageExtendSelector,
@@ -386,9 +236,9 @@ export default {
       openImageSelector,
       closeImageSelector,
       handleCompleteSelect,
-      layersFileList,
+      layerNavList,
       activeID,
-      handleChangeActiveID,
+      handleActiveLayerNav,
     };
   },
 };

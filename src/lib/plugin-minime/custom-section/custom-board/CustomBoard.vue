@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-02 16:31:25
+ * @LastEditTime: 2021-11-16 16:58:44
 -->
 <template>
   <div class="custom-board">
@@ -21,14 +21,14 @@
       <!-- fabric -->
       <div class="custom-board__canvas-box" ref="canvasBox">
         <canvas id="customBoard"></canvas>
-        <canvas-layer
-          :list="layerList"
+        <canvas-layers
+          :list="layerNavList"
           :activeID="activeID"
-          @change="changeActiveLayer"
+          @change="handleActiveLayerNav"
         />
       </div>
       <!-- 色彩饱和度调整，单头的时候出现 -->
-      <brightness-bar :url="singleAvatar.rawAvatarURL" @change="changeAvatar" />
+      <brightness-bar :url="singleAvatar.rawAvatarURL" @change="changeAvatarColor" />
     </div>
     <div class="custom-board__bottom">
       <base-row :gutter="10">
@@ -56,6 +56,14 @@
         <base-icon icon="loading" :size="30" color="#ffffff"></base-icon>
       </div>
     </div>
+
+    <!-- 文件选择 -->
+    <div class="image-extend-selector-dialog" v-if="selectorVisible">
+      <image-select-plugin
+        @close="closeImageSelector"
+        @complete="handleCompleteSelect"
+      />
+    </div>
   </div>
 </template>
 
@@ -68,11 +76,13 @@ import BaseCol from "../../../../base/BaseCol.vue";
 import BaseButton from "../../../../base/BaseButton.vue";
 import BaseIcon from "../../../../base/BaseIcon.vue";
 import BrightnessBar from "./BrightnessBar.vue";
-import CanvasLayer from "./CanvasLayers.vue";
+import CanvasLayers from "../../../../components/CanvasLayers.vue";
+import ImageSelectPlugin from "../../../../components/image-select-plugin/ImageSelectPlugin.vue";
 
-import CanvasRenderer from "../../../../utils/canvasRenderer";
 import { getLayers } from "../../../../utils/layers";
 import { debounce } from "lodash";
+
+import useMultipleAvatarDIY from "../../../../composables/useMultipleAvatarDIY";
 
 export default {
   components: {
@@ -82,7 +92,8 @@ export default {
     BaseButton,
     BaseIcon,
     BrightnessBar,
-    CanvasLayer,
+    CanvasLayers,
+    ImageSelectPlugin,
   },
 
   props: {
@@ -118,147 +129,53 @@ export default {
   setup(props, context) {
     const { config, skin } = props;
 
+    const {
+      canvasBox,
+      createCanvas,
+      layerNavList,
+      activeID,
+      createLayerNav,
+      handleActiveLayerNav,
+      removeAnnex,
+      bringForwardLayer,
+      beforeSelectAvatar,
+      replaceActionLayer,
+    } = useMultipleAvatarDIY(props);
+
     // fabric实例
     let fabricInstance = null;
 
     const state = reactive({
       singleAvatar: {
-        avatar: {
-          chin: null,
-          url: "",
+        data: {
+          avatar: {
+            chin: null,
+            url: "",
+          },
+          rawFile: "",
         },
-        rawFile: "",
+        id: null,
         rawAvatarURL: "",
       },
     });
 
     onMounted(() => {
+      // fabric实例
+      fabricInstance = createCanvas("customBoard");
       setAvatar();
       renderer();
     });
 
-    // 文件发生变化的时候重新渲染
-    watch(
-      () => props.selectFiles,
-      () => {
-        setAvatar();
-        renderer();
-      },
-      { deep: true }
-    );
-
-    // 实力化插件
-    const canvasBox = ref(null);
-    function setCanvasInstance() {
-      if (!fabricInstance) {
-        const { width, height } = canvasBox.value.getBoundingClientRect();
-        const normalHeight = (width / 500) * 660;
-        fabricInstance = new CanvasRenderer("customBoard", {
-          width,
-          height: Math.min(normalHeight, height),
-          scale: width / config.width,
-        });
-      }
-    }
-
-    // 记录删除的annex
-    const annexRecords = ref({});
-    const activeID = ref("");
-    async function hideAnnex(canvas, layer) {
-      const { id, left, top, width, angle, scaleX } = layer;
-      const scale = canvas.scale;
-
-      annexRecords.value[id] = {
-        left: left / scale,
-        top: top / scale,
-        width: (width * scaleX) / scale,
-        angle,
-      };
-      canvas.remove({layer});
-
-      await nextTick();
-      activeID.value = "";
-    }
-
-    // 还原annex
-    function revertAnnex(canvas, data) {
-      const { url, id } = data;
-      const record = annexRecords.value[id];
-
-      if (!record) {
-        return;
-      }
-
-      const { left, top, width, angle } = record;
-      const layerInfo = {
-        url,
-        id,
-        left,
-        top,
-        width,
-        angle,
-        sort: 10,
-        customControls: true,
-        type: "annex",
-      };
-
-      canvas.add(layerInfo, true);
-    }
-
-    // 渲染图层
-    const layerList = ref([]);
-    function renderLayer(items) {
-      const availableItems = items.filter((item) => {
-        return item.name !== "svg" && item.selectable;
-      });
-
-      if (availableItems.length === 0) {
-        return;
-      }
-
-      layerList.value = availableItems.map((item) => {
-        return {
-          id: item.id,
-          url: item.getSrc(),
-        };
-      });
-
-      activeID.value = availableItems[0].id;
-      fabricInstance.setActiveObject(availableItems[0]);
-    }
-
-    // 修改激活图层
-    function changeActiveLayer(data) {
-      activeID.value = data.id;
-      const items = fabricInstance.getObjects();
-      const obj = items.find((item) => item.id === data.id);
-
-      if (obj) {
-        // 存在则激活
-        fabricInstance.setActiveObject(obj);
-      } else {
-        // 不存在则还原
-        revertAnnex(fabricInstance, data);
-      }
-    }
-
     // 设置头部
     function setAvatar() {
       const firstItem = props.selectFiles[0];
-      state.singleAvatar = {
-        avatar: {
-          ...firstItem.avatar,
-        },
-        rawFile: firstItem.rawFile,
-        rawAvatarURL: firstItem.avatar.url,
-      };
+      state.singleAvatar.data = { ...firstItem.data };
+      state.singleAvatar.rawAvatarURL = firstItem.data.avatar.url;
     }
 
     // 渲染器
     const loading = ref(false);
     const renderer = debounce(function () {
-      setCanvasInstance();
-
       // 如果头像数量===1，则用singleAvatar来生成layers，否则用selectFiles
       const layers = getLayers({
         config,
@@ -269,31 +186,41 @@ export default {
       loading.value = true;
       fabricInstance.render({
         layers,
-        success: (items) => {
+        success: () => {
           loading.value = false;
-          renderLayer(items);
+          createLayerNav();
         },
-        replacePhoto: (item) => {
-          const { type } = item;
-          if (type === "avatar") {
-            context.emit("selectFile");
-          } else if (type === "annex") {
-            hideAnnex(fabricInstance, item);
-          }
+        replacePhoto: (layer) => {
+          // 添加一个延迟，先执行click再执行replace
+          setTimeout(() => {
+            const { type } = layer;
+            if (type === "avatar") {
+              beforeSelectAvatar(layer);
+              openImageSelector();
+            } else if (type === "annex") {
+              removeAnnex(layer);
+            }
+          }, 300);
         },
         singleClick: (data) => {
-          const { type, id } = data.layer;
-          if (type === "annex" || type === "avatar") {
-            activeID.value = id;
+          const { layer } = data;
+          const { type, selectable } = layer;
+          if (type === "avatar" || (type === "annex" && selectable)) {
+            // 如果点击的是头像或者附件，则向上移动一层
+            bringForwardLayer(layer);
           }
         },
       });
     }, 300);
 
-    // 修改头像
-    function changeAvatar(url) {
-      state.singleAvatar.avatar.url = url;
-      renderer();
+    // 修改头像亮度饱和度
+    function changeAvatarColor(url) {
+      const avatar = fabricInstance.getObjects().find(layer => layer.type === 'avatar');
+      if (avatar) {
+        avatar.setSrc(url, () => {
+          fabricInstance.refresh();
+        });
+      }
     }
 
     // 保存数据
@@ -307,22 +234,36 @@ export default {
       context.emit("back");
     }
 
-    // 打开图片扩展
-    function handleOpenImageExtendSelector() {
-      context.emit("openImageExtendSelector");
+    // 文件选择
+    const selectorVisible = ref(false);
+    function openImageSelector() {
+      setImageSelectorVisible(true);
+    }
+    function closeImageSelector() {
+      setImageSelectorVisible(false);
+    }
+    function handleCompleteSelect(data) {
+      setImageSelectorVisible(false);
+      replaceActionLayer(data);
+    }
+    function setImageSelectorVisible(flag) {
+      selectorVisible.value = flag;
     }
 
     return {
       ...toRefs(state),
       loading,
-      layerList,
+      layerNavList,
       activeID,
       canvasBox,
       backToList,
-      changeActiveLayer,
-      changeAvatar,
+      handleActiveLayerNav,
+      changeAvatarColor,
       handleConfirm,
-      handleOpenImageExtendSelector,
+      openImageSelector,
+      closeImageSelector,
+      handleCompleteSelect,
+      selectorVisible,
     };
   },
 };
@@ -332,6 +273,10 @@ export default {
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
 
+.image-extend-selector-dialog {
+  @include pos-absolute(0, 0, 0, 0, 2020);
+  background-color: #ffffff;
+}
 .custom-board {
   @include pos-absolute(0, 0, 0, 0, 999);
   @include flex-col-sb;

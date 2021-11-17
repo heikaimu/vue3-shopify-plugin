@@ -1,15 +1,6 @@
 <template>
   <div class="plugin-dialog">
     <div class="plugin-dialog__content">
-      <!-- 扩展头像弹出窗 -->
-      <div class="image-extend-selector-dialog" v-if="extendSelectorVisible">
-        <image-select-plugin
-          :isCustomBody="isCustomBody"
-          @close="closeImageExtendSelector"
-          @complete="handleCompleteExtendSelect"
-        />
-      </div>
-
       <!-- 主流程 -->
       <transition name="slide-left-fade" mode="out-in">
         <!-- 文件选择 -->
@@ -28,7 +19,6 @@
           @selectBody="setBodyConfig"
           @confirm="confirmCustom"
           @setStep="setStep"
-          @openImageExtendSelector="openImageExtendSelector"
         />
       </transition>
 
@@ -58,10 +48,10 @@
 import { nextTick, toRaw, ref } from "vue";
 
 import BodyCustom from "./custom-section/BodyCustom.vue";
-import ImageSelectPlugin from "../../components/image-select-plugin/ImageSelectPlugin.vue";
 import FilesUploader from "../../components/files-uploader/FilesUploader.vue";
 import IncrementServices from "../../components/increment/IncrementServices.vue";
 import BaseLoadingDot from "../../base/BaseLoadingDot.vue";
+import ImageSelectPlugin from "../../components/image-select-plugin/ImageSelectPlugin.vue";
 
 import useBodyMain from "../../composables/useBodyMain";
 import useUpload from "../../composables/useUpload";
@@ -70,11 +60,11 @@ export default {
   name: "MinimePillow",
 
   components: {
-    ImageSelectPlugin,
     BodyCustom,
     FilesUploader,
     IncrementServices,
     BaseLoadingDot,
+    ImageSelectPlugin,
   },
 
   props: {
@@ -128,22 +118,6 @@ export default {
       }
     }
 
-    // 扩展图片
-    const extendSelectorVisible = ref(false);
-    function openImageExtendSelector() {
-      setImageExtendSelectorVisible(true);
-    }
-    function closeImageExtendSelector() {
-      setImageExtendSelectorVisible(false);
-    }
-    function handleCompleteExtendSelect(data) {
-      saveFileAndAvatar(data);
-      setImageExtendSelectorVisible(false);
-    }
-    function setImageExtendSelectorVisible(flag) {
-      extendSelectorVisible.value = flag;
-    }
-
     /*
     保存定制主人物图
     修改主定制状态
@@ -177,19 +151,21 @@ export default {
           url: preview,
         },
       ];
-      const { faceNum } = getBodyConfig();
-      selectFiles.value.slice().forEach((item, index) => {
+
+      const lastAvatar = selectFiles.value[selectFiles.value.length - 1];
+      if (lastAvatar) {
         files.push(
           {
-            name: `Original_${index}`,
-            url: item.rawFile,
+            name: `Original`,
+            url: lastAvatar.data.rawFile,
           },
           {
-            name: `Ai_${index}`,
-            url: item.avatar.url,
+            name: `Ai`,
+            url: lastAvatar.data.avatar.url,
           }
         );
-      });
+      }
+
       startUpload(files.filter((item) => item.url));
     }
 
@@ -224,10 +200,6 @@ export default {
       saveIncrement,
       uploadFiles,
       uploadVisible,
-      extendSelectorVisible,
-      openImageExtendSelector,
-      handleCompleteExtendSelect,
-      closeImageExtendSelector,
       confirmCustom,
       closePlugin,
       completeUpload,

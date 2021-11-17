@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-24 11:03:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-02 16:13:15
+ * @LastEditTime: 2021-11-16 16:51:47
  */
 import { getRandomID } from './image';
 
@@ -94,7 +94,7 @@ function getAvatarList(config, files) {
 
   const list = config.faceList;
   return list.map((item, index) => {
-    const avatar = files[index % files.length].avatar;
+    const avatar = files[index % files.length].data.avatar;
     item.configType = config.type;
     return getAvatar(item, avatar);
   });

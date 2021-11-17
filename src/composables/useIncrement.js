@@ -4,29 +4,28 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-28 17:54:01
+ * @LastEditTime: 2021-11-17 10:23:18
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
 
-import { CombineImage } from "../utils/combineImage";
+const CLOSE_RESET = true;
 
-export default function useIncrement(config, previewBody) {
-  const combineImage = new CombineImage();
+export default function useIncrement(config) {
 
   const state = reactive({
+    originalProductOptionsValue: {},
     productOptionsValue: {},
     previewWidthBackground: null,
     textRenderParams: null,
     queue: [],
     index: -1,
-    sizeList: [],
-    publishLoading: false
   })
 
   // 设置初始化值
   onMounted(() => {
     // 初始化商品选项
+    state.originalProductOptionsValue = { ...config.productOptionsValue || {} };
     state.productOptionsValue = config.productOptionsValue || {};
     // 增量
     const { slides, publish, background, text, relatedProduct, vip } = config.currentProductTypeConfig;
@@ -38,7 +37,6 @@ export default function useIncrement(config, previewBody) {
     initText(text);
     // 推荐
     initPublish(publish);
-
     // 关联产品
     initRelatedProduct(relatedProduct);
     // VIP
@@ -103,62 +101,9 @@ export default function useIncrement(config, previewBody) {
   })
   // 修改推荐值如果是尺寸，并且插件内有可选尺寸，需要重新渲染预览图
   function changePublish(data) {
-    if (data.key === 'Size') {
-      const currentSize = config.sizeList.find(item => {
-        return item.label === data.sku.title;
-      })
-
-      if (currentSize) {
-        // renderPreview(currentSize);
-      }
-    }
-
     _changeProductOptionsValue(data.key, data.sku.title);
   }
   // ===============推荐 END===============
-
-  // ===============渲染带背景的预览图===============
-  const layerImage = computed(() => {
-    return previewBody.value;
-  })
-
-  async function renderPreview(size) {
-    // TODO
-    const background = state.queue.find(item => item.name === 'background');
-    if (background) {
-      const params = {
-        size: toRaw(size.value),
-        backgroundImage: getBackground(background, size),
-        layerList: getComposing(background, size),
-        layerImage: layerImage.value,
-      }
-      state.publishLoading = true;
-      const { url, id } = await combineImage.getURL(params, 'renderAgain');
-      state.publishLoading = false;
-      setPreviewWidthBackground(url);
-    }
-  }
-
-  function getBackground(data, size) {
-    const item = (data.backgroundList || [])[data.value.background.index];
-    if (!item) {
-      return [];
-    }
-
-    const background = item.list.find(item => item.size === size.label);
-    return background ? background.url : '';
-  }
-
-  function getComposing(data, size) {
-    const item = (data.composingList || [])[data.value.composing.index];
-    if (!item) {
-      return [];
-    }
-
-    const composing = item.list.find(item => item.name === size.label);
-    return composing ? composing.position : [];
-  }
-  // ===============渲染带背景的预览图 END===============
 
   // ===============背景===============
   function initBackground(background) {
@@ -172,7 +117,6 @@ export default function useIncrement(config, previewBody) {
         backgroundImage: background.backgroundImage,
         value: {}
       });
-      state.sizeList = background.size;
     }
   }
   const backgroundVisible = computed(() => {
@@ -262,6 +206,14 @@ export default function useIncrement(config, previewBody) {
   // 设置index
   function setIncrementIndex(index) {
     state.index = index;
+    if (index === -1 && CLOSE_RESET) {
+      resetProductOptionsValue();
+    }
+  }
+
+  // 重置所有的商品选项
+  function resetProductOptionsValue() {
+    state.productOptionsValue = { ...state.originalProductOptionsValue };
   }
 
   // 下一个增量

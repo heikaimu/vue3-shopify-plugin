@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-23 13:24:29
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-01 17:04:53
+ * @LastEditTime: 2021-11-16 15:10:21
  */
 
 import { fabric } from 'fabric';
@@ -219,7 +219,7 @@ export default class CanvasRenderer {
 
   // 添加虚拟BOX
   _addVBox(config, resolve) {
-    const { left, top, width, angle = 0, originX = 'left', originY = 'top', selectable = true, name, type, globalCompositeOperation } = config;
+    const { left, top, width, angle = 0, originX = 'left', originY = 'top', selectable = true, name, type, globalCompositeOperation, id } = config;
 
     fabric.Image.fromURL(VBOX_URL, img => {
       const targetWidth = width * this.scale;
@@ -233,7 +233,8 @@ export default class CanvasRenderer {
         selectable,
         name: name || type,
         globalCompositeOperation,
-        type: "vBox"
+        type: "vBox",
+        id
       });
 
       img.on('mousedown', () => {
@@ -415,7 +416,6 @@ export default class CanvasRenderer {
   discardActiveObject() {
     this.fabricInstance.discardActiveObject();
     this.fabricInstance.renderAll();
-    alert();
   }
 
   /**
