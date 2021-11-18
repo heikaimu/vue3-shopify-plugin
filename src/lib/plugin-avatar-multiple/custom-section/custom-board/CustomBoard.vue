@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-16 15:42:44
+ * @LastEditTime: 2021-11-18 11:06:29
 -->
 <template>
   <div class="custom-board">
@@ -148,7 +148,7 @@ export default {
 
       fabricInstance.render({
         layers: list,
-        success: () => {
+        success: (items) => {
           loading.value = false;
           createLayerNav();
         },

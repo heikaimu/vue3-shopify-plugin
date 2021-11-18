@@ -4,10 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-23 15:22:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-09 17:12:11
+ * @LastEditTime: 2021-11-17 16:06:24
 -->
 <template>
   <div class="files-uploader-wrapper">
+    <img src="https://cdn.shopify.com/s/files/1/0550/0773/9963/files/sandglass_260x_0fbf95d8-37c1-401a-a43c-cbc8bad0bddb.gif?v=1637136366" alt="" srcset="">
     <div class="upload-progress-wrapper">
       <div class="progress">
         <span class="line green" :style="{ width: `${percent}%` }">
@@ -111,7 +112,7 @@ export default {
 @import "src/styles/_mixins.scss";
 
 .files-uploader-wrapper {
-  @include flex-row-center;
+  @include flex-col-center;
   @include pos-absolute(0, 0, 0, 0, 1992);
   background-color: #ffffff;
 }

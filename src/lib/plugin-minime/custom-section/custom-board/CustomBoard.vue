@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-16 16:58:44
+ * @LastEditTime: 2021-11-17 14:04:19
 -->
 <template>
   <div class="custom-board">
@@ -140,6 +140,7 @@ export default {
       bringForwardLayer,
       beforeSelectAvatar,
       replaceActionLayer,
+      findLayerListByType
     } = useMultipleAvatarDIY(props);
 
     // fabric实例
@@ -189,6 +190,12 @@ export default {
         success: () => {
           loading.value = false;
           createLayerNav();
+          // 默认激活头部图层
+          const avatarLayer = findLayerListByType('avatar')[0];
+          if (avatarLayer) {
+            fabricInstance.setActiveObject(avatarLayer);
+            activeID.value = avatarLayer.id;
+          }
         },
         replacePhoto: (layer) => {
           // 添加一个延迟，先执行click再执行replace

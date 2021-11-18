@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-16 10:57:28
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-16 16:18:33
+ * @LastEditTime: 2021-11-18 11:14:22
  */
 import { ref } from "vue";
 import CanvasRenderer from "../utils/canvasRenderer";
@@ -152,7 +152,7 @@ export default function useMultipleAvatarDIY(props) {
     activeID.value = activeObject ? activeObject.id : "";
 
     // 获取头像以及可以操作的附件，排序
-    const availableLayers = _findLayerListByType('annex', 'avatar')
+    const availableLayers = findLayerListByType('annex', 'avatar')
       .sort((a, b) => {
         const textureA = Number(a.cacheKey.replace("texture", ""));
         const textureB = Number(b.cacheKey.replace("texture", ""));
@@ -196,7 +196,7 @@ export default function useMultipleAvatarDIY(props) {
 
   // 置顶所有附件
   function topAnnex() {
-    const annexList = _findLayerListByType('annex');
+    const annexList = findAllAnnexLayer();
     annexList.forEach((annex) => {
       annex.bringToFront();
     });
@@ -234,8 +234,13 @@ export default function useMultipleAvatarDIY(props) {
   }
 
   // 通过type查询所有图层列表
-  function _findLayerListByType(...args) {
+  function findLayerListByType(...args) {
     return fabricInstance.getObjects().filter((item) => args.includes(item.type) && item.selectable);
+  }
+
+  // 所有的附件
+  function findAllAnnexLayer() {
+    return fabricInstance.getObjects().filter((item) => item.type === 'annex');
   }
 
   return {
@@ -249,6 +254,7 @@ export default function useMultipleAvatarDIY(props) {
     removeAnnex,
     beforeSelectAvatar,
     replaceActionLayer,
-    bringForwardLayer
+    bringForwardLayer,
+    findLayerListByType
   }
 }
