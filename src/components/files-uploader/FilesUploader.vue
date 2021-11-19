@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-23 15:22:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-17 16:06:24
+ * @LastEditTime: 2021-11-19 10:19:30
 -->
 <template>
   <div class="files-uploader-wrapper">
@@ -86,7 +86,7 @@ export default {
 
     function upload(item) {
       const { name, url } = item;
-      const suffix = name.indexOf('Ai_') > -1 ? 'png' : 'jpg';
+      const suffix = name.indexOf('Ai') > -1 ? 'png' : 'jpg';
       uploadFile({
         name: `${state.time}_${props.website}_${name}_${getRandomID()}.${suffix}`,
         file: url ? dataURLtoBlob(url) : null,
