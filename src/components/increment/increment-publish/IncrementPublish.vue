@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-04 16:12:21
+ * @LastEditTime: 2021-11-22 14:42:17
 -->
 <template>
   <div class="increment-wrapper">
@@ -16,20 +16,30 @@
 
       <div class="text-wrapper">
         <div class="text__preview">
-          <img v-if="currentItem.url" class="img" :src="currentItem.url" alt="" srcset="" />
+          <img
+            v-if="currentItem.url"
+            class="img"
+            :src="currentItem.url"
+            alt=""
+            srcset=""
+          />
         </div>
         <p class="desc">{{ currentItem.desc }}</p>
         <p class="add-price">{{ currentPrice }}</p>
       </div>
       <div class="add-to-cart">
         <div class="item">
-          <base-button type="primary" size="large" @click="handleNext(true)" id="button_add_to_cart_7"
-            >Sure & Next</base-button
+          <base-button
+            type="primary"
+            size="large"
+            @click="handleNext(true)"
+            id="button_add_to_cart_7"
+            >{{ pluginText.yes_next }}</base-button
           >
         </div>
         <div class="item">
           <div class="divider">
-            <span class="text">or</span>
+            <span class="text">{{ pluginText.or }}</span>
           </div>
         </div>
         <div class="item">
@@ -39,7 +49,7 @@
             plain
             @click="handleNext(false)"
             id="button_add_to_cart_8"
-            >No Thanks & Next</base-button
+            >{{ pluginText.no_next }}</base-button
           >
         </div>
       </div>
@@ -48,7 +58,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, toRaw, onMounted, watch } from "vue";
+import { reactive, toRefs, computed, inject, onMounted } from "vue";
 
 import BaseNotice from "../../../base/BaseNotice.vue";
 import BaseButton from "../../../base/BaseButton.vue";
@@ -78,8 +88,8 @@ export default {
       default: () => {},
     },
     dollarSign: {
-      type: String
-    }
+      type: String,
+    },
   },
 
   emits: {
@@ -93,6 +103,9 @@ export default {
       publishQueue: [],
       queueIndex: -1,
     });
+
+    // 国际化
+    const pluginText = inject("pluginText");
 
     // 判断有哪些属性需要推荐
     onMounted(() => {
@@ -138,7 +151,10 @@ export default {
         return "";
       }
 
-      return `+${props.dollarSign}${number(currentItem.value.sku.addPrice / 100, 2)}`;
+      return `+${props.dollarSign}${number(
+        currentItem.value.sku.addPrice / 100,
+        2
+      )}`;
     });
 
     // 关闭
@@ -162,6 +178,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       currentItem,
       currentPrice,
       handleClose,

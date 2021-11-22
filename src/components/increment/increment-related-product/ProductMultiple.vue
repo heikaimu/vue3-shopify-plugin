@@ -4,11 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-01 10:45:38
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-04 16:05:01
+ * @LastEditTime: 2021-11-22 14:42:41
 -->
 <template>
   <div>
-    <h2 class="multiple-product__title">Maybe you like</h2>
+    <h2 class="multiple-product__title">{{ pluginText.maybe_like }}</h2>
 
     <div class="multiple-product-wrapper">
       <swiper
@@ -20,7 +20,9 @@
         <swiper-slide v-for="(item, index) in list" :key="index">
           <div class="related-product__card">
             <img class="related-product__bg" :src="item.url" alt="" />
-            <p class="related-product__price">{{dollarSign}}{{ item.price }}</p>
+            <p class="related-product__price">
+              {{ dollarSign }}{{ item.price }}
+            </p>
             <p class="related-product__text">{{ item.title }}</p>
             <div class="check-icon">
               <base-icon
@@ -37,7 +39,9 @@
     <div class="add-to-cart">
       <div class="item">
         <div class="divider">
-          <span class="text">selected products: {{ checkedList.length }}</span>
+          <span class="text"
+            >{{ pluginText.selected_product }}: {{ checkedList.length }}</span
+          >
         </div>
       </div>
       <div class="item">
@@ -46,12 +50,12 @@
           size="large"
           @click="handleSave(true)"
           id="button_add_to_cart_3"
-          >Sure & Add To Cart</base-button
+          >{{ pluginText.yes_add_cart }}</base-button
         >
       </div>
       <div class="item">
         <div class="divider">
-          <span class="text">or</span>
+          <span class="text">{{ pluginText.or }}</span>
         </div>
       </div>
       <div class="item">
@@ -61,7 +65,7 @@
           plain
           @click="handleSave(false)"
           id="button_add_to_cart_4"
-          >No Thanks & Add To Cart</base-button
+          >{{ pluginText.no_add_cart }}</base-button
         >
       </div>
     </div>
@@ -69,7 +73,7 @@
 </template>
 
 <script setup>
-import { nextTick, computed } from "vue";
+import { nextTick, computed, inject } from "vue";
 
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
@@ -88,11 +92,14 @@ const props = defineProps({
     default: () => [],
   },
   dollarSign: {
-    type: String
-  }
+    type: String,
+  },
 });
 
 const emit = defineEmits(["next"]);
+
+// 国际化
+const pluginText = inject("pluginText");
 
 const perView = computed(() => {
   return props.list && props.list.length > 2 ? 2.3 : 2;
@@ -178,7 +185,7 @@ async function handleSave(flag) {
   font-weight: 600;
   text-align: center;
   color: #333333;
-  width: 50%;
+  width: 70%;
   margin: 0 auto;
   padding-top: 30px;
 }

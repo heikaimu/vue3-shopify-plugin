@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 13:04:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-08 15:17:20
+ * @LastEditTime: 2021-11-22 13:44:28
 -->
 <template>
   <div class="layer-file-select">
@@ -18,7 +18,7 @@
               accept="image/*"
               @change="handleSelectFile"
             />
-            <span class="text">Choose from your album</span>
+            <span class="text">{{ pluginText.photo_select }}</span>
             <svg viewBox="0 0 30 30">
               <path
                 d="M12.2908253,14.0142199 L17.66,18.2328549 L16,21 L20.5857864,16.4142136 C21.366835,15.633165 22.633165,15.633165 23.4142136,16.4142136 L26,18.9998549 L26,21 C26,22.6568542 24.6568542,24 23,24 L7,24 C5.34314575,24 4,22.6568542 4,21 L4,19 L9.75359944,14.0683433 C10.478128,13.4473189 11.5404728,13.4246572 12.2908253,14.0142199 Z"
@@ -39,7 +39,7 @@
               capture="camera"
               @change="handleSelectFile"
             />
-            <span class="text">Take A Photo</span>
+            <span class="text">{{ pluginText.take_photo }}</span>
             <svg viewBox="0 0 30 30" class="red">
               <path
                 d="M26,14.4996803 L26,21 C26,22.1045695 25.1045695,23 24,23 L6,23 C4.8954305,23 4,22.1045695 4,21 L4,14.4996803 L10.1002017,14.4990961 C10.0344945,14.8224862 10,15.1572148 10,15.5 C10,18.2614237 12.2385763,20.5 15,20.5 C17.7614237,20.5 20,18.2614237 20,15.5 C20,15.1572148 19.9655055,14.8224862 19.8997983,14.4990961 L26,14.4996803 Z"
@@ -127,7 +127,7 @@
                   </g>
                 </svg>
               </div>
-              <span class="text">Choose from Online Services</span>
+              <span class="text">{{ pluginText.third_photo_select }}</span>
             </div>
           </label>
         </li>
@@ -139,18 +139,23 @@
     </div>
 
     <div class="layer-file-select__bottom">
-      <base-button type="info" plain @click="handleClosePlugin" id="button_cancel">Cancel</base-button>
+      <base-button
+        type="info"
+        plain
+        @click="handleClosePlugin"
+        id="button_cancel"
+        >{{pluginText.cancel}}</base-button
+      >
     </div>
   </div>
 </template>
 
 <script>
-import { onMounted, reactive, toRefs } from "vue";
+import { onMounted, reactive, toRefs, inject } from "vue";
 
 import AvatarListCache from "./AvatarListCache.vue";
 import BaseButton from "../../../base/BaseButton.vue";
 
-import localforage from "localforage";
 import { blobToDataURL } from "../../../utils/image";
 
 export default {
@@ -169,6 +174,9 @@ export default {
     const state = reactive({
       isMobile: false,
     });
+
+    // 国际化
+    const pluginText = inject("pluginText");
 
     onMounted(() => {
       state.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(
@@ -229,6 +237,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       handleSelectFile,
       selectCacheFile,
       handleOpenFilestack,
@@ -265,60 +274,60 @@ export default {
   }
 }
 
-    .file-select__list {
-      @include card-shadow;
-      overflow: hidden;
-      border-radius: 6px;
-      margin-bottom: 0;
+.file-select__list {
+  @include card-shadow;
+  overflow: hidden;
+  border-radius: 6px;
+  margin-bottom: 0;
 
-      & + .file-select__list {
-        margin-top: 10px;
-      }
+  & + .file-select__list {
+    margin-top: 10px;
+  }
+}
+
+.file-select__item:last-child .file-select__card {
+  border-bottom: none;
+}
+
+.file-select__card {
+  @include flex-row-sb;
+  height: 60px;
+  padding: 0 15px;
+  border-bottom: 1px solid #e7e7e7;
+  background-color: #fff;
+  cursor: pointer;
+  margin-bottom: 0;
+  position: relative;
+
+  .hide-input {
+    @include pos-absolute;
+    visibility: hidden;
+  }
+
+  .text {
+    font-size: 16px;
+    color: $title-color;
+  }
+
+  svg {
+    width: 30px;
+    height: 24px;
+    fill: #626ab3;
+
+    &.red {
+      fill: $sub-theme-color;
     }
-
-    .file-select__item:last-child .file-select__card {
-      border-bottom: none;
-    }
-
-    .file-select__card {
-      @include flex-row-sb;
-      height: 60px;
-      padding: 0 15px;
-      border-bottom: 1px solid #e7e7e7;
-      background-color: #fff;
-      cursor: pointer;
-      margin-bottom: 0;
-      position: relative;
-
-      .hide-input {
-        @include pos-absolute;
-        visibility: hidden;
-      }
-
-      .text {
-        font-size: 16px;
-        color: $title-color;
-      }
-
-      svg {
-        width: 30px;
-        height: 24px;
-        fill: #626ab3;
-
-        &.red {
-          fill: $sub-theme-color;
-        }
-      }
-    }
-    .third-card-wrapper {
-      @include flex-col-center;
-      width: 100%;
-      .svg {
-      }
-      .text {
-        font-size: 14px;
-        color: $title-color;
-        line-height: 1;
-      }
-    }
+  }
+}
+.third-card-wrapper {
+  @include flex-col-center;
+  width: 100%;
+  .svg {
+  }
+  .text {
+    font-size: 14px;
+    color: $title-color;
+    line-height: 1;
+  }
+}
 </style>

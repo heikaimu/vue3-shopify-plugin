@@ -4,20 +4,22 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-09 13:26:13
+ * @LastEditTime: 2021-11-22 14:03:02
 -->
 <template>
   <div class="increment-wrapper">
     <div class="increment-blank" @click="handleClose"></div>
     <div class="increment-slides">
       <span class="close-icon">
-        <base-icon icon="close" @click="handleClose" id="icon_close_1"/>
+        <base-icon icon="close" @click="handleClose" id="icon_close_1" />
       </span>
       <div class="preview-image">
         <img :src="customBodyPreviewURL" alt="" />
       </div>
-      <p class="custom-title">Print back side？<br/>
-add your design mirrored on back side for only <strong>+{{dollarSign}}5.00</strong></p>
+      <p class="custom-title">
+        {{ pluginText.slide_text1 }}<br />{{ pluginText.slide_text2 }}
+        <strong>+{{ dollarSign }}5.00</strong>
+      </p>
       <div class="slides-selector">
         <div
           v-for="(item, index) in data"
@@ -28,15 +30,21 @@ add your design mirrored on back side for only <strong>+{{dollarSign}}5.00</stro
           @click="handleSelect(item)"
         >
           <span class="text">{{ item.title }}</span>
-          <span class="price" v-if="item.price">+{{dollarSign}}{{ item.price }}</span>
+          <span class="price" v-if="item.price"
+            >+{{ dollarSign }}{{ item.price }}</span
+          >
           <span class="icon" v-if="item.active">
             <base-icon icon="check" color="#ff533a" />
           </span>
         </div>
       </div>
       <div class="add-to-cart">
-        <base-button type="primary" size="large" @click="handleNext" id="button_add_to_cart_1"
-          >Add To Cart</base-button
+        <base-button
+          type="primary"
+          size="large"
+          @click="handleNext"
+          id="button_add_to_cart_1"
+          >{{ pluginText.add_cart }}</base-button
         >
       </div>
     </div>
@@ -44,7 +52,7 @@ add your design mirrored on back side for only <strong>+{{dollarSign}}5.00</stro
 </template>
 
 <script>
-import { reactive, toRefs, onMounted } from "vue";
+import { inject } from "vue";
 
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
@@ -69,8 +77,8 @@ export default {
       default: "",
     },
     dollarSign: {
-      type: String
-    }
+      type: String,
+    },
   },
 
   emits: {
@@ -80,7 +88,8 @@ export default {
   },
 
   setup(props, context) {
-    const state = reactive({});
+    // 国际化
+    const pluginText = inject("pluginText");
 
     // 选择面
     function handleSelect(item) {
@@ -98,7 +107,7 @@ export default {
     }
 
     return {
-      ...toRefs(state),
+      pluginText,
       handleSelect,
       handleClose,
       handleNext,

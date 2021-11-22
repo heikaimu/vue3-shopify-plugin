@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-09 13:26:18
+ * @LastEditTime: 2021-11-22 13:57:36
 -->
 <template>
   <div class="increment-wrapper">
@@ -13,7 +13,7 @@
       <span class="close-icon">
         <base-icon icon="close" @click="handleClose" />
       </span>
-      
+
       <div class="preview-image">
         <!-- <base-loading-dot/> -->
         <canvas id="bgCombineCanvas"></canvas>
@@ -56,10 +56,7 @@
         </ul>
       </div>
 
-      <base-notice class="bg-notice"
-        >Just for preview, the background will be cropped according to the size
-        you pick</base-notice
-      >
+      <base-notice class="bg-notice">{{ pluginText.bg_note_content }}</base-notice>
 
       <!-- 尺寸 -->
       <swiper-size
@@ -91,7 +88,7 @@
           size="large"
           @click="handleNext"
           id="button_add_to_cart_2"
-          >Add To Cart</base-button
+          >{{ pluginText.add_cart }}</base-button
         >
       </div>
     </div>
@@ -99,7 +96,7 @@
 </template>
 
 <script>
-import { watch, toRaw } from "vue";
+import { watch, toRaw, inject } from "vue";
 
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
@@ -161,6 +158,9 @@ export default {
   },
 
   setup(props, context) {
+    // 国际化
+    const pluginText = inject("pluginText");
+
     // 背景
     const {
       backgroundList,
@@ -217,13 +217,13 @@ export default {
       const layerList = getComposing(currentSize.value);
       textRenderParams = {
         size: toRaw(size),
-        layerList: layerList.filter(item => item.type === 'text')
-      }
+        layerList: layerList.filter((item) => item.type === "text"),
+      };
       return {
         size: toRaw(size),
         backgroundImage,
-        layerList: layerList.filter(item => item.type !== 'text'),
-        layerImage: props.customBodyPreviewURL
+        layerList: layerList.filter((item) => item.type !== "text"),
+        layerImage: props.customBodyPreviewURL,
       };
     }
 
@@ -245,9 +245,9 @@ export default {
               composing: {
                 index: composingIndex.value,
                 title: composingName.value,
-              }
+              },
             },
-            textRenderParams
+            textRenderParams,
           });
           resolve();
         });
@@ -266,6 +266,7 @@ export default {
     }
 
     return {
+      pluginText,
       handleClose,
       handleNext,
       backgroundList,

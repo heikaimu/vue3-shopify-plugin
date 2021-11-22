@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-04 16:11:50
+ * @LastEditTime: 2021-11-22 14:03:36
 -->
 <template>
   <div class="increment-wrapper">
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, toRaw, onMounted, watch } from "vue";
+import { reactive, toRefs, computed, inject, onMounted, watch } from "vue";
 
 import BaseNotice from "../../../base/BaseNotice.vue";
 import BaseButton from "../../../base/BaseButton.vue";
@@ -138,11 +138,14 @@ export default {
       },
     });
 
+    // 国际化
+    const pluginText = inject("pluginText");
+
     const addToCartText = computed(() => {
       if (state.activeValue === "yes" && state.customText.text !== "") {
-        return `Add To Cart +${props.dollarSign}${props.data.price}`;
+        return `${pluginText.add_cart} +${props.dollarSign}${props.data.price}`;
       } else {
-        return `Add To Cart`;
+        return `${pluginText.add_cart}`;
       }
     });
 
@@ -258,6 +261,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       addToCartText,
       shouldRender,
       handleClose,

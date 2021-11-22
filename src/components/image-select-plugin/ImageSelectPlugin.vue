@@ -4,13 +4,13 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-10 13:51:14
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-13 14:30:16
+ * @LastEditTime: 2021-11-22 13:50:51
 -->
 <template>
   <div class="file-select">
     <!-- top -->
     <div class="file-select__top border-bottom">
-      <base-header mainText="Choose Photos Source" @close="handleClosePlugin" />
+      <base-header :mainText="pluginText.photo_select_title" @close="handleClosePlugin" />
     </div>
     <!-- medium -->
     <div class="file-select__medium">
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, toRaw } from "vue";
+import { reactive, toRefs, toRaw, inject } from "vue";
 
 import BaseHeader from "../../base/BaseHeader.vue";
 import LayerImageSelect from "./layer-image-select/LayerImageSelect.vue";
@@ -100,6 +100,9 @@ export default {
         url: "",
       },
     });
+
+       // 国际化
+    const pluginText = inject("pluginText");
 
     // ========================== 文件选择 ========================
     // 选择新文件
@@ -206,6 +209,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       handleClosePlugin,
       completeSelect,
       handleChangeFile,

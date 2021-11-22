@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-15 18:36:47
+ * @LastEditTime: 2021-11-22 13:53:19
 -->
 <template>
   <div class="body-card" @click="handleClick">
@@ -26,7 +26,7 @@
     </div>
     <!-- 标签 -->
     <p class="body-card__edit-tag" :class="{ disabled: loading }">
-      Tap &amp; Edit
+      {{ pluginText.tap_edit }}
     </p>
     <!-- loading -->
     <div class="body-card__loading" v-if="loading">
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, watch, computed, onMounted } from "vue";
+import { reactive, toRefs, watch, inject, onMounted } from "vue";
 
 import BaseIcon from "../../../../base/BaseIcon.vue";
 
@@ -79,6 +79,9 @@ export default {
       layerList: [],
       loading: false,
     });
+
+    // 国际化
+    const pluginText = inject("pluginText");
 
     onMounted(() => {
       renderImage(props.skin);
@@ -124,7 +127,7 @@ export default {
 
     // 普通图片
     function normalImage(skin) {
-      state.bodyURL = '';
+      state.bodyURL = "";
       const currentSkinImage = config.images.find(
         (item) => item.color === skin
       );
@@ -186,7 +189,7 @@ export default {
       });
     }
 
-    // 点击
+    // 点击
     function handleClick() {
       if (!state.loading) {
         context.emit("click");
@@ -195,6 +198,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       bgLoad,
       handleClick,
     };

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-04 16:01:37
+ * @LastEditTime: 2021-11-22 14:04:08
 -->
 <template>
   <div class="increment-wrapper">
@@ -30,7 +30,9 @@
                 color="#fbe4a4"
               ></base-icon>
             </div>
-            <div class="button-content">VIP SERVICE + {{dollarSign}}{{ data.price }}</div>
+            <div class="button-content">
+              {{ pluginText.vip_service }} + {{ dollarSign }}{{ data.price }}
+            </div>
             <div class="crown"></div>
             <div class="light"></div>
           </div>
@@ -45,7 +47,7 @@
           size="large"
           @click="handleNext(true)"
           id="button_add_to_cart_10"
-          >Add To Cart</base-button
+          >{{ pluginText.add_cart }}</base-button
         >
       </div>
     </div>
@@ -53,7 +55,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, toRaw, onMounted, nextTick } from "vue";
+import { reactive, toRefs, inject, onMounted, nextTick } from "vue";
 
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
@@ -89,6 +91,9 @@ export default {
       active: false,
     });
 
+    // 国际化
+    const pluginText = inject("pluginText");
+
     onMounted(() => {
       state.active = props.value;
     });
@@ -115,6 +120,7 @@ export default {
       handleSelect,
       handleClose,
       handleNext,
+      pluginText,
     };
   },
 };

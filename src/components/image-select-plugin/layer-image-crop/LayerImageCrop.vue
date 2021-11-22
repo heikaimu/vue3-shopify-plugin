@@ -5,7 +5,7 @@
         <img id="image" :src="fileURL" alt="" />
       </div>
       <div class="cropper-view__notice">
-        <base-notice>Drag the frame to choose one face</base-notice>
+        <base-notice>{{ pluginText.crop_action_content }}</base-notice>
       </div>
     </div>
     <div class="cropper-view__bottom">
@@ -40,7 +40,12 @@
           </div>
         </div>
         <div class="confirm-button-wrapper">
-          <base-button type="primary" @click="handleConfirm" id="button_confirm_2">CONFIRM</base-button>
+          <base-button
+            type="primary"
+            @click="handleConfirm"
+            id="button_confirm_2"
+            >{{ pluginText.confirm }}</base-button
+          >
         </div>
       </footer>
     </div>
@@ -48,7 +53,7 @@
 </template>
 
 <script>
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, inject } from "vue";
 
 import BaseHeader from "../../../base/BaseHeader.vue";
 import BaseButton from "../../../base/BaseButton.vue";
@@ -82,6 +87,9 @@ export default {
       cropper: null,
     });
 
+    // 国际化
+    const pluginText = inject("pluginText");
+
     onMounted(() => {
       const image = document.getElementById("image");
       state.cropper = new Cropper(image, {
@@ -114,6 +122,7 @@ export default {
     }
 
     return {
+      pluginText,
       handleZoom,
       handleReset,
       handleConfirm,

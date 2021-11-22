@@ -4,11 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-20 10:41:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 14:14:25
+ * @LastEditTime: 2021-11-22 13:54:16
 -->
 <template>
   <div class="color-selector-wrapper">
-    <p class="color-title">Skin Color:</p>
+    <p class="color-title">{{ pluginText.skin_color }}:</p>
     <nav class="color-selector">
       <p
         v-for="(item, index) in list"
@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import { inject } from "vue";
+
 import BaseIcon from "../../../../base/BaseIcon.vue";
 
 export default {
@@ -40,8 +42,8 @@ export default {
     },
     skin: {
       type: String,
-      deafult: ''
-    }
+      deafult: "",
+    },
   },
 
   emits: {
@@ -49,14 +51,17 @@ export default {
   },
 
   setup(props, context) {
+    // 国际化
+    const pluginText = inject("pluginText");
 
     // 修改肤色
     function handleChangeColor(item) {
-      context.emit('change', item.name);
+      context.emit("change", item.name);
     }
-    
+
     return {
-      handleChangeColor
+      pluginText,
+      handleChangeColor,
     };
   },
 };

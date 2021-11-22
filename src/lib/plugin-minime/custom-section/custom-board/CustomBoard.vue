@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-17 14:04:19
+ * @LastEditTime: 2021-11-22 13:55:06
 -->
 <template>
   <div class="custom-board">
@@ -28,14 +28,17 @@
         />
       </div>
       <!-- 色彩饱和度调整，单头的时候出现 -->
-      <brightness-bar :url="singleAvatar.rawAvatarURL" @change="changeAvatarColor" />
+      <brightness-bar
+        :url="singleAvatar.rawAvatarURL"
+        @change="changeAvatarColor"
+      />
     </div>
     <div class="custom-board__bottom">
       <base-row :gutter="10">
         <base-col :span="8">
-          <base-button plain @click="backToList" id="button_replace_2"
-            >Replace</base-button
-          >
+          <base-button plain @click="backToList" id="button_replace_2">{{
+            pluginText.replace
+          }}</base-button>
         </base-col>
         <base-col :span="16">
           <base-button
@@ -44,7 +47,7 @@
             :blod="600"
             @click="handleConfirm"
             id="button_confirm_3"
-            >CONFIRM</base-button
+            >{{ pluginText.confirm }}</base-button
           >
         </base-col>
       </base-row>
@@ -68,7 +71,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref, nextTick, onMounted, watch } from "vue";
+import { reactive, toRefs, ref, inject, onMounted } from "vue";
 
 import BaseHeader from "../../../../base/BaseHeader.vue";
 import BaseRow from "../../../../base/BaseRow.vue";
@@ -140,8 +143,11 @@ export default {
       bringForwardLayer,
       beforeSelectAvatar,
       replaceActionLayer,
-      findLayerListByType
+      findLayerListByType,
     } = useMultipleAvatarDIY(props);
+
+    // 国际化
+    const pluginText = inject("pluginText");
 
     // fabric实例
     let fabricInstance = null;
@@ -191,7 +197,7 @@ export default {
           loading.value = false;
           createLayerNav();
           // 默认激活头部图层
-          const avatarLayer = findLayerListByType('avatar')[0];
+          const avatarLayer = findLayerListByType("avatar")[0];
           if (avatarLayer) {
             fabricInstance.setActiveObject(avatarLayer);
             activeID.value = avatarLayer.id;
@@ -222,7 +228,9 @@ export default {
 
     // 修改头像亮度饱和度
     function changeAvatarColor(url) {
-      const avatar = fabricInstance.getObjects().find(layer => layer.type === 'avatar');
+      const avatar = fabricInstance
+        .getObjects()
+        .find((layer) => layer.type === "avatar");
       if (avatar) {
         avatar.setSrc(url, () => {
           fabricInstance.refresh();
@@ -259,6 +267,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       loading,
       layerNavList,
       activeID,

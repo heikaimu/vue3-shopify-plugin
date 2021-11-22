@@ -23,19 +23,16 @@
           </li>
         </ul>
         <div class="image-view__notice">
-          <base-notice
-            >AI image cropping is mainly for preview.NOT FINAL DESIGN! Our
-            designer will finalize the perfect fit!</base-notice
-          >
+          <base-notice>{{ pluginText.crop_note_content }}</base-notice>
         </div>
       </div>
     </div>
     <div class="image-view__bottom">
       <base-row :gutter="10">
         <base-col :span="12">
-          <base-button plain @click="handleBack" id="button_replace_1"
-            >Replace</base-button
-          >
+          <base-button plain @click="handleBack" id="button_replace_1">{{
+            pluginText.replace
+          }}</base-button>
         </base-col>
         <base-col :span="12">
           <base-button
@@ -43,7 +40,7 @@
             @click="handleConfirm"
             :blod="600"
             id="button_confirm_1"
-            >CONFIRM</base-button
+            >{{ pluginText.confirm }}</base-button
           >
         </base-col>
       </base-row>
@@ -58,7 +55,7 @@
 </template>
 
 <script>
-import { reactive, toRefs } from "vue";
+import { reactive, toRefs, inject } from "vue";
 
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseNotice from "../../../base/BaseNotice.vue";
@@ -68,7 +65,7 @@ import BaseCol from "../../../base/BaseCol.vue";
 import LoadingAvatar from "./LoadingAvatar.vue";
 
 import { imageReset } from "../../../utils/image";
-import { getCartoonURL, getAIAvatar } from "../../../api/picart";
+import { getAIAvatar } from "../../../api/picart";
 
 export default {
   components: {
@@ -105,6 +102,9 @@ export default {
       loadingState: "pending",
       loadingPendingText: "",
     });
+
+    // 国际化
+    const pluginText = inject("pluginText");
 
     // 裁剪
     function handleCrop() {
@@ -161,6 +161,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       handleCrop,
       handleRotate,
       handleConfirm,

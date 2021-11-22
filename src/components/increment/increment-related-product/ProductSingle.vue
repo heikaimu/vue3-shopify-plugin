@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-01 10:45:12
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-09 13:27:14
+ * @LastEditTime: 2021-11-22 14:00:23
 -->
 <template>
   <div>
@@ -25,12 +25,12 @@
           size="large"
           @click="handleSave(true)"
           id="button_add_to_cart_3"
-          >Sure & Add To Cart</base-button
+          >{{ pluginText.yes_add_cart }}</base-button
         >
       </div>
       <div class="item">
         <div class="divider">
-          <span class="text">or</span>
+          <span class="text">{{ pluginText.or }}</span>
         </div>
       </div>
       <div class="item">
@@ -40,7 +40,7 @@
           plain
           @click="handleSave(false)"
           id="button_add_to_cart_4"
-          >No Thanks & Add To Cart</base-button
+          >{{ pluginText.no_add_cart }}</base-button
         >
       </div>
     </div>
@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { nextTick } from "vue";
+import { nextTick, inject } from "vue";
 
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
@@ -68,6 +68,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["next", "change"]);
+
+// 国际化
+const pluginText = inject("pluginText");
 
 async function handleSave(flag) {
   if (flag) {

@@ -4,13 +4,13 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-10 14:37:40
+ * @LastEditTime: 2021-11-22 13:45:25
 -->
 <template>
   <div class="avatar-cache">
     <div class="avatar-cache-header">
-      <p class="avatar-cache-header__title">Images Records（Click To Use）</p>
-      <span class="avatar-cache-header__clear-button" @click="handleClearAll">Clear All</span>
+      <p class="avatar-cache-header__title">{{ pluginText.photo_cache_title }}</p>
+      <span class="avatar-cache-header__clear-button" @click="handleClearAll">{{ pluginText.clear_cache }}</span>
     </div>
     <div class="cache-list-wrapper">
       <base-row :gutter="20" v-if="list.length > 0">
@@ -23,13 +23,13 @@
           ></base-card>
         </base-col>
       </base-row>
-      <p v-else class="avatar-cache__empty-text">Three is no cache files</p>
+      <p v-else class="avatar-cache__empty-text">{{ pluginText.no_cache }}</p>
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, toRaw } from "vue";
+import { reactive, toRefs, onMounted, toRaw, inject } from "vue";
 
 import BaseRow from "../../../base/BaseRow.vue";
 import BaseCol from "../../../base/BaseCol.vue";
@@ -52,6 +52,9 @@ export default {
     const state = reactive({
       list: [],
     });
+
+    // 国际化
+    const pluginText = inject("pluginText");
 
     onMounted(() => {
       localforage.getItem("avatarList").then((res) => {
@@ -78,6 +81,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       selectFile,
       removeFile,
       handleClearAll,

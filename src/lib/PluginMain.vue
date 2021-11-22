@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-12 16:20:07
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-19 11:31:38
+ * @LastEditTime: 2021-11-22 14:35:46
 -->
 <template>
   <component
@@ -16,10 +16,11 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted } from "vue";
+import { reactive, toRefs, onMounted, provide } from "vue";
 
 import PluginAvatarMultiple from "./plugin-avatar-multiple/PluginAvatarMultiple.vue";
 import PluginMinime from "./plugin-minime/MinimePillow.vue";
+import { pluginText } from "../language";
 
 export default {
   components: {
@@ -36,6 +37,10 @@ export default {
       type: String,
       default: "$",
     },
+    language: {
+      type: String,
+      default: "us",
+    },
   },
 
   setup(props) {
@@ -43,7 +48,14 @@ export default {
       currentElementComponent: "PluginMinime",
     });
 
+    // 国际化
+    provide("pluginText", pluginText(props.language));
+
     onMounted(() => {
+      setComp();
+    });
+
+    function setComp() {
       if (props.config.miniMeData.length === 0) {
         state.currentElementComponent = "PluginMinime";
       } else {
@@ -59,7 +71,7 @@ export default {
           state.currentElementComponent = "PluginMinime";
         }
       }
-    });
+    }
 
     return {
       ...toRefs(state),
