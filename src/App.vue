@@ -18,7 +18,7 @@
     <div class="right">
       <MinimePillow
         :config="config"
-        language="de"
+        language="us"
         :sizeActiveName="sizeActiveName"
         :backgroundActiveName="backgroundActiveName"
         v-if="visible"

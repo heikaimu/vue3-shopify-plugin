@@ -1,5 +1,6 @@
 {
-  "name": "my-lib",
+  "name": "minime-pillow-vue",
+  "version": "0.0.0",
   "files": [
     "dist"
   ],
@@ -9,9 +10,12 @@
     ".": {
       "import": "./dist/my-lib.es.js",
       "require": "./dist/my-lib.umd.js"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
     }
   },
-  "version": "0.0.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
