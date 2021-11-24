@@ -13,7 +13,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: './src/lib/index.js',
-      name: 'MinimePillow'
+      name: 'MinimePillow',
+      fileName: 'minime-pillow'
     },
     rollupOptions: {
       external: [

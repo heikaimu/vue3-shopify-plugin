@@ -3455,6 +3455,45 @@ minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
+minime-pillow-vue@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/minime-pillow-vue/-/minime-pillow-vue-0.0.0.tgz#0a716112126c6f7f7135059028bee4b5df0f3ba8"
+  integrity sha512-ve7aygpbp2Tfa/TLK3VcOJWGucRzietuvTRVjVq9b+X7X7z9JSj9BQ4Ei7GOGq9dLl3tTZ3SH77ykYN0Ewr7/Q==
+  dependencies:
+    "@better-scroll/core" "^2.4.1"
+    axios "^0.21.1"
+    better-scroll "^2.4.1"
+    cropperjs "^1.5.12"
+    element-plus "^1.0.2-beta.55"
+    fabric "2.7.0"
+    fabric-customise-controls "^2.0.6-beta"
+    filestack-js "^3.23.1"
+    localforage "^1.9.0"
+    lodash "^4.17.21"
+    swiper "^6.8.0"
+    vue "^3.1.5"
+    vuedraggable "^4.1.0"
+
+minime-pillow@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/minime-pillow/-/minime-pillow-0.0.1.tgz#d379f9ec59d20dd4fdda4b811084cbdbb2298289"
+  integrity sha512-ejkYViXwqwBBb4xu5GRxQ68eCu+1bQ6ScRiwHJxiVMcyMhQUg90rMNW14EcDqQiY1oDD82zGujG6zO9peOb9JA==
+  dependencies:
+    "@better-scroll/core" "^2.4.1"
+    axios "^0.21.1"
+    better-scroll "^2.4.1"
+    cropperjs "^1.5.12"
+    element-plus "^1.0.2-beta.55"
+    fabric "2.7.0"
+    fabric-customise-controls "^2.0.6-beta"
+    filestack-js "^3.23.1"
+    localforage "^1.9.0"
+    lodash "^4.17.21"
+    minime-pillow-vue "^0.0.0"
+    swiper "^6.8.0"
+    vue "^3.1.5"
+    vuedraggable "^4.1.0"
+
 minimist@^1.2.0, minimist@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"

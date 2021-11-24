@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-01 10:45:38
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 14:42:41
+ * @LastEditTime: 2021-11-23 17:53:57
 -->
 <template>
   <div>
@@ -20,10 +20,12 @@
         <swiper-slide v-for="(item, index) in list" :key="index">
           <div class="related-product__card">
             <img class="related-product__bg" :src="item.url" alt="" />
-            <p class="related-product__price">
-              {{ dollarSign }}{{ item.price }}
-            </p>
-            <p class="related-product__text">{{ item.title }}</p>
+            <div class="text-box">
+              <p class="related-product__price">
+                {{ dollarSign }}{{ item.price }}
+              </p>
+              <p class="related-product__text">{{ item.title }}</p>
+            </div>
             <div class="check-icon">
               <base-icon
                 icon="check"
@@ -193,12 +195,17 @@ async function handleSave(flag) {
 .related-product__card {
   position: relative;
   cursor: pointer;
+  border: 1px solid #e7e7e7;
+  border-radius: 4px;
   .related-product__bg {
     display: block;
     line-height: 1;
-    border-radius: 4px;
+    border-radius: 4px 4px 0 0;
   }
 
+  .text-box {
+    padding: 5px;
+  }
   .related-product__price {
     padding-top: 5px;
     font-size: 16px;

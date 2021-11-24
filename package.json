@@ -1,15 +1,15 @@
 {
-  "name": "minime-pillow-vue",
-  "version": "0.0.0",
+  "name": "minime-pillow",
+  "version": "0.0.2",
   "files": [
     "dist"
   ],
-  "main": "./dist/my-lib.umd.js",
-  "module": "./dist/my-lib.es.js",
+  "main": "./dist/minime-pillow.umd.js",
+  "module": "./dist/minime-pillow.es.js",
   "exports": {
     ".": {
-      "import": "./dist/my-lib.es.js",
-      "require": "./dist/my-lib.umd.js"
+      "import": "./dist/minime-pillow.es.js",
+      "require": "./dist/minime-pillow.umd.js"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",
@@ -23,9 +23,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@better-scroll/core": "^2.4.1",
     "axios": "^0.21.1",
-    "better-scroll": "^2.4.1",
     "cropperjs": "^1.5.12",
     "element-plus": "^1.0.2-beta.55",
     "fabric": "2.7.0",
@@ -33,6 +31,7 @@
     "filestack-js": "^3.23.1",
     "localforage": "^1.9.0",
     "lodash": "^4.17.21",
+    "minime-pillow": "^0.0.1",
     "swiper": "^6.8.0",
     "vue": "^3.1.5",
     "vuedraggable": "^4.1.0"

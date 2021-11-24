@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-22 10:11:47
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 14:39:53
+ * @LastEditTime: 2021-11-24 14:00:43
  */
 const text = {
   // 文件选择标题
@@ -139,6 +139,27 @@ const text = {
   slide_text2: {
     us: 'add your design mirrored on back side for only',
     de: 'fügen Sie Ihr Design auf der Rückseite gespiegelt für nur'
+  },
+  // 文字定制询问
+  yes_please: {
+    us: 'Yes, please',
+    de: 'Ja, bitte'
+  },
+  no_thanks: {
+    us: 'No, thanks',
+    de: 'Nein, danke'
+  },
+  font_family: {
+    us: 'Font Family',
+    de: 'Schriftart Familie'
+  },
+  font_color: {
+    us: 'Font Color',
+    de: 'Schriftart Farbe'
+  },
+  text_title: {
+    us: 'Text Title',
+    de: 'Text Titel'
   }
 }
 

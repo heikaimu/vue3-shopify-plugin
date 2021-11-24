@@ -18,7 +18,8 @@
     <div class="right">
       <MinimePillow
         :config="config"
-        language="us"
+        language="de"
+        :isManagementUse="false"
         :sizeActiveName="sizeActiveName"
         :backgroundActiveName="backgroundActiveName"
         v-if="visible"
@@ -31,7 +32,11 @@
 
 <script>
 import { reactive, toRefs, onMounted } from "vue";
+
 import MinimePillow from "./lib";
+// import MinimePillow from "minime-pillow";
+// import "minime-pillow/dist/style.css";
+
 import BaseImages from "./base/BaseImages.vue";
 import axios from "axios";
 import { configMock } from "./mock/config";
@@ -46,7 +51,7 @@ import { getList } from "./api/images";
 export default {
   components: {
     MinimePillow,
-    BaseImages
+    BaseImages,
   },
 
   setup() {
@@ -59,12 +64,12 @@ export default {
       backgroundActiveName: "Green",
       products: products,
       activeType: "",
-      images: []
+      images: [],
     });
 
     onMounted(() => {
       state.images = getList(3);
-    })
+    });
 
     function complete(data) {
       console.log(data);
@@ -183,6 +188,13 @@ function getProductConfig(config, type) {
   ).map((title) => {
     return config.composingList.find((item) => item.title === title);
   });
+
+  // 文字
+  config.currentProductTypeConfig.text.value = {
+    color: "#111111",
+    fontFamily: "Black Ops One",
+    text: "wow,wow",
+  };
 }
 
 // 获取SKU list

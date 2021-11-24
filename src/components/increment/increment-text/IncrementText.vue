@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 14:03:36
+ * @LastEditTime: 2021-11-24 14:02:35
 -->
 <template>
   <div class="increment-wrapper">
@@ -40,14 +40,14 @@
 
             <base-tabs v-if="shouldRender" v-model:activeName="activeName">
               <!-- 字体选择 -->
-              <base-tab-pane label="Font Family" name="family">
+              <base-tab-pane :label="pluginText.font_family" name="family">
                 <font-selector
                   v-model:fontFamily="customText.fontFamily"
                 ></font-selector>
               </base-tab-pane>
 
               <!-- 色彩选择 -->
-              <base-tab-pane label="Font Color" name="color">
+              <base-tab-pane :label="pluginText.font_color" name="color">
                 <color-selector
                   v-model:color="customText.color"
                 ></color-selector>
@@ -115,8 +115,8 @@ export default {
       type: Object,
     },
     dollarSign: {
-      type: String
-    }
+      type: String,
+    },
   },
 
   emits: {
@@ -127,14 +127,17 @@ export default {
   },
 
   setup(props, context) {
+    const { value } = props;
+    const { text, fontFamily, color } = value;
+
     // 图片渲染器
     const state = reactive({
-      activeValue: "no",
+      activeValue: text ? "yes" : "no",
       activeName: "",
       customText: {
         text: "",
-        fontFamily: "Black Ops One",
-        color: "#111111",
+        fontFamily: fontFamily || "Black Ops One",
+        color: color || "#111111",
       },
     });
 
@@ -155,7 +158,12 @@ export default {
     });
 
     onMounted(() => {
+      // 渲染
       shouldRender.value && renderer();
+      // 回填文字
+      setTimeout(() => {
+        state.customText.text = props.value.text || '';
+      }, 1000);
     });
 
     watch(state.customText, () => {
@@ -224,15 +232,16 @@ export default {
     const rendererText = debounce(function () {
       const items = fabricInstance.getObjects();
       const textItems = items.filter((item) => item.type === "text");
-      const {text, fontFamily, color} = state.customText;
-      
+      const { text, fontFamily, color } = state.customText;
+
       for (const item of textItems) {
         const inputMaxSize = props.data.size ? Number(props.data.size) : 15;
-        
+
         const length = Math.max(Math.floor(inputMaxSize / 2), text.length);
-        
-        const fontSize = (2.5 * item.originalWidth) / length * fabricInstance.scale;
-        
+
+        const fontSize =
+          ((2.5 * item.originalWidth) / length) * fabricInstance.scale;
+
         fabricInstance.update({
           layer: item,
           options: {

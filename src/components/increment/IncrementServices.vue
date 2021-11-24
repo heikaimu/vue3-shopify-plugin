@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-17 10:54:07
+ * @LastEditTime: 2021-11-24 11:05:24
 -->
 <template>
   <!-- 增量服务 -->
@@ -125,13 +125,18 @@ export default {
     },
     // 货币符号
     dollarSign: {
-      type: String
-    }
+      type: String,
+    },
+    // 是否是后台使用
+    isManagementUse: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   emits: {
     save: null,
-    close: null
+    close: null,
   },
 
   setup(props, context) {
@@ -159,7 +164,7 @@ export default {
       changeText,
       changePublish,
       next,
-    } = useIncrement(props.config, props.previewBody);
+    } = useIncrement(props);
 
     /* 
     监听主定制流程的完成状态
@@ -196,7 +201,7 @@ export default {
 
     // 关闭
     function handleClose() {
-      context.emit('close', false);
+      context.emit("close", false);
     }
 
     // 开始上传

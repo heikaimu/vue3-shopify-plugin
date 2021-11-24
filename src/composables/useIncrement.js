@@ -4,14 +4,16 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-17 10:23:18
+ * @LastEditTime: 2021-11-24 13:42:09
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
 
 const CLOSE_RESET = true;
 
-export default function useIncrement(config) {
+export default function useIncrement(props) {
+
+  const { config, isManagementUse } = props;
 
   const state = reactive({
     originalProductOptionsValue: {},
@@ -29,18 +31,22 @@ export default function useIncrement(config) {
     state.productOptionsValue = config.productOptionsValue || {};
     // 增量
     const { slides, publish, background, text, relatedProduct, vip } = config.currentProductTypeConfig;
-    // 单双面
-    initSlides(slides);
     // 背景
     initBackground(background);
     // 文字
     initText(text);
-    // 推荐
-    initPublish(publish);
-    // 关联产品
-    initRelatedProduct(relatedProduct);
-    // VIP
-    initVip(vip);
+
+    // 如果不是后台使用则添加下面增量
+    if (!isManagementUse) {
+      // 单双面
+      initSlides(slides);
+      // 推荐
+      initPublish(publish);
+      // 关联产品
+      initRelatedProduct(relatedProduct);
+      // VIP
+      initVip(vip);
+    }
   })
 
   // 是否有增量
@@ -150,8 +156,13 @@ export default function useIncrement(config) {
       state.queue.push({
         name: "text",
         data: toRaw(text.data),
-        value: {}
+        value: {
+          color: text.value.color || '',
+          fontFamily: text.value.fontFamily || '',
+          text: text.value.text || ''
+        }
       });
+      console.log(state.queue)
     }
   }
   const textVisible = computed(() => {

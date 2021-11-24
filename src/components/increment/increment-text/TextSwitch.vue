@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:26:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-29 11:02:48
+ * @LastEditTime: 2021-11-24 10:22:06
 -->
 <template>
   <!-- 开关 -->
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, watch } from "vue";
+import { reactive, toRefs, watch, inject } from "vue";
 
 export default {
   props: {
@@ -40,14 +40,17 @@ export default {
   },
 
   setup(props, context) {
+    // 国际化
+    const pluginText = inject("pluginText");
+    
     const state = reactive({
       list: [
         {
-          label: "Yes, please",
+          label: pluginText.yes_please,
           value: "yes",
         },
         {
-          label: "No, thanks",
+          label: pluginText.no_thanks,
           value: "no",
         },
       ],
@@ -69,6 +72,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       handleSwitch,
     };
   },

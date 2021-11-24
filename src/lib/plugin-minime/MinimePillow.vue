@@ -77,7 +77,7 @@ export default {
     dollarSign: {
       type: String,
       default: "$",
-    },
+    }
   },
 
   emits: {

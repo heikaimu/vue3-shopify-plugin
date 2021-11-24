@@ -4,12 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:16:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-28 17:58:52
+ * @LastEditTime: 2021-11-24 14:04:30
 -->
 <template>
   <!-- 输入框 -->
   <div class="input-wrapper">
-    <p class="text-length">Text Title {{ text.length }} | {{ size }}</p>
+    <p class="text-length">
+      {{ pluginText.text_title }} {{ text.length }} | {{ size }}
+    </p>
     <input
       type="text"
       class="text-input"
@@ -22,7 +24,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, watch } from "vue";
+import { reactive, toRefs, watch, inject } from "vue";
 
 export default {
   props: {
@@ -41,6 +43,9 @@ export default {
       value: "",
     });
 
+    // 国际化
+    const pluginText = inject("pluginText");
+
     watch(
       () => props.text,
       (val) => {
@@ -56,6 +61,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       handleInput,
     };
   },

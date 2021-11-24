@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-12 16:20:07
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 14:35:46
+ * @LastEditTime: 2021-11-24 10:56:30
 -->
 <template>
   <component
@@ -40,7 +40,7 @@ export default {
     language: {
       type: String,
       default: "us",
-    },
+    }
   },
 
   setup(props) {
