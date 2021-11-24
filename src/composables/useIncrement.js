@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-24 13:42:09
+ * @LastEditTime: 2021-11-24 14:21:38
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -152,17 +152,17 @@ export default function useIncrement(props) {
 
   // ===============文字===============
   function initText(text) {
-    if (text && text.visible) {
+    const {visible, data, value} = text;
+    if (text && visible) {
       state.queue.push({
         name: "text",
-        data: toRaw(text.data),
+        data: toRaw(data),
         value: {
-          color: text.value.color || '',
-          fontFamily: text.value.fontFamily || '',
-          text: text.value.text || ''
+          color: value ? value.color : '',
+          fontFamily: value ? value.fontFamily : '',
+          text: value ? value.text : ''
         }
       });
-      console.log(state.queue)
     }
   }
   const textVisible = computed(() => {

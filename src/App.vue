@@ -33,9 +33,9 @@
 <script>
 import { reactive, toRefs, onMounted } from "vue";
 
-import MinimePillow from "./lib";
-// import MinimePillow from "minime-pillow";
-// import "minime-pillow/dist/style.css";
+// import MinimePillow from "./lib";
+import MinimePillow from "minime-pillow";
+import "minime-pillow/dist/style.css";
 
 import BaseImages from "./base/BaseImages.vue";
 import axios from "axios";

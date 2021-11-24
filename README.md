@@ -1,45 +1,25 @@
-- 下拉框数据字典
+<!--
+ * @Description: 
+ * @Version: 2.0
+ * @Author: Yaowen Liu
+ * @Date: 2021-11-20 10:05:05
+ * @LastEditors: Yaowen Liu
+ * @LastEditTime: 2021-11-24 14:18:01
+-->
+```
+      <MinimePillow
+        :config="config"
+        language="de"
+        :isManagementUse="false"
+        :sizeActiveName="sizeActiveName"
+        :backgroundActiveName="backgroundActiveName"
+        v-if="visible"
+        @close="visible = false"
+        @complete="complete"
+      />
+```
 
-- 状态显示
-  - 当前状态： 回填、编辑、同步时间
-  - 主码流：回填、编辑、视频播放
-  - 次码流：回填、编辑、视频播放
-
-- 编码设置
-  - 主码流：回填、编辑
-  - 次码流1：回填、编辑
-  - 次码流2：回填、编辑
-  - 次码流3：回填、编辑
-  - 视频设置：回填、编辑
-  - 音频设置：回填、编辑
-  - 高级设置：？？？
-
-- OSD设置
-  - 主码流：回填、保存
-    - 透明度
-    - 区域1（文本/图片/滚动文本/时间对应不同表单）
-    - 区域2（文本/图片对应不同的表单）
-    - 区域3（文本/图片对应不同的表单）
-    - 区域4（文本/图片对应不同的表单））
-  - 次码流：回填、保存
-    - 透明度
-    - 区域1（文本/图片/滚动文本/时间对应不同表单）
-    - 区域2（文本/图片对应不同的表单）
-    - 区域3（文本/图片对应不同的表单）
-    - 区域4（文本/图片对应不同的表单））
-    
-- 系统设置
-  - 网络设置：回填、保存
-    - 网口
-    - DNS
-    - NTP
-    - 端口
-  - GB28181设置：回填、保存
-  - 密码设置：保存
-  - 系统升级：选择文件后升级
-  - 恢复出厂设置：重置
-  - 重启设备
-    - 理解重启：重启
-    - 定时重启：回填、保存
-
-接口总数大约：37个
+```
+import MinimePillow from "minime-pillow";
+import "minime-pillow/dist/style.css";
+```
