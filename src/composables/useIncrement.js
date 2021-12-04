@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-24 14:21:38
+ * @LastEditTime: 2021-12-02 15:44:29
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -13,7 +13,7 @@ const CLOSE_RESET = true;
 
 export default function useIncrement(props) {
 
-  const { config, isManagementUse } = props;
+  const { config, isManagementUse, language } = props;
 
   const state = reactive({
     originalProductOptionsValue: {},
@@ -73,7 +73,7 @@ export default function useIncrement(props) {
   // ===============单双面===============
   function initSlides(slides) {
     if (slides && slides.visible) {
-      const initSlide = 'double'
+      const initSlide = language === 'us' ? 'double' : 'Doppelte';
       state.queue.push({
         name: "slides",
         data: toRaw(slides.data),
@@ -87,7 +87,13 @@ export default function useIncrement(props) {
   })
   function changeSlides(val) {
     _changeValue('slides', val);
-    const typeVal = val === 'double' ? "Double Side" : "Single Side";
+    let typeVal = '';
+    if (language === 'us') {
+      typeVal = val === 'double' ? "Double Side" : "Single Side";
+    }
+    if (language === 'de') {
+      typeVal = val === 'Doppelte' ? "Doppelte Seite" : "Einzelne Seite";
+    }
     _changeProductOptionsValue('Type', typeVal);
   }
   // ===============单双面 END===============
@@ -140,10 +146,10 @@ export default function useIncrement(props) {
     _changeProductOptionsValue('Color', val.params.background.title);
 
     // 只有当尺寸属于SKU中的一个的情况才能修改SKU
-    const sizeIndex = config.skuList.findIndex(item => item.options.Size === val.params.size.title);
-    if (sizeIndex > -1) {
-      _changeProductOptionsValue('Size', val.params.size.title)
-    };
+    // const sizeIndex = (config.skuList || []).findIndex(item => item.options.Size === val.params.size.title);
+    // if (sizeIndex > -1) {
+    //   _changeProductOptionsValue('Size', val.params.size.title)
+    // };
   }
   function setPreviewWidthBackground(url) {
     state.previewWidthBackground = url;

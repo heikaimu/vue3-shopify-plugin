@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-18 11:06:29
+ * @LastEditTime: 2021-12-04 17:02:25
 -->
 <template>
   <div class="custom-board">
@@ -15,7 +15,9 @@
         :subText="title"
         icon="close"
         @close="handleClose"
-      />
+      >
+        <skin-selector v-if="config.images.length===9" :skin="currentSkin" @change="handleChangeSkin"></skin-selector>
+      </base-header>
     </div>
     <div class="custom-board__medium">
       <!-- fabric -->
@@ -70,6 +72,7 @@ import BaseRow from "../../../../base/BaseRow.vue";
 import BaseCol from "../../../../base/BaseCol.vue";
 import ImageSelectPlugin from "../../../../components/image-select-plugin/ImageSelectPlugin.vue";
 import CanvasLayers from "../../../../components/CanvasLayers.vue";
+import SkinSelector from "./SkinSelector.vue";
 
 import { debounce } from "lodash";
 
@@ -84,6 +87,7 @@ export default {
     BaseCol,
     ImageSelectPlugin,
     CanvasLayers,
+    SkinSelector
   },
 
   props: {
@@ -116,19 +120,20 @@ export default {
 
   setup(props, context) {
     const { config } = props;
-
     const {
       canvasBox,
       createCanvas,
       createRenderLayerList,
       layerNavList,
       activeID,
+      currentSkin,
       createLayerNav,
       handleActiveLayerNav,
       removeAnnex,
       beforeSelectAvatar,
       replaceActionLayer,
       bringForwardLayer,
+      setNewSkin
     } = useMultipleAvatarDIY(props, context);
 
     let fabricInstance = null;
@@ -226,6 +231,12 @@ export default {
       selectorVisible.value = flag;
     }
 
+    // 修改肤色
+    function handleChangeSkin(val) {
+      setNewSkin(val);
+      renderer();
+    }
+
     return {
       loading,
       canvasBox,
@@ -238,7 +249,9 @@ export default {
       handleCompleteSelect,
       layerNavList,
       activeID,
+      currentSkin,
       handleActiveLayerNav,
+      handleChangeSkin
     };
   },
 };

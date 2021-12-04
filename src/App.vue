@@ -18,7 +18,7 @@
     <div class="right">
       <MinimePillow
         :config="config"
-        language="de"
+        language="us"
         :isManagementUse="false"
         :sizeActiveName="sizeActiveName"
         :backgroundActiveName="backgroundActiveName"
@@ -33,9 +33,9 @@
 <script>
 import { reactive, toRefs, onMounted } from "vue";
 
-// import MinimePillow from "./lib";
-import MinimePillow from "minime-pillow";
-import "minime-pillow/dist/style.css";
+import MinimePillow from "./lib";
+// import MinimePillow from "minime-pillow";
+// import "minime-pillow/dist/style.css";
 
 import BaseImages from "./base/BaseImages.vue";
 import axios from "axios";
@@ -108,7 +108,8 @@ function getConfig(product, publishSize) {
   // })
 
   let config = {};
-  const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
+  // const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
+  const url = `http://192.168.1.250:15000/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
 
   return new Promise((resolve, reject) => {
     axios.get(url).then((res) => {
@@ -123,8 +124,10 @@ function getConfig(product, publishSize) {
         config.defaultSkin = "yellow";
         config.skuList = getSKUlist(product);
         config.productOptionsValue = {
-          Size: publishSize,
+          Größe: publishSize,
         };
+        config.productPrice = '$300';
+        config.productTitle = product.title;
 
         getProductConfig(config, product.type);
         topBodyCard(config);

@@ -37,7 +37,7 @@ export function getSKUList(product) {
  */
 export function publishSKU(list, optionKey, options, publishName) {
   const other = {};
-
+console.log(options)
   Object.keys(options).forEach(key => {
     if (key !== optionKey) {
       other[key] = options[key];

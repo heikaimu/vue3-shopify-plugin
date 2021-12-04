@@ -132,6 +132,11 @@ export default {
       type: Boolean,
       default: false,
     },
+    // 语言
+    language: {
+      type: String,
+      default: 'us'
+    }
   },
 
   emits: {

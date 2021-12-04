@@ -3512,6 +3512,24 @@ minime-pillow@^0.0.3:
     vue "^3.1.5"
     vuedraggable "^4.1.0"
 
+minime-pillow@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/minime-pillow/-/minime-pillow-0.0.4.tgz#7d20c2395c49f49f97e4695db9372f6655f71786"
+  integrity sha512-goRtwqA8r8fEmanKPVtriCczmMe1KN8cSU8hKiUyns3Wt+BfwNLsSGqnOFoNjsvMAJfoRhxfIKuxinwHcqgyCA==
+  dependencies:
+    axios "^0.21.1"
+    cropperjs "^1.5.12"
+    element-plus "^1.0.2-beta.55"
+    fabric "2.7.0"
+    fabric-customise-controls "^2.0.6-beta"
+    filestack-js "^3.23.1"
+    localforage "^1.9.0"
+    lodash "^4.17.21"
+    minime-pillow "^0.0.3"
+    swiper "^6.8.0"
+    vue "^3.1.5"
+    vuedraggable "^4.1.0"
+
 minimist@^1.2.0, minimist@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"

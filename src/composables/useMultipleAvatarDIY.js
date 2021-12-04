@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-16 10:57:28
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-18 11:14:22
+ * @LastEditTime: 2021-12-04 13:31:23
  */
 import { ref } from "vue";
 import CanvasRenderer from "../utils/canvasRenderer";
@@ -19,6 +19,7 @@ import { getRandomID } from "../utils/image";
 export default function useMultipleAvatarDIY(props) {
 
   const { config, skin } = props;
+  const currentSkin = ref(skin);
 
   /**
    * ************ 实列化插件 *************
@@ -44,11 +45,11 @@ export default function useMultipleAvatarDIY(props) {
   function createRenderLayerList() {
     const list = [];
     // 添加底板图
-    const body = getBody(config, skin);
+    const body = getBody(config, currentSkin.value);
     list.push(body);
 
     // 添加附件图
-    const annexList = getAnnexList(config, skin);
+    const annexList = getAnnexList(config, currentSkin.value);
     list.push(...annexList);
 
     // 如果是hood模式，添加svg蒙版层
@@ -225,6 +226,11 @@ export default function useMultipleAvatarDIY(props) {
     fabricInstance.setActiveObject(layer);
   }
 
+  // 肤色
+  function setNewSkin(val) {
+    currentSkin.value = val;
+  }
+
   /**
    * ************* 通用 *************
    */
@@ -249,12 +255,14 @@ export default function useMultipleAvatarDIY(props) {
     createRenderLayerList,
     layerNavList,
     activeID,
+    currentSkin,
     createLayerNav,
     handleActiveLayerNav,
     removeAnnex,
     beforeSelectAvatar,
     replaceActionLayer,
     bringForwardLayer,
-    findLayerListByType
+    findLayerListByType,
+    setNewSkin
   }
 }

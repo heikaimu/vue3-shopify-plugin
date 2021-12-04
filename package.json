@@ -1,6 +1,6 @@
 {
   "name": "minime-pillow",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "files": [
     "dist"
   ],
@@ -31,7 +31,7 @@
     "filestack-js": "^3.23.1",
     "localforage": "^1.9.0",
     "lodash": "^4.17.21",
-    "minime-pillow": "^0.0.3",
+    "minime-pillow": "^0.0.4",
     "swiper": "^6.8.0",
     "vue": "^3.1.5",
     "vuedraggable": "^4.1.0"

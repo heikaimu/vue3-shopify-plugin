@@ -4,13 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-12 16:20:07
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-24 10:56:30
+ * @LastEditTime: 2021-12-02 10:46:44
 -->
 <template>
   <component
     v-bind="$attrs"
     :config="config"
     :dollarSign="dollarSign"
+    :language="language"
     :is="currentElementComponent"
   />
 </template>

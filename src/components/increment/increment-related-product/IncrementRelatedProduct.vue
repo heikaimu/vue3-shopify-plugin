@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-25 16:36:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-04 16:07:52
+ * @LastEditTime: 2021-11-29 17:59:16
 -->
 <template>
   <div class="increment-wrapper">
@@ -78,6 +78,7 @@ function handleClose() {
 
 // 前往下一步
 function handleNext() {
+  emit("change", checkedList.value);
   emit("next");
 }
 </script>
