@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-20 10:41:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-04 13:37:54
+ * @LastEditTime: 2021-12-07 10:18:52
 -->
 <template>
   <div class="color-selector-wrapper">
@@ -217,6 +217,7 @@ export default {
 
 .color-selector-wrapper .color-selector {
   @include pos-absolute(50px, 0, auto, auto, 999);
+  display: block;
   padding: 10px;
   border-radius: 0 0 4px 6px;
   background-color: #ffffff;
@@ -225,6 +226,7 @@ export default {
 .color-selector-wrapper .color-selector__item {
   @include flex-row-center;
   padding: 4px 0;
+  width: 100%;
 }
 
 .color-selector-wrapper .color-selector__item .gender {

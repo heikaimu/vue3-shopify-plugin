@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-04 17:02:25
+ * @LastEditTime: 2021-12-07 11:15:09
 -->
 <template>
   <div class="custom-board">
@@ -16,7 +16,11 @@
         icon="close"
         @close="handleClose"
       >
-        <skin-selector v-if="config.images.length===9" :skin="currentSkin" @change="handleChangeSkin"></skin-selector>
+        <skin-selector
+          v-if="config.images.length === 9"
+          :skin="currentSkin"
+          @change="handleChangeSkin"
+        ></skin-selector>
       </base-header>
     </div>
     <div class="custom-board__medium">
@@ -46,19 +50,21 @@
     </div>
 
     <!-- loading -->
-    <div class="custom-board__loading" v-if="loading">
+    <div class="custom-board__loading" v-if="loading || skinLoading">
       <div class="loading-icon">
         <base-icon icon="loading" :size="30" color="#ffffff"></base-icon>
       </div>
     </div>
 
     <!-- 文件选择 -->
-    <div class="image-extend-selector-dialog" v-if="selectorVisible">
-      <image-select-plugin
-        @close="closeImageSelector"
-        @complete="handleCompleteSelect"
-      />
-    </div>
+    <transition name="slide-bottom-fade" mode="out-in">
+      <div class="image-extend-selector-dialog" v-if="selectorVisible">
+        <image-select-plugin
+          @close="closeImageSelector"
+          @complete="handleCompleteSelect"
+        />
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -87,7 +93,7 @@ export default {
     BaseCol,
     ImageSelectPlugin,
     CanvasLayers,
-    SkinSelector
+    SkinSelector,
   },
 
   props: {
@@ -127,13 +133,14 @@ export default {
       layerNavList,
       activeID,
       currentSkin,
+      skinLoading,
       createLayerNav,
       handleActiveLayerNav,
       removeAnnex,
       beforeSelectAvatar,
       replaceActionLayer,
       bringForwardLayer,
-      setNewSkin
+      renderBgAndAnnex,
     } = useMultipleAvatarDIY(props, context);
 
     let fabricInstance = null;
@@ -218,7 +225,9 @@ export default {
     // 文件选择
     const selectorVisible = ref(false);
     function openImageSelector() {
-      setImageSelectorVisible(true);
+      setTimeout(() => {
+        setImageSelectorVisible(true);
+      }, 300);
     }
     function closeImageSelector() {
       setImageSelectorVisible(false);
@@ -233,8 +242,7 @@ export default {
 
     // 修改肤色
     function handleChangeSkin(val) {
-      setNewSkin(val);
-      renderer();
+      renderBgAndAnnex(val);
     }
 
     return {
@@ -250,8 +258,9 @@ export default {
       layerNavList,
       activeID,
       currentSkin,
+      skinLoading,
       handleActiveLayerNav,
-      handleChangeSkin
+      handleChangeSkin,
     };
   },
 };
@@ -310,5 +319,23 @@ export default {
 }
 .custom-board__button--confirm {
   width: 120px;
+}
+
+// 下方
+.slide-bottom-fade-enter-from,
+.slide-bottom-fade-leave-to {
+  transform: translate3d(0, -30px, 0);
+  opacity: 0;
+}
+.slide-bottom-fade-leave-from,
+.slide-bottom-fade-enter-to {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+.slide-bottom-fade-enter-active {
+  transition: all 0.3s ease-in-out;
+}
+.slide-bottom-fade-leave-active {
+  transition: all 0.1s ease;
 }
 </style>

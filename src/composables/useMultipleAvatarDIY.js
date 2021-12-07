@@ -4,9 +4,9 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-16 10:57:28
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-04 13:31:23
+ * @LastEditTime: 2021-12-07 15:26:59
  */
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import CanvasRenderer from "../utils/canvasRenderer";
 import {
   getSVG,
@@ -14,7 +14,7 @@ import {
   getBody,
   getAvatar,
 } from "../utils/layers";
-import { getRandomID } from "../utils/image";
+import { getRandomID, loadImage } from "../utils/image";
 
 export default function useMultipleAvatarDIY(props) {
 
@@ -231,6 +231,48 @@ export default function useMultipleAvatarDIY(props) {
     currentSkin.value = val;
   }
 
+  // 重新渲染背景和附件
+  const skinLoading = ref(false);
+  async function renderBgAndAnnex(val) {
+    setNewSkin(val);
+
+    skinLoading.value = true;
+    const queue = [];
+
+    // 背景
+    const bgParams = getBody(config, val);
+    queue.push(fabricInstance.add(bgParams, false, false));
+
+    // 附件
+    const annexLayers = findAllAnnexLayer();
+    for (let i = 0; i < config.annex.length; i++) {
+      const currentAnnex = config.annex[i].images.find(item => item.color === val);
+      if (currentAnnex && currentAnnex.url) {
+          queue.push(setAnnexUrl(annexLayers[i], currentAnnex.url));
+      }
+    }
+    Promise.all(queue).then(() => {
+      fabricInstance.refresh();
+      skinLoading.value = false;
+    })
+  }
+
+  function setAnnexUrl(layer, url) {
+    return new Promise((resolve) => {
+      loadImage(url).then(image => {
+        layer.setSrc(url, () => {
+          layer.set({
+            width: image.width,
+            height: image.height
+          })
+          setTimeout(() => {
+            resolve();
+          }, 60);
+        });
+      })
+    })
+  }
+
   /**
    * ************* 通用 *************
    */
@@ -256,6 +298,7 @@ export default function useMultipleAvatarDIY(props) {
     layerNavList,
     activeID,
     currentSkin,
+    skinLoading,
     createLayerNav,
     handleActiveLayerNav,
     removeAnnex,
@@ -263,6 +306,7 @@ export default function useMultipleAvatarDIY(props) {
     replaceActionLayer,
     bringForwardLayer,
     findLayerListByType,
-    setNewSkin
+    setNewSkin,
+    renderBgAndAnnex
   }
 }

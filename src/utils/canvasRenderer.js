@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-23 13:24:29
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-24 11:30:12
+ * @LastEditTime: 2021-12-07 15:26:35
  */
 
 import { fabric } from 'fabric';
@@ -424,13 +424,13 @@ export default class CanvasRenderer {
    * @param {*} active - 是否设置新增的图层为激活状态
    * @returns 
    */
-  add(item, active = false) {
+  add(item, active = false, refresh = true) {
     return new Promise(async (resolve, reject) => {
       if (!item) {
         reject();
       } else {
         await this._addLayerItem(item, active);
-        this.fabricInstance.renderAll();
+        refresh && this.fabricInstance.renderAll();
         resolve();
       }
     })

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 17:35:23
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-04 17:08:02
+ * @LastEditTime: 2021-12-07 14:33:51
 -->
 <template>
   <div>
@@ -12,7 +12,7 @@
       v-if="currentConfig"
       :config="currentConfig"
       :selectFiles="selectFiles"
-      :skin="skin"
+      :skin="config.defaultSkin"
       :title="config.productTitle"
       :price="config.productPrice"
       @close="closePlugin"
@@ -51,10 +51,9 @@ export default {
 
   setup(props, context) {
     const state = reactive({
-      currentIndex: 0,
+      currentIndex: 23,
       currentConfig: null,
-      faceList: [],
-      skin: "white",
+      faceList: []
     });
 
     onMounted(() => {

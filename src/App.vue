@@ -42,7 +42,7 @@ import axios from "axios";
 import { configMock } from "./mock/config";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
-const WEBSITE = "FT";
+const WEBSITE = "L";
 
 import products from "../products/index";
 
@@ -108,8 +108,8 @@ function getConfig(product, publishSize) {
   // })
 
   let config = {};
-  // const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
-  const url = `http://192.168.1.250:15000/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
+  const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
+  // const url = `http://192.168.1.250:15000/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
 
   return new Promise((resolve, reject) => {
     axios.get(url).then((res) => {
