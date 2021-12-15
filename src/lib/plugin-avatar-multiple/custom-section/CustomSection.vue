@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 17:35:23
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-07 14:33:51
+ * @LastEditTime: 2021-12-10 16:11:19
 -->
 <template>
   <div>
@@ -51,7 +51,7 @@ export default {
 
   setup(props, context) {
     const state = reactive({
-      currentIndex: 23,
+      currentIndex: 0,
       currentConfig: null,
       faceList: []
     });

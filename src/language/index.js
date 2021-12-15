@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-22 10:11:47
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-24 14:00:43
+ * @LastEditTime: 2021-12-13 14:17:54
  */
 const text = {
   // 文件选择标题
@@ -73,8 +73,8 @@ const text = {
   },
   // 背景提示
   bg_note_content: {
-    us: 'Just for preview, the background will',
-    de: 'Nur zur Vorschau, der Hintergrund wird'
+    us: 'Just for preview, our designer will finalize the perfect image!',
+    de: 'Nur für die Vorschau, unser Designer wird das perfekte Bild zu beenden!'
   },
   // 肤色
   skin_color: {
@@ -160,6 +160,22 @@ const text = {
   text_title: {
     us: 'Text Title',
     de: 'Text Titel'
+  },
+  background: {
+    us: 'Background',
+    de: 'Hintergrund'
+  },
+  background_group: {
+    us: 'Background Group',
+    de: 'Hintergrund Gruppe'
+  },
+  size: {
+    us: 'Size',
+    de: 'Größe'
+  },
+  composing: {
+    us: 'Composing',
+    de: 'Komposition'
   }
 }
 

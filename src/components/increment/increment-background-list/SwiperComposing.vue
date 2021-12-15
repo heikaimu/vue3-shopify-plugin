@@ -4,11 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-10 13:40:19
+ * @LastEditTime: 2021-12-13 14:16:48
 -->
 <template>
   <div class="composing-selector">
-    <p class="composing-title">Composing {{ pagination }}</p>
+    <p class="composing-title">{{ pluginText.composing }} {{ pagination }}</p>
     <swiper
       :slides-per-view="5"
       :space-between="5"
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { watch } from "vue";
+import { watch, inject } from "vue";
 
 import { Swiper, SwiperSlide } from "swiper/swiper-vue.esm";
 // Import Swiper styles
@@ -55,6 +55,9 @@ export default {
   },
 
   setup(props, context) {
+    // 国际化
+    const pluginText = inject("pluginText");
+
     let { mySwiper, pagination } = useSwiper(props);
 
     // 当索引改变的时候修改激活对象
@@ -83,6 +86,7 @@ export default {
     }
 
     return {
+      pluginText,
       pagination,
       onSwiper,
       onSlideChange,

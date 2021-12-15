@@ -4,28 +4,30 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-13 14:16:15
+ * @LastEditTime: 2021-12-13 14:15:32
 -->
 <template>
-  <div class="size-selector">
-    <p class="size-title">{{ pluginText.size }} {{ pagination }}</p>
+  <div class="composing-selector">
+    <p class="composing-title">
+      {{ pluginText.background_group }} {{ pagination }}
+    </p>
     <swiper
-      :slides-per-view="3"
-      :space-between="3"
+      :slides-per-view="5"
+      :space-between="5"
       :centered-slides="true"
       @swiper="onSwiper"
       @slideChange="onSlideChange"
       @click="onSlideClick"
     >
       <swiper-slide v-for="(item, index) in data" :key="index">
-        <div class="size-card">{{ item }}</div>
+        <div class="composing-card">{{ item.name }}</div>
       </swiper-slide>
     </swiper>
   </div>
 </template>
 
 <script>
-import { inject, watch } from "vue";
+import { watch, inject } from "vue";
 
 import { Swiper, SwiperSlide } from "swiper/swiper-vue.esm";
 // Import Swiper styles
@@ -55,10 +57,10 @@ export default {
   },
 
   setup(props, context) {
+    let { mySwiper, pagination } = useSwiper(props);
+
     // 国际化
     const pluginText = inject("pluginText");
-
-    let { mySwiper, pagination } = useSwiper(props);
 
     // 当索引改变的时候修改激活对象
     watch(
@@ -100,11 +102,11 @@ export default {
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
 
-.size-selector {
+.composing-selector {
   padding: 0 10px 0 10px;
   // background-color: #f9f9f9;
   margin-bottom: 5px;
-  .size-title {
+  .composing-title {
     @include flex-row-center;
     font-size: 12px;
     line-height: 2;
@@ -131,7 +133,7 @@ export default {
     }
   }
 
-  .size-card {
+  .composing-card {
     border-radius: 17px;
     background-color: #f2f2f2;
     cursor: pointer;
@@ -142,7 +144,7 @@ export default {
     font-weight: 600;
   }
   .swiper-slide-active {
-    .size-card {
+    .composing-card {
       background-color: $theme-color;
       color: #ffffff;
     }

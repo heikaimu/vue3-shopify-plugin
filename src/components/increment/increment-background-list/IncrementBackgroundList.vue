@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 13:57:36
+ * @LastEditTime: 2021-12-13 14:01:59
 -->
 <template>
   <div class="increment-wrapper">
@@ -56,7 +56,9 @@
         </ul>
       </div>
 
-      <base-notice class="bg-notice">{{ pluginText.bg_note_content }}</base-notice>
+      <base-notice class="bg-notice">{{
+        pluginText.bg_note_content
+      }}</base-notice>
 
       <!-- 尺寸 -->
       <swiper-size
@@ -73,6 +75,14 @@
         :activeIndex="composingIndex"
         @change="changeComposingIndex"
       ></swiper-composing>
+
+      <!-- 背景分组 -->
+      <swiper-background-group
+        v-if="backgroundGroupList.length > 1"
+        :data="backgroundGroupList"
+        :activeIndex="groupIndex"
+        @change="changeGroup"
+      ></swiper-background-group>
 
       <!-- 背景 -->
       <swiper-background
@@ -96,13 +106,14 @@
 </template>
 
 <script>
-import { watch, toRaw, inject } from "vue";
+import { watch, toRaw, ref, inject, computed } from "vue";
 
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
 import BaseNotice from "../../../base/BaseNotice.vue";
 import BaseLoadingDot from "../../../base/BaseLoadingDot.vue";
 import SwiperSize from "./SwiperSize.vue";
+import SwiperBackgroundGroup from "./SwiperBackgroundGroup.vue";
 import SwiperBackground from "./SwiperBackground.vue";
 import SwiperComposing from "./SwiperComposing.vue";
 
@@ -120,6 +131,7 @@ export default {
     BaseNotice,
     BaseLoadingDot,
     SwiperSize,
+    SwiperBackgroundGroup,
     SwiperBackground,
     SwiperComposing,
   },
@@ -163,11 +175,14 @@ export default {
 
     // 背景
     const {
+      groupIndex,
+      backgroundGroupList,
       backgroundList,
       backgroundIndex,
       backgroundName,
       changeBackgroundIndex,
       getBackgroundImage,
+      changeGroup,
     } = useBackground(props);
 
     // 排版
@@ -200,9 +215,15 @@ export default {
     // 立刻渲染
     const renderNow = debounce((renderAll = true) => {
       const params = getRenderParams();
+
+      if (!params) {
+        return;
+      }
+
       if (!params.backgroundImage) {
         return;
       }
+
       renderPreview(params, renderAll);
     }, 100);
 
@@ -210,6 +231,10 @@ export default {
 
     // 获取渲染参数
     function getRenderParams() {
+      if (!currentSize.value) {
+        return;
+      }
+
       const size = props.sizeList.find(
         (item) => item.label === currentSize.value
       ).value;
@@ -269,8 +294,11 @@ export default {
       pluginText,
       handleClose,
       handleNext,
+      backgroundGroupList,
+      groupIndex,
       backgroundList,
       backgroundIndex,
+      changeGroup,
       changeBackgroundIndex,
       sizeList,
       sizeIndex,

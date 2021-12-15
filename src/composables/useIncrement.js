@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-02 15:44:29
+ * @LastEditTime: 2021-12-13 14:10:03
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -246,7 +246,7 @@ export default function useIncrement(props) {
 
   // 修改默认商品属性值
   function _changeProductOptionsValue(key, val) {
-    if (!state.productOptionsValue[key]) {
+    if (!state.originalProductOptionsValue[key]) {
       return;
     }
 

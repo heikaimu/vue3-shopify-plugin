@@ -4,11 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-30 13:56:38
+ * @LastEditTime: 2021-12-13 14:14:26
 -->
 <template>
   <div class="background-selector">
-    <p class="background-title">Background {{ pagination }}</p>
+    <p class="background-title">{{pluginText.background}} {{ pagination }}</p>
     <swiper
       :slides-per-view="5"
       :space-between="5"
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, watch, computed } from "vue";
+import { inject, watch, computed } from "vue";
 
 import { Swiper, SwiperSlide } from "swiper/swiper-vue.esm";
 // Import Swiper styles
@@ -65,6 +65,10 @@ export default {
   },
 
   setup(props, context) {
+
+    // 国际化
+    const pluginText = inject("pluginText");
+
     let { mySwiper, pagination } = useSwiper(props);
 
     const list = computed(() => {
@@ -104,6 +108,7 @@ export default {
     }
 
     return {
+      pluginText,
       pagination,
       list,
       onSwiper,

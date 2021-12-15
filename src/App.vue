@@ -42,7 +42,7 @@ import axios from "axios";
 import { configMock } from "./mock/config";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
-const WEBSITE = "L";
+const WEBSITE = "M";
 
 import products from "../products/index";
 
@@ -124,7 +124,8 @@ function getConfig(product, publishSize) {
         config.defaultSkin = "yellow";
         config.skuList = getSKUlist(product);
         config.productOptionsValue = {
-          Größe: publishSize,
+          Size: publishSize,
+          Type: 'Single Side'
         };
         config.productPrice = '$300';
         config.productTitle = product.title;

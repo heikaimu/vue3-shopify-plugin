@@ -37,7 +37,6 @@ export function getSKUList(product) {
  */
 export function publishSKU(list, optionKey, options, publishName) {
   const other = {};
-console.log(options)
   Object.keys(options).forEach(key => {
     if (key !== optionKey) {
       other[key] = options[key];
@@ -47,7 +46,6 @@ console.log(options)
   let otherList = list.filter(item => {
     return _isInclude(item.options, other);
   })
-
   otherList = _unique(otherList, 'price');
   const sortList = otherList.sort((a, b) => {
     return a.price - b.price
@@ -59,7 +57,7 @@ console.log(options)
     return isInclude;
   })
   const currentItem = sortList[currentIndex];
-
+  
   let publishItem;
   const publishByName = sortList.find(item => item.options[optionKey] === publishName);
   if (publishName && publishByName && currentItem) {
@@ -74,7 +72,6 @@ console.log(options)
   if (!publishItem || !currentItem) {
     return false;
   }
-
   if (publishItem.price === currentItem.price) {
     return false;
   }

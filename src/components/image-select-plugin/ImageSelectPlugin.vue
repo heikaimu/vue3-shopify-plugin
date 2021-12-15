@@ -4,13 +4,16 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-10 13:51:14
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 13:50:51
+ * @LastEditTime: 2021-12-13 14:13:28
 -->
 <template>
   <div class="file-select">
     <!-- top -->
     <div class="file-select__top border-bottom">
-      <base-header :mainText="pluginText.photo_select_title" @close="handleClosePlugin" />
+      <base-header
+        :mainText="pluginText.photo_select_title"
+        @close="handleClosePlugin"
+      />
     </div>
     <!-- medium -->
     <div class="file-select__medium">
@@ -66,7 +69,7 @@ export default {
     LayerImageSelect,
     LayerImageHandler,
     LayerImageCrop,
-    LayerAvatarSelect
+    LayerAvatarSelect,
   },
 
   props: {
@@ -101,7 +104,7 @@ export default {
       },
     });
 
-       // 国际化
+    // 国际化
     const pluginText = inject("pluginText");
 
     // ========================== 文件选择 ========================
@@ -120,7 +123,7 @@ export default {
         chin,
         url,
         width,
-        height
+        height,
       };
       completeSelect();
     }
@@ -218,7 +221,7 @@ export default {
       handleRotateImage,
       handleSaveImage,
       handleCompleteCrop,
-      handleSelectOneAvatar
+      handleSelectOneAvatar,
     };
   },
 };

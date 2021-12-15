@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-13 10:29:16
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-26 11:00:52
+ * @LastEditTime: 2021-12-13 11:01:50
  */
 import { getSKUList, publishSKU } from '../src/utils/productSKU';
 import { product } from '../products/minimePillow';
@@ -106,6 +106,19 @@ test('异性抱枕尺寸2，双面', () => {
   expect(res).toEqual({
     title: '40cm-16\"',
     addPrice: 500
+  });
+})
+
+test('异性抱枕尺寸3，双面', () => {
+  const list = getSKUList(product);
+  const options = {
+    Size: "30cm-12\"",
+    Type: "Double Side"
+  }
+  const res = publishSKU(list, 'Size', options, '50cm-20"');
+  expect(res).toEqual({
+    title: '50cm-20\"',
+    addPrice: 1500
   });
 })
 

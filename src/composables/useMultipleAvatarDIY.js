@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-16 10:57:28
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-07 15:26:59
+ * @LastEditTime: 2021-12-07 17:21:54
  */
 import { ref, nextTick } from "vue";
 import CanvasRenderer from "../utils/canvasRenderer";
@@ -248,7 +248,7 @@ export default function useMultipleAvatarDIY(props) {
     for (let i = 0; i < config.annex.length; i++) {
       const currentAnnex = config.annex[i].images.find(item => item.color === val);
       if (currentAnnex && currentAnnex.url) {
-          queue.push(setAnnexUrl(annexLayers[i], currentAnnex.url));
+        queue.push(setAnnexUrl(annexLayers[i], currentAnnex.url));
       }
     }
     Promise.all(queue).then(() => {
@@ -259,17 +259,11 @@ export default function useMultipleAvatarDIY(props) {
 
   function setAnnexUrl(layer, url) {
     return new Promise((resolve) => {
-      loadImage(url).then(image => {
-        layer.setSrc(url, () => {
-          layer.set({
-            width: image.width,
-            height: image.height
-          })
-          setTimeout(() => {
-            resolve();
-          }, 60);
-        });
-      })
+      layer.setSrc(url, () => {
+        resolve();
+      }, {
+        crossOrigin: 'Anonymous'
+      });
     })
   }
 
