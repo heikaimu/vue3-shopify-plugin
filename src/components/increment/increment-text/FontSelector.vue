@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:13:47
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-30 10:29:49
+ * @LastEditTime: 2021-12-16 10:28:33
 -->
 <template>
   <ul class="font__list">
@@ -52,16 +52,16 @@ export default {
           label: "Lobster",
         },
         {
-          value: "Righteous",
-          label: "Righteous",
+          value: "Satisfy",
+          label: "Satisfy",
         },
         {
-          value: "Staatliches",
-          label: "Staatliches",
+          value: "Kaushan Script",
+          label: "Kaushan Script",
         },
         {
-          value: "Permanent Marker",
-          label: "Permanent Marker",
+          value: "Dancing Script",
+          label: "Dancing Script",
         },
       ],
       value: "",

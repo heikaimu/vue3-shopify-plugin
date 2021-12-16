@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-24 14:02:35
+ * @LastEditTime: 2021-12-16 10:37:37
 -->
 <template>
   <div class="increment-wrapper">
@@ -136,7 +136,7 @@ export default {
       activeName: "",
       customText: {
         text: "",
-        fontFamily: fontFamily || "Black Ops One",
+        fontFamily: fontFamily || "Satisfy",
         color: color || "#111111",
       },
     });
@@ -208,8 +208,8 @@ export default {
           fontFamily: state.customText.fontFamily,
           color: state.customText.color,
           selectable: false,
-          stroke: "#ffffff",
-          strokeWidth: 1,
+          // stroke: "#ffffff",
+          // strokeWidth: 1,
         };
       });
       const layers = [

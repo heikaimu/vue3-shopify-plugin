@@ -108,8 +108,8 @@ function getConfig(product, publishSize) {
   // })
 
   let config = {};
-  const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
-  // const url = `http://192.168.1.250:15000/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
+  // const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
+  const url = `http://192.168.1.250:15000/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
 
   return new Promise((resolve, reject) => {
     axios.get(url).then((res) => {
@@ -194,11 +194,11 @@ function getProductConfig(config, type) {
   });
 
   // 文字
-  config.currentProductTypeConfig.text.value = {
-    color: "#111111",
-    fontFamily: "Black Ops One",
-    text: "wow,wow",
-  };
+  // config.currentProductTypeConfig.text.value = {
+  //   color: "#111111",
+  //   fontFamily: "Black Ops One",
+  //   text: "wow,wow",
+  // };
 }
 
 // 获取SKU list

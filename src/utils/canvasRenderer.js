@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-23 13:24:29
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-07 15:26:35
+ * @LastEditTime: 2021-12-16 10:37:53
  */
 
 import { fabric } from 'fabric';
