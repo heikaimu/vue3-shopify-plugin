@@ -4,11 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-23 15:22:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-19 10:19:30
+ * @LastEditTime: 2021-12-17 13:52:16
 -->
 <template>
   <div class="files-uploader-wrapper">
-    <img src="https://cdn.shopify.com/s/files/1/0550/0773/9963/files/sandglass_260x_0fbf95d8-37c1-401a-a43c-cbc8bad0bddb.gif?v=1637136366" alt="" srcset="">
+    <img class="gif" :src="loadingGif" alt="" srcset="">
     <div class="upload-progress-wrapper">
       <div class="progress">
         <span class="line green" :style="{ width: `${percent}%` }">
@@ -48,6 +48,7 @@ export default {
       percent: 0,
       uploadRes: {},
       time: "",
+      loadingGif: 'https://cdn.shopifycdn.net/s/files/1/0343/0275/4948/files/01.gif?v=1639719841'
     });
 
     onMounted(() => {
@@ -115,9 +116,14 @@ export default {
   @include flex-col-center;
   @include pos-absolute(0, 0, 0, 0, 1992);
   background-color: #ffffff;
+
+  .gif {
+    width: 100px;
+  }
 }
 .upload-progress-wrapper {
   width: 200px;
+  margin-top: 10px;
 
   .progress {
     height: 20px;
@@ -138,13 +144,13 @@ export default {
       text-align: right;
 
       &.green {
-        background: #85c440;
-        border-color: #78b337 #6ba031 #568128;
+        background: #F97182;
+        border-color: #F97182 #F97182 #F97182;
         background-image: linear-gradient(
           180deg,
-          #b7dc8e 0,
-          #99ce5f 70%,
-          #85c440
+          #F97182 0,
+          #F97182 70%,
+          #F97182
         );
       }
 
