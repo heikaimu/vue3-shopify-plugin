@@ -42,7 +42,7 @@ import axios from "axios";
 import { configMock } from "./mock/config";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
-const WEBSITE = "M";
+const WEBSITE = "L";
 
 import products from "../products/index";
 
@@ -108,13 +108,32 @@ function getConfig(product, publishSize) {
   // })
 
   let config = {};
+  const url = `https://sback.globalhot.shop/plugins/api/v1/configure?id=30`;
   // const url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
-  const url = `http://192.168.1.250:15000/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
+  // const url = `http://192.168.1.250:15000/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
 
   return new Promise((resolve, reject) => {
     axios.get(url).then((res) => {
       const { status, data } = res.data;
       if (status === "0") {
+//         const r = data[0];
+
+
+//         const a = JSON.parse(r.configure);
+// console.log(a)
+//         return;
+
+//         const link = document.createElement("a");
+//       link.download = "minime.json";
+//       link.style.display = "none";
+//       const json = a;
+//       const blob = new Blob([json]);
+//       link.href = URL.createObjectURL(blob);
+//       document.body.appendChild(link);
+//       link.click();
+//       document.body.removeChild(link);
+//         return;
+
         const configItem = data[0] || {};
         if (!configItem) {
           return;
