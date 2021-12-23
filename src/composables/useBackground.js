@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 14:27:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-15 09:39:23
+ * @LastEditTime: 2021-12-21 17:09:52
  */
 import { reactive, toRefs, onMounted, nextTick, computed } from "vue";
 import { debounce } from "lodash";
@@ -33,7 +33,7 @@ export default function useBackground(props) {
     return curItem.title;
   })
 
-  onMounted(async() => {
+  onMounted(async () => {
     // 通过传入的背景色名称来获取索引，如果是背景(bg-xx)直接匹配，如果是颜色Color:xxx只匹配前面部分
     const list = props.data.backgroundList.filter(item => Boolean(item)).map(item => {
       const { list, title, group } = item;
@@ -70,31 +70,36 @@ export default function useBackground(props) {
         state.backgroundGroupList.splice(i, 1);
       }
     }
-    
-    // 当前展示的列表
-    state.backgroundList = state.backgroundGroupList[state.groupIndex].list;
+
     state.groupIndex = 0;
     state.backgroundIndex = 0;
 
     // 遍历获取当前索引
-    for (let i = 0; i < state.backgroundList.length; i++) {
-      const group = state.backgroundList[i];
+    for (let i = 0; i < state.backgroundGroupList.length; i++) {
+      const group = state.backgroundGroupList[i];
       for (let j = 0; j < group.list.length; j++) {
         const item = group.list[j];
         if (item.title === props.backgroundActiveName) {
           state.groupIndex = i;
           state.backgroundIndex = j;
-          return;
         }
       }
     }
+
+    await nextTick();
+
+    // 当前展示的列表
+    state.backgroundList = state.backgroundGroupList[state.groupIndex].list;
   })
 
   // 切换组
   function changeGroup(index) {
     state.groupIndex = index;
     state.backgroundList = state.backgroundGroupList[index].list;
-    state.backgroundIndex = 0;
+    // 如果新组没有这个索引的数据则设置index为0
+    if (!state.backgroundList[state.backgroundIndex]) {
+      state.backgroundIndex = 0;
+    }
   }
 
   // 背景修改

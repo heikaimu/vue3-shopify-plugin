@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 13:55:06
+ * @LastEditTime: 2021-12-21 10:38:09
 -->
 <template>
   <div class="custom-board">
@@ -13,7 +13,7 @@
         :center="false"
         :mainText="price"
         :subText="title"
-        icon="arrowDown"
+        icon="arrowLeft"
         @close="backToList"
       />
     </div>

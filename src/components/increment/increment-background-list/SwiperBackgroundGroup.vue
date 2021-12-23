@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-13 14:15:32
+ * @LastEditTime: 2021-12-21 17:08:33
 -->
 <template>
   <div class="composing-selector">
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { watch, inject } from "vue";
+import { watch, inject, onMounted } from "vue";
 
 import { Swiper, SwiperSlide } from "swiper/swiper-vue.esm";
 // Import Swiper styles
@@ -61,6 +61,10 @@ export default {
 
     // 国际化
     const pluginText = inject("pluginText");
+
+    onMounted(() => {
+      mySwiper.slideTo(props.activeIndex);
+    }),
 
     // 当索引改变的时候修改激活对象
     watch(
