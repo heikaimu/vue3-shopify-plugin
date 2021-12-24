@@ -4,30 +4,30 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-23 13:24:37
+ * @LastEditTime: 2021-12-23 17:02:23
 -->
 <template>
   <base-row :gutter="10">
     <base-col
       :span="12"
-      v-for="(item, index) in list"
+      v-for="(item, index) in data"
       :key="index"
       class="body-card-row"
     >
-      <div class="card">
-        <img class="img" :src="item.url" alt="" />
-      </div>
+      <background-card :data="item" :active="index===activeIndex" v-bind="$attrs"></background-card>
     </base-col>
   </base-row>
 </template>
 
 <script>
-import { inject, watch, computed } from "vue";
+import { inject, computed } from "vue";
+import BackgroundCard from "./BackgroundCard.vue";
 import BaseRow from "../../../base/BaseRow.vue";
 import BaseCol from "../../../base/BaseCol.vue";
 
 export default {
   components: {
+    BackgroundCard,
     BaseRow,
     BaseCol,
   },
@@ -41,10 +41,6 @@ export default {
       type: Number,
       default: 0,
     },
-    size: {
-      type: String,
-      default: "100x100",
-    },
   },
 
   emits: {
@@ -52,23 +48,12 @@ export default {
   },
 
   setup(props, context) {
+
     // 国际化
     const pluginText = inject("pluginText");
 
-    const list = computed(() => {
-      return props.data.map((group) => {
-        return {
-          title: group.title,
-          url:
-            (group.list.find((item) => item.size === props.size) || {}).url ||
-            "",
-        };
-      });
-    });
-
     return {
-      pluginText,
-      list,
+      pluginText
     };
   },
 };
@@ -77,4 +62,7 @@ export default {
 <style lang="scss" scoped>
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
+ .body-card-row {
+    margin-bottom: 10px;
+  }
 </style>
