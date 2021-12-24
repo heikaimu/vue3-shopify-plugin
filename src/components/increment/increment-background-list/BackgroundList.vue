@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-23 17:02:23
+ * @LastEditTime: 2021-12-24 09:58:26
 -->
 <template>
   <base-row :gutter="10">
@@ -14,7 +14,11 @@
       :key="index"
       class="body-card-row"
     >
-      <background-card :data="item" :active="index===activeIndex" v-bind="$attrs"></background-card>
+      <background-card
+        :data="item"
+        :active="index === activeIndex"
+        v-bind="$attrs"
+      ></background-card>
     </base-col>
   </base-row>
 </template>
@@ -48,12 +52,11 @@ export default {
   },
 
   setup(props, context) {
-
     // 国际化
     const pluginText = inject("pluginText");
 
     return {
-      pluginText
+      pluginText,
     };
   },
 };
@@ -62,7 +65,7 @@ export default {
 <style lang="scss" scoped>
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
- .body-card-row {
-    margin-bottom: 10px;
-  }
+.body-card-row {
+  margin-bottom: 10px;
+}
 </style>

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-23 15:11:40
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-24 09:55:53
+ * @LastEditTime: 2021-12-24 10:19:39
 -->
 <template>
   <div class="card-box" @click="handleSelectCard">
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { reactive, ref, toRefs, watch, onMounted, computed } from "vue";
+import { reactive, toRefs, computed } from "vue";
 import { loadImage } from "../../../utils/image";
 export default {
   props: {
@@ -51,9 +51,13 @@ export default {
     },
   },
 
-  setup(props) {
+  emits: {
+    cardSelect: null
+  },
+
+  setup(props, context) {
     const state = reactive({
-      position: [],
+      position: []
     });
 
     // 背景图，当尺寸存在的时候去取对应的背景图
@@ -113,9 +117,7 @@ export default {
     }
 
     function handleSelectCard() {
-      context.emit('cardSelect', {
-        
-      })
+      context.emit('cardSelect')
     }
 
     return {
@@ -133,6 +135,7 @@ export default {
 .card-box {
   position: relative;
   overflow: hidden;
+  cursor: pointer;
   .bg-img {
     width: 100%;
     display: block;

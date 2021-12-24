@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-23 17:32:31
+ * @LastEditTime: 2021-12-24 10:19:52
 -->
 <template>
   <div class="background-wrapper">
@@ -64,6 +64,7 @@
             :activeIndex="backgroundIndex"
             :customBodyPreviewURL="customBodyPreviewURL"
             @change="changeBackgroundIndex"
+            @cardSelect="handleCardSelect"
           ></background-list>
         </div>
       </div>
@@ -152,6 +153,11 @@ export default {
       listBox && listBox.value.scrollIntoView({ block: "start", inline: "nearest" });
     })
 
+    // 选择卡片
+    function handleCardSelect() {
+      alert();
+    }
+
     // 排版
     const {
       composingList,
@@ -194,6 +200,7 @@ export default {
       changeComposingIndex,
       queryVisible,
       handleOpenToggle,
+      handleCardSelect,
       listBox
     };
   },
