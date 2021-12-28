@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 14:34:01
+ * @LastEditTime: 2021-12-28 18:09:31
 -->
 <template>
   <div class="background-wrapper">
@@ -120,9 +120,20 @@ export default {
       type: Object,
       default: () => {},
     },
+    textData: {
+      type: Object,
+      default: () => {},
+    },
     customBodyPreviewURL: {
       type: String,
       default: "",
+    },
+    sizeList: {
+      type: Array,
+      default: 0,
+    },
+    dollarSign: {
+      type: String,
     },
     backgroundActiveName: {
       type: String,
@@ -135,17 +146,6 @@ export default {
     sizeActiveName: {
       type: String,
       default: "",
-    },
-    sizeList: {
-      type: Array,
-      default: 0,
-    },
-    textData: {
-      type: Object,
-      default: () => {},
-    },
-    dollarSign: {
-      type: String,
     },
   },
 
