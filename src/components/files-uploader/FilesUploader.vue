@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-23 15:22:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-17 13:52:16
+ * @LastEditTime: 2021-12-28 18:14:07
 -->
 <template>
   <div class="files-uploader-wrapper">
@@ -114,7 +114,7 @@ export default {
 
 .files-uploader-wrapper {
   @include flex-col-center;
-  @include pos-absolute(0, 0, 0, 0, 1992);
+  @include pos-absolute(0, 0, 0, 0, 999999);
   background-color: #ffffff;
 
   .gif {

@@ -4,89 +4,89 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 18:10:17
+ * @LastEditTime: 2021-12-28 18:16:20
 -->
 <template>
   <!-- 增量服务 -->
-  <!-- <transition name="slide-bottom-fade" mode="out-in"> -->
-  <!-- 单双面 -->
-  <increment-slides
-    v-if="slidesVisible"
-    :data="incrementData.data"
-    :value="incrementData.value"
-    :customBodyPreviewURL="previewBody"
-    :dollarSign="dollarSign"
-    @change="changeSlides"
-    @close="handleClose"
-    @next="nextIncrement"
-  />
+  <transition name="slide-bottom-fade" mode="out-in">
+    <!-- 单双面 -->
+    <increment-slides
+      v-if="slidesVisible"
+      :data="incrementData.data"
+      :value="incrementData.value"
+      :customBodyPreviewURL="previewBody"
+      :dollarSign="dollarSign"
+      @change="changeSlides"
+      @close="handleClose"
+      @next="nextIncrement"
+    />
 
-  <!-- 背景图 -->
-  <increment-background-list
-    v-else-if="backgroundVisible"
-    :data="incrementData"
-    :textData="textData"
-    :customBodyPreviewURL="previewBody"
-    :sizeList="config.sizeList"
-    :dollarSign="dollarSign"
-    :backgroundActiveName="backgroundActiveName"
-    :composingActiveName="composingActiveName"
-    :sizeActiveName="sizeActiveName"
-    @change="changeBackground"
-    @saveBgRenderParams="saveBgRenderParams"
-    @close="handleClose"
-    @next="nextIncrement"
-  />
+    <!-- 背景图 -->
+    <increment-background-list
+      v-else-if="backgroundVisible"
+      :data="incrementData"
+      :textData="textData"
+      :customBodyPreviewURL="previewBody"
+      :sizeList="config.sizeList"
+      :dollarSign="dollarSign"
+      :backgroundActiveName="backgroundActiveName"
+      :composingActiveName="composingActiveName"
+      :sizeActiveName="sizeActiveName"
+      @change="changeBackground"
+      @saveBgRenderParams="saveBgRenderParams"
+      @close="handleClose"
+      @next="nextIncrement"
+    />
 
-  <!-- 文字 -->
-  <increment-text
-    v-else-if="textVisible"
-    :data="incrementData.data"
-    :value="incrementData.value"
-    :bgRenderParams="bgRenderParams"
-    :dollarSign="dollarSign"
-    @change="changeText"
-    @close="handleClose"
-    @next="nextIncrement"
-    @render="setPreviewWidthBackground"
-    @back="back"
-  />
+    <!-- 文字 -->
+    <increment-text
+      v-else-if="textVisible"
+      :data="incrementData.data"
+      :value="incrementData.value"
+      :bgRenderParams="bgRenderParams"
+      :dollarSign="dollarSign"
+      @change="changeText"
+      @close="handleClose"
+      @next="nextIncrement"
+      @render="setPreviewWidthBackground"
+      @back="back"
+    />
 
-  <!-- 推荐 -->
-  <increment-publish
-    v-else-if="publishVisible"
-    :data="incrementData.data"
-    :value="incrementData.value"
-    :productOptionsValue="productOptionsValue"
-    :skuList="config.skuList"
-    :dollarSign="dollarSign"
-    @change="changePublish"
-    @close="handleClose"
-    @next="nextIncrement"
-  />
+    <!-- 推荐 -->
+    <increment-publish
+      v-else-if="publishVisible"
+      :data="incrementData.data"
+      :value="incrementData.value"
+      :productOptionsValue="productOptionsValue"
+      :skuList="config.skuList"
+      :dollarSign="dollarSign"
+      @change="changePublish"
+      @close="handleClose"
+      @next="nextIncrement"
+    />
 
-  <!-- 关联产品 -->
-  <increment-related-product
-    v-else-if="relatedProductVisible"
-    :data="incrementData.data"
-    :value="incrementData.value"
-    :dollarSign="dollarSign"
-    @change="changeRelatedProduct"
-    @close="handleClose"
-    @next="nextIncrement"
-  />
+    <!-- 关联产品 -->
+    <increment-related-product
+      v-else-if="relatedProductVisible"
+      :data="incrementData.data"
+      :value="incrementData.value"
+      :dollarSign="dollarSign"
+      @change="changeRelatedProduct"
+      @close="handleClose"
+      @next="nextIncrement"
+    />
 
-  <!-- vip -->
-  <increment-vip
-    v-else-if="vipVisible"
-    :data="incrementData.data"
-    :value="incrementData.value"
-    :dollarSign="dollarSign"
-    @change="changeVip"
-    @close="handleClose"
-    @next="nextIncrement"
-  />
-  <!-- </transition> -->
+    <!-- vip -->
+    <increment-vip
+      v-else-if="vipVisible"
+      :data="incrementData.data"
+      :value="incrementData.value"
+      :dollarSign="dollarSign"
+      @change="changeVip"
+      @close="handleClose"
+      @next="nextIncrement"
+    />
+  </transition>
 </template>
 
 <script>

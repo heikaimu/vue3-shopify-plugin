@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-28 13:53:52
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 16:41:54
+ * @LastEditTime: 2021-12-28 18:13:36
 -->
 <template>
   <transition name="slide-bottom-fade">
@@ -53,13 +53,13 @@ function handleClose() {
 @import "src/styles/_mixins.scss";
 
 .glass-dialog {
-  @include pos-absolute(0, 0, 0, 0, 99996);
+  @include pos-absolute(0, 0, 0, 0, 9996);
   .dialog__blank {
-    @include pos-absolute(0, 0, 0, 0, 99997);
+    @include pos-absolute(0, 0, 0, 0, 9997);
     @include glass;
   }
   .dialog__content {
-    @include pos-absolute(auto, 0, 0, 0, 99998);
+    @include pos-absolute(auto, 0, 0, 0, 9998);
     border-radius: 10px 10px 0 0;
     background-color: #ffffff;
     .close-wrapper {
