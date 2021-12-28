@@ -4,16 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-13 14:10:07
+ * @LastEditTime: 2021-12-28 16:55:22
 -->
 <template>
-  <div class="increment-wrapper">
-    <div class="increment-blank" @click="handleClose"></div>
+  <base-glass-dialog :visible="true" @close="handleClose">
     <div class="increment-publish">
-      <span class="close-icon">
-        <base-icon icon="close" @click="handleClose" />
-      </span>
-
       <div class="text-wrapper">
         <div class="text__preview">
           <img
@@ -54,7 +49,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </base-glass-dialog>
 </template>
 
 <script>
@@ -62,7 +57,7 @@ import { reactive, toRefs, computed, inject, onMounted } from "vue";
 
 import BaseNotice from "../../../base/BaseNotice.vue";
 import BaseButton from "../../../base/BaseButton.vue";
-import BaseIcon from "../../../base/BaseIcon.vue";
+import BaseGlassDialog from "../../../base/BaseGlassDialog.vue";
 
 import { publishSKU } from "../../../utils/productSKU";
 import { number } from "../../../utils/number";
@@ -71,7 +66,7 @@ export default {
   components: {
     BaseNotice,
     BaseButton,
-    BaseIcon,
+    BaseGlassDialog,
   },
 
   props: {
@@ -192,83 +187,65 @@ export default {
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
 
-.increment-wrapper {
-  @include pos-absolute(0, 0, 0, 0, 1000);
-  .increment-blank {
-    @include glass;
-    @include pos-absolute(0, 0, 0, 0, 1001);
-    cursor: pointer;
+.increment-publish {
+  .text-wrapper {
+    padding: 20px 20px 20px 20px;
+    .text__preview {
+      @include flex-row-center;
+      // @include pos-absolute(-120px, auto, auto, 50%, 1003);
+      // transform: translate3d(-50%, 0, 0);
+      padding-bottom: 20px;
+      width: 100%;
+      .img {
+        @include card-shadow-lg;
+        display: block;
+        width: 240px;
+        height: 240px;
+        object-fit: contain;
+        padding: 2px;
+        background: #fff;
+        border-radius: 10px;
+      }
+    }
+    .add-price {
+      width: 100%;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: $theme-color;
+    }
+    .desc {
+      padding: 0 20px 10px 20px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: $title-color;
+      text-align: center;
+      margin-bottom: 0;
+    }
   }
 
-  .increment-publish {
-    @include pos-absolute(auto, 0, 0, 0, 1002);
-    border-radius: 10px 10px 0 0;
-    background-color: #ffffff;
-
-    .close-icon {
-      @include pos-absolute(20px, auto, auto, 20px, 1004);
-      cursor: pointer;
-    }
-
-    .text-wrapper {
-      padding: 140px 20px 20px 20px;
-      .text__preview {
-        @include flex-col-center;
-        @include pos-absolute(-120px, auto, auto, 50%, 1003);
-        transform: translate3d(-50%, 0, 0);
+  .add-to-cart {
+    padding: 0 20px 20px 20px;
+    .item {
+      & + .item {
+        margin-top: 10px;
+      }
+      .divider {
+        @include flex-row-center;
         width: 100%;
-        height: 240px;
-        .img {
-          @include card-shadow-lg;
-          display: block;
-          width: 240px;
-          height: 240px;
-          object-fit: contain;
-          padding: 2px;
-          background: #fff;
-          border-radius: 10px;
-        }
-      }
-      .add-price {
-        width: 100%;
-        text-align: center;
-        font-size: 16px;
-        font-weight: 700;
-        color: $theme-color;
-      }
-      .desc {
-        padding: 0 20px 10px 20px;
-        font-size: 18px;
-        line-height: 1.6;
-        color: $title-color;
-        text-align: center;
-        margin-bottom: 0;
-      }
-    }
-
-    .add-to-cart {
-      padding: 0 20px 20px 20px;
-      .item {
-        & + .item {
-          margin-top: 10px;
-        }
-        .divider {
+        .text {
           @include flex-row-center;
-          width: 100%;
-          .text {
-            @include flex-row-center;
-            font-size: 14px;
-            font-weight: 600;
-            color: $context-color;
-            &::after,
-            &::before {
-              display: block;
-              content: "";
-              width: 60px;
-              height: 1px;
-              background-color: currentColor;
-              margin: 0 5px;
-            }
+          font-size: 14px;
+          font-weight: 600;
+          color: $context-color;
+          &::after,
+          &::before {
+            display: block;
+            content: "";
+            width: 60px;
+            height: 1px;
+            background-color: currentColor;
+            margin: 0 5px;
           }
         }
       }

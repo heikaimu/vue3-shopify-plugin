@@ -4,27 +4,21 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-27 16:46:10
+ * @LastEditTime: 2021-12-28 17:13:28
 -->
 <template>
-  <div class="increment-wrapper">
-    <div class="increment-blank" @click="handleClose"></div>
-
+  <base-glass-dialog :visible="true" :loading="loadingVisible" @close="handleClose">
     <!-- 文字定制内容 -->
     <div class="increment-text">
-      <span class="close-icon">
-        <base-icon icon="close" @click="handleClose" />
-      </span>
-
       <!-- 文字定制 -->
-      <div class="text-wrapper" v-if="customVisible">
+      <div class="text-wrapper">
         <div class="text__preview">
           <div class="text-canvas-box">
-            <canvas id="textCanvas" v-if="shouldRender"></canvas>
+            <canvas id="textCanvas" v-if="shouldRenderCanvas"></canvas>
             <img v-else :src="data.url" alt="" srcset="" />
           </div>
 
-          <operations-bar @handle="handleObject"></operations-bar>
+          <!-- <operations-bar @handle="handleObject"></operations-bar> -->
         </div>
 
         <!-- 定制信息 -->
@@ -62,41 +56,27 @@
           >
         </div>
       </div>
-
-      <!-- 文字定制询问 -->
-      <confirm-box
-        v-else
-        :data="data"
-        :price="data.price"
-        :dollarSign="dollarSign"
-        @custom="handleCustom"
-      ></confirm-box>
     </div>
-
-    <!-- loading -->
-    <div class="loading-box" v-if="loadingVisible">
-      <BaseLoadingDot />
-    </div>
-  </div>
+  </base-glass-dialog>
 </template>
 
 <script>
-import { reactive, ref, toRefs, computed, inject, nextTick, watch } from "vue";
+import { reactive, ref, toRefs, computed, inject, onMounted, watch } from "vue";
 
 import BaseNotice from "../../../base/BaseNotice.vue";
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
 import BaseTabs from "../../../base/BaseTabs.vue";
 import BaseTabPane from "../../../base/BaseTabPane.vue";
-import BaseLoadingDot from "../../../base/BaseLoadingDot.vue";
+import BaseGlassDialog from "../../../base/BaseGlassDialog.vue";
 import TextSwitch from "./TextSwitch.vue";
 import TextInput from "./TextInput.vue";
 import FontSelector from "./FontSelector.vue";
 import ColorSelector from "./ColorSelector.vue";
-import ConfirmBox from "./ConfirmBox.vue";
 import OperationsBar from "./OperationsBar.vue";
 
 import ImageAndTextRenderer from "../../../utils/ImageAndTextRenderer";
+import { clearImageEdgeBlank } from "../../../utils/image";
 
 const CANVAS_WIDTH = 230;
 
@@ -107,12 +87,11 @@ export default {
     BaseIcon,
     BaseTabs,
     BaseTabPane,
-    BaseLoadingDot,
+    BaseGlassDialog,
     TextSwitch,
     TextInput,
     FontSelector,
     ColorSelector,
-    ConfirmBox,
     OperationsBar,
   },
 
@@ -138,39 +117,51 @@ export default {
     close: null,
     next: null,
     render: null,
+    back: null,
   },
 
   setup(props, context) {
     // 国际化
     const pluginText = inject("pluginText");
 
+    // 是否显示定制文字
+    const customTextVisible = ref(props.bgRenderParams.customTextVisible);
+
     // 文字信息
     const { text, fontFamily, color } = props.value;
     const state = reactive({
       activeName: "",
       customText: {
-        text: "",
+        text: text,
         fontFamily: fontFamily || "Satisfy",
         color: color || "#111111",
       },
-      customVisible: false,
-      customTextVisible: false,
+    });
+
+    // 是否需要渲染canvas，只有当选择了背景才渲染，否则直接展示预设的图片
+    const shouldRenderCanvas = computed(() => {
+      return Boolean(props.bgRenderParams);
+    });
+
+    onMounted(() => {
+      // 如果不定制文字，则清空文字
+      if (!customTextVisible.value) {
+        clearText();
+        updateTextInfo;
+      }
+
+      // 只有当展示canvas的时候才渲染
+      if (shouldRenderCanvas.value) {
+        initTextRender();
+      }
     });
 
     // 渲染器实列
     let renderInstance = null;
     let zoomRecord = 1;
 
-    /**
-     * 开始定制，回填文字
-     * @param {Boolean} flag - 是否显示文字定制信息
-     */
-    async function handleCustom(flag) {
-      // 定制内容显示
-      state.customVisible = true;
-      state.customTextVisible = flag;
-      await nextTick();
-
+    // 初始化canvas
+    async function initTextRender() {
       // 文字回填
       state.customText.text = props.value.text || "";
 
@@ -180,9 +171,19 @@ export default {
       }
 
       // 回填图层
-      renderParamsBindText();
+      await recreateLayers();
       zoomRecord = CANVAS_WIDTH / props.bgRenderParams.width;
       renderInstance.init(props.bgRenderParams, zoomRecord);
+      renderInstance.on("tlClick", () => {
+        context.emit("close");
+      });
+    }
+
+    // 清空文字
+    function clearText() {
+      state.customText.text = "";
+      state.customText.fontFamily = "";
+      state.customText.color = "";
     }
 
     // 图层移动
@@ -192,18 +193,22 @@ export default {
       renderInstance.handleObject(image, command);
     }
 
-    // 给文字渲染层加上文字内容，颜色，字体
-    function renderParamsBindText() {
-      props.bgRenderParams.layerList.forEach((item) => {
+    // 图层重构，给文字渲染层加上文字内容，颜色，字体，图片去边
+    async function recreateLayers() {
+      for (let i = 0; i < props.bgRenderParams.layerList.length; i++) {
+        const item = props.bgRenderParams.layerList[i];
         if (item.type === "text") {
           item.text = state.customText.text;
           item.fontFamily = state.customText.fontFamily;
           item.color = state.customText.color;
         }
-      });
+        if (item.type === "image") {
+          item.url = await clearImageEdgeBlank(item.url);
+        }
+      }
     }
 
-    // 文字聚焦
+    // 文字聚焦后放大画布
     function handleFocus() {
       const items = renderInstance.getObjects();
       const textItems = items.filter((item) => item.type === "text");
@@ -216,19 +221,24 @@ export default {
       renderInstance.zoomToPoint(x, y, zoom);
     }
 
-    // 文字失去焦点
+    // 文字失去焦点还原画布
     function handleBlur() {
       renderInstance.resetZoom();
     }
 
     // 文字及文字属性更新后
     watch(state.customText, () => {
-      updateText();
-      context.emit("change", state.customText);
+      renderText();
+      updateTextInfo();
     });
 
     // 更新文字
-    function updateText() {
+    function updateTextInfo() {
+      context.emit("change", state.customText);
+    }
+
+    // 重新渲染文字
+    function renderText() {
       const items = renderInstance.getObjects();
       const textItems = items.filter((item) => item.type === "text");
       const { text, fontFamily, color } = state.customText;
@@ -255,7 +265,7 @@ export default {
 
     // 保存定制
     async function handleSave() {
-      if (shouldRender.value) {
+      if (shouldRenderCanvas.value) {
         loadingVisible.value = true;
         const url = await getOriginalSizePreview();
         loadingVisible.value = false;
@@ -263,11 +273,6 @@ export default {
         context.emit("render", url);
       }
       handleNext();
-    }
-
-    // 下一步
-    function handleNext() {
-      context.emit("next");
     }
 
     // 获取原始尺寸的预览图
@@ -281,34 +286,34 @@ export default {
 
     // 按钮文字
     const addToCartText = computed(() => {
-      if (state.customTextVisible && state.customText.text !== "") {
+      if (customTextVisible.value && state.customText.text !== "") {
         return `${pluginText.add_cart} +${props.dollarSign}${props.data.price}`;
       } else {
         return `${pluginText.add_cart}`;
       }
     });
 
-    // 是否需要渲染canvas，只有当选择了背景才渲染
-    const shouldRender = computed(() => {
-      return Boolean(props.bgRenderParams);
-    });
+    // 下一步
+    function handleNext() {
+      context.emit("next");
+    }
 
     // 关闭
     function handleClose() {
-      context.emit("close");
+      context.emit("back");
     }
 
     return {
       ...toRefs(state),
       pluginText,
+      customTextVisible,
       addToCartText,
-      shouldRender,
+      shouldRenderCanvas,
       loadingVisible,
       handleClose,
       handleSave,
       handleFocus,
       handleBlur,
-      handleCustom,
       handleNext,
       handleObject,
     };
@@ -320,80 +325,50 @@ export default {
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
 
-.increment-wrapper {
-  @include pos-absolute(0, 0, 0, 0, 1000);
-
-  .loading-box {
-    @include pos-absolute(0, 0, 0, 0, 1002);
-    @include flex-row-center;
-    background-color: rgba(255, 255, 255, 0.9);
-  }
-  .increment-blank {
-    @include glass;
-    @include pos-absolute(0, 0, 0, 0, 1001);
-    cursor: pointer;
-  }
-
-  .increment-text {
-    @include pos-absolute(auto, 0, 0, 0, 1002);
-    border-radius: 10px 10px 0 0;
-    background-color: #ffffff;
-
-    .close-icon {
-      @include pos-absolute(20px, auto, auto, 20px, 1004);
-      cursor: pointer;
-    }
-
-    .text-wrapper {
-      padding: 0 10px 10px 10px;
-      .text__preview {
-        @include flex-col-center;
-        // @include pos-absolute(-120px, auto, auto, 50%, 1003);
-        // transform: translate3d(-50%, 0, 0);
-        width: 100%;
-        .text-canvas-box {
-          @include card-shadow-lg;
-          margin-top: -50px;
-          padding: 5px;
-          background-color: #ffffff;
-          line-height: 0;
-          // overflow: hidden;
-          img {
-            display: block;
-            width: 200px;
-            line-height: 1;
-          }
-        }
-      }
-
-      .custom-font-board {
-        // max-height: 160px;
-        // overflow-x: hidden;
-        // overflow-y: auto;
-        /*解决ios上滑动不流畅*/
-        -webkit-overflow-scrolling: touch;
-        &::-webkit-scrollbar {
-          // 滚动条
-          // display: none;
-          width: 4px;
-        }
-
-        .board-item {
-          margin-top: 10px;
-        }
-
-        .desc {
-          font-size: 16px;
-          color: $title-color;
-          font-weight: 600;
-          margin-bottom: 10px;
+.increment-text {
+  .text-wrapper {
+    padding: 0 10px 10px 10px;
+    .text__preview {
+      @include flex-col-center;
+      width: 100%;
+      .text-canvas-box {
+        @include card-shadow-lg;
+        padding: 5px;
+        background-color: #ffffff;
+        line-height: 0;
+        // overflow: hidden;
+        img {
+          display: block;
+          width: 200px;
+          line-height: 1;
         }
       }
     }
 
-    .add-to-cart {
-      margin-top: 20px;
+    .custom-font-board {
+      /*解决ios上滑动不流畅*/
+      -webkit-overflow-scrolling: touch;
+      &::-webkit-scrollbar {
+        // 滚动条
+        // display: none;
+        width: 4px;
+      }
+
+      .board-item {
+        margin-top: 10px;
+      }
+
+      .desc {
+        font-size: 16px;
+        color: $title-color;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
     }
+  }
+
+  .add-to-cart {
+    margin-top: 20px;
   }
 }
 </style>

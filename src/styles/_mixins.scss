@@ -72,7 +72,7 @@
 }
 
 // 毛玻璃
-@mixin glass($color:#000000, $alpha: 0.8) {
+@mixin glass($color:#000000, $alpha: 0.6) {
     background-color: rgba($color: $color, $alpha: $alpha);
     backdrop-filter : blur(10px);
 }

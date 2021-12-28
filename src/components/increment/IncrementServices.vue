@@ -4,11 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-24 14:02:15
+ * @LastEditTime: 2021-12-28 17:10:58
 -->
 <template>
   <!-- 增量服务 -->
-  <transition name="slide-bottom-fade" mode="out-in">
+  <!-- <transition name="slide-bottom-fade" mode="out-in"> -->
     <!-- 单双面 -->
     <increment-slides
       v-if="slidesVisible"
@@ -25,6 +25,7 @@
     <increment-background-list
       v-else-if="backgroundVisible"
       :data="incrementData"
+      :textData="textData"
       :customBodyPreviewURL="previewBody"
       :sizeList="config.sizeList"
       :dollarSign="dollarSign"
@@ -46,6 +47,7 @@
       @close="handleClose"
       @next="nextIncrement"
       @render="setPreviewWidthBackground"
+      @back="back"
     />
 
     <!-- 推荐 -->
@@ -82,7 +84,7 @@
       @close="handleClose"
       @next="nextIncrement"
     />
-  </transition>
+  <!-- </transition> -->
 </template>
 
 <script>
@@ -152,6 +154,7 @@ export default {
       queue,
       hasIncrement,
       incrementData,
+      textData,
       slidesVisible,
       publishVisible,
       backgroundVisible,
@@ -170,6 +173,7 @@ export default {
       changeText,
       changePublish,
       next,
+      back
     } = useIncrement(props);
 
     /* 
@@ -225,6 +229,7 @@ export default {
       queue,
       hasIncrement,
       incrementData,
+      textData,
       slidesVisible,
       publishVisible,
       backgroundVisible,
@@ -244,6 +249,7 @@ export default {
       changeText,
       changePublish,
       next,
+      back,
       nextIncrement,
     };
   },

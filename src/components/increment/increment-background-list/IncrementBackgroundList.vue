@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-27 14:17:41
+ * @LastEditTime: 2021-12-28 14:34:01
 -->
 <template>
   <div class="background-wrapper">
@@ -24,10 +24,13 @@
     </div>
 
     <div class="background-medium">
-
       <!-- 分组 -->
       <div class="side-navigation-box">
-        <SideNavigation :list="backgroundGroupList" :value="groupIndex" @change="changeGroup"/>
+        <SideNavigation
+          :list="backgroundGroupList"
+          :value="groupIndex"
+          @change="changeGroup"
+        />
       </div>
 
       <!-- 背景 -->
@@ -67,6 +70,14 @@
       :groupIndex="groupIndex"
       :changeGroup="changeGroup"
     ></query-bar>
+
+    <!-- 文字确认弹窗 -->
+    <text-confirm-box
+      v-model:visible="textConfirmVisible"
+      :data="textData"
+      :dollarSign="dollarSign"
+      @custom="handleCustom"
+    ></text-confirm-box>
   </div>
 </template>
 
@@ -82,6 +93,7 @@ import BackgroundList from "./BackgroundList.vue";
 import QueryBar from "./QueryBar.vue";
 import FilterButton from "./FilterButton.vue";
 import SideNavigation from "./SideNavigation.vue";
+import TextConfirmBox from "./TextConfirmBox.vue";
 
 import useBackground from "../../../composables/useBackground";
 import useComposing from "../../../composables/useComposing";
@@ -99,7 +111,8 @@ export default {
     BackgroundList,
     QueryBar,
     FilterButton,
-    SideNavigation
+    SideNavigation,
+    TextConfirmBox,
   },
 
   props: {
@@ -126,6 +139,13 @@ export default {
     sizeList: {
       type: Array,
       default: 0,
+    },
+    textData: {
+      type: Object,
+      default: () => {},
+    },
+    dollarSign: {
+      type: String,
     },
   },
 
@@ -178,10 +198,15 @@ export default {
     // 加载层
     const loadingVisible = ref(false);
 
+    // 文字确认弹窗
+    const textConfirmVisible = ref(false);
+
+    // 卡片信息
+    let cardInfo = null;
     // 选择卡片
     async function handleCardSelect(params) {
       // 设置背景渲染参数
-      context.emit("saveBgRenderParams", params);
+      cardInfo = params;
 
       // 获取渲染好的背景信息
       loadingVisible.value = true;
@@ -189,6 +214,21 @@ export default {
       context.emit("change", bgInfo);
       loadingVisible.value = false;
 
+      // 如果有文字则出现文字弹窗
+      if (props.textData) {
+        textConfirmVisible.value = true;
+      } else {
+        // 前往下一步
+        context.emit("next");
+      }
+    }
+
+    // 定制
+    function handleCustom(flag) {
+      context.emit("saveBgRenderParams", {
+        ...cardInfo,
+        customTextVisible: flag,
+      });
       // 前往下一步
       context.emit("next");
     }
@@ -233,7 +273,7 @@ export default {
     // 是否有搜索条件
     const isExistQueryBar = computed(() => {
       return sizeList.value.length > 1 || composingList.value.length > 1;
-    })
+    });
 
     return {
       pluginText,
@@ -256,7 +296,9 @@ export default {
       listBox,
       queryVisible,
       handleOpenToggle,
-      isExistQueryBar
+      isExistQueryBar,
+      textConfirmVisible,
+      handleCustom,
     };
   },
 };

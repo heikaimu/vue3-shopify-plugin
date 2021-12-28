@@ -4,15 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 14:03:02
+ * @LastEditTime: 2021-12-28 16:41:14
 -->
 <template>
-  <div class="increment-wrapper">
-    <div class="increment-blank" @click="handleClose"></div>
+  <base-glass-dialog :visible="true" @close="handleClose">
     <div class="increment-slides">
-      <span class="close-icon">
-        <base-icon icon="close" @click="handleClose" id="icon_close_1" />
-      </span>
       <div class="preview-image">
         <img :src="customBodyPreviewURL" alt="" />
       </div>
@@ -48,7 +44,7 @@
         >
       </div>
     </div>
-  </div>
+  </base-glass-dialog>
 </template>
 
 <script>
@@ -56,14 +52,20 @@ import { inject } from "vue";
 
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
+import BaseGlassDialog from "../../../base/BaseGlassDialog.vue";
 
 export default {
   components: {
+    BaseGlassDialog,
     BaseButton,
     BaseIcon,
   },
 
   props: {
+    visible: {
+      type: Boolean,
+      default: false,
+    },
     customBodyPreviewURL: {
       type: String,
       default: "",
@@ -120,93 +122,75 @@ export default {
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
 
-.increment-wrapper {
-  @include pos-absolute(0, 0, 0, 0, 1000);
-  .increment-blank {
-    @include glass;
-    @include pos-absolute(0, 0, 0, 0, 1001);
-    cursor: pointer;
+.increment-slides {
+  .preview-image {
+    @include flex-row-center;
+    width: 100%;
+    height: 200px;
+    img {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+    }
   }
 
-  .increment-slides {
-    @include pos-absolute(auto, 0, 0, 0, 1002);
-    border-radius: 10px 10px 0 0;
-    background-color: #ffffff;
-
-    .close-icon {
-      @include pos-absolute(20px, auto, auto, 20px, 1003);
-      cursor: pointer;
+  .custom-title {
+    padding: 0 10px 10px 10px;
+    text-align: center;
+    font-size: 15px;
+    color: $title-color;
+    strong {
+      font-weight: 600;
+      color: $theme-color;
     }
+  }
 
-    .preview-image {
-      @include flex-row-center;
+  .slides-selector {
+    padding: 20px;
+    .slides-selector__item {
       width: 100%;
-      height: 200px;
-      img {
-        width: 180px;
-        height: 180px;
-        object-fit: contain;
-      }
-    }
-
-    .custom-title {
-      padding: 0 10px 10px 10px;
+      padding: 20px 0;
+      border-radius: 6px;
+      box-shadow: 0 0 0 1px $theme-color;
       text-align: center;
-      font-size: 15px;
-      color: $title-color;
-      strong {
-        font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      & + .slides-selector__item {
+        margin-top: 15px;
+      }
+
+      .text {
+        font-size: 16px;
         color: $theme-color;
       }
-    }
-
-    .slides-selector {
-      padding: 20px;
-      .slides-selector__item {
-        width: 100%;
-        padding: 20px 0;
-        border-radius: 6px;
+      .price {
+        @include pos-absolute(-13px, auto, auto, 50%);
+        transform: translateX(-50%);
+        font-size: 12px;
+        font-weight: 700;
+        padding: 5px 10px;
+        color: $theme-color;
+        background-color: #fff;
+        border-radius: 12px;
         box-shadow: 0 0 0 1px $theme-color;
-        text-align: center;
-        cursor: pointer;
-        position: relative;
-        & + .slides-selector__item {
-          margin-top: 15px;
-        }
+      }
+      .icon {
+        @include pos-absolute(50%, 20px, auto, auto);
+        transform: translate3d(0, -50%, 0);
+      }
 
+      &.active {
+        background-color: rgba(255, 83, 58, 0.1);
+        box-shadow: 0 0 0 2px $theme-color;
         .text {
-          font-size: 16px;
-          color: $theme-color;
-        }
-        .price {
-          @include pos-absolute(-13px, auto, auto, 50%);
-          transform: translateX(-50%);
-          font-size: 12px;
-          font-weight: 700;
-          padding: 5px 10px;
-          color: $theme-color;
-          background-color: #fff;
-          border-radius: 12px;
-          box-shadow: 0 0 0 1px $theme-color;
-        }
-        .icon {
-          @include pos-absolute(50%, 20px, auto, auto);
-          transform: translate3d(0, -50%, 0);
-        }
-
-        &.active {
-          background-color: rgba(255, 83, 58, 0.1);
-          box-shadow: 0 0 0 2px $theme-color;
-          .text {
-            font-weight: 600;
-          }
+          font-weight: 600;
         }
       }
     }
+  }
 
-    .add-to-cart {
-      padding: 0 20px 20px 20px;
-    }
+  .add-to-cart {
+    padding: 0 20px 20px 20px;
   }
 }
 </style>

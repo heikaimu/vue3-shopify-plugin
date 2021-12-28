@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-24 13:35:21
+ * @LastEditTime: 2021-12-28 17:10:33
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -22,6 +22,7 @@ export default function useIncrement(props) {
     bgRenderParams: null,
     queue: [],
     index: -1,
+    textData: null
   })
 
   // 设置初始化值
@@ -165,6 +166,7 @@ export default function useIncrement(props) {
           text: value ? value.text : ''
         }
       });
+      state.textData = data;
     }
   }
   const textVisible = computed(() => {
@@ -234,6 +236,11 @@ export default function useIncrement(props) {
     state.index += 1;
   }
 
+  // 上一个增量
+  function back() {
+    state.index -= 1;
+  }
+
   // 通用修改值
   function _changeValue(name, val) {
     const currentItem = state.queue.find(item => item.name === name);
@@ -269,6 +276,7 @@ export default function useIncrement(props) {
     changeText,
     changePublish,
     setIncrementIndex,
-    next
+    next,
+    back
   }
 }

@@ -112,13 +112,9 @@ function removeID(newID) {
 @import "src/styles/_mixins.scss";
 
 .product-wrapper {
-  height: 250px;
-  position: relative;
   .single-product-card {
     width: 100%;
     @include flex-col-center;
-    @include pos-absolute(-120px, auto, auto, 50%, 1003);
-    transform: translate3d(-50%, 0, 0);
     .single-product__img {
       @include card-shadow-lg;
       display: block;
