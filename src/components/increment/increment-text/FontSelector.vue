@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:13:47
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-16 10:28:33
+ * @LastEditTime: 2021-12-27 15:04:50
 -->
 <template>
   <ul class="font__list">
@@ -95,7 +95,7 @@ export default {
   margin-left: -4px;
   margin-right: -4px;
   .font__item {
-    width: 20%;
+    flex: 1;
     box-sizing: border-box;
     padding: 4px;
     .font__text {

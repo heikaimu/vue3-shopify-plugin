@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:13:55
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-30 10:33:24
+ * @LastEditTime: 2021-12-27 15:05:46
 -->
 <template>
   <ul class="color__list">
@@ -93,7 +93,7 @@ export default {
   .color__item {
     flex: 1;
     box-sizing: border-box;
-    padding: 4px;
+    padding: 0 4px;
     .color__text {
       @include flex-row-center;
       height: 30px;

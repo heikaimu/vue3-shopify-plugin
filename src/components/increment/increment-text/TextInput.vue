@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:16:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-24 14:04:30
+ * @LastEditTime: 2021-12-27 15:08:07
 -->
 <template>
   <!-- 输入框 -->
@@ -19,6 +19,8 @@
       placeholder="custom text"
       v-model="value"
       @input="handleInput"
+      @focus="focus"
+      @blur="blur"
     />
   </div>
 </template>
@@ -36,6 +38,12 @@ export default {
       type: String,
       default: "15",
     },
+  },
+
+  emits: {
+    focus: null,
+    blur: null,
+    'update:text': null
   },
 
   setup(props, context) {
@@ -59,10 +67,22 @@ export default {
       context.emit("update:text", state.value);
     }
 
+    // 聚焦
+    function focus() {
+      context.emit('focus');
+    }
+
+    // 失去焦点
+    function blur() {
+      context.emit('blur');
+    }
+
     return {
       ...toRefs(state),
       pluginText,
       handleInput,
+      focus,
+      blur,
     };
   },
 };

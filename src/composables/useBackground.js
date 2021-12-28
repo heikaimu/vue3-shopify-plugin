@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 14:27:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-21 17:09:52
+ * @LastEditTime: 2021-12-27 14:42:32
  */
 import { reactive, toRefs, onMounted, nextTick, computed } from "vue";
 import { debounce } from "lodash";
@@ -48,16 +48,20 @@ export default function useBackground(props) {
     // 构造分组
     const groupKeys = [...new Set(list.map(item => item.group))].filter(key => Boolean(key));
     state.backgroundGroupList = groupKeys.map(key => {
+      const curList = list.filter(item => item.group === key)
       return {
         name: key,
-        list: list.filter(item => item.group === key)
+        list: curList,
+        count: curList.length
       }
     })
 
     // 没有分组的添加进other分组
+    const otherList = list.filter(item => !item.group)
     const otherGroup = {
       name: 'other',
-      list: list.filter(item => !item.group)
+      list: otherList,
+      count: otherList.length
     }
 
     if (otherGroup.list.length > 0) {

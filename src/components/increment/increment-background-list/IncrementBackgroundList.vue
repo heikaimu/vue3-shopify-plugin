@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-24 10:19:52
+ * @LastEditTime: 2021-12-27 14:17:41
 -->
 <template>
   <div class="background-wrapper">
@@ -14,50 +14,29 @@
         mainText="Background Chose"
         icon="arrowLeft"
         @close="handleClose"
-      />
+      >
+        <filter-button
+          v-if="isExistQueryBar"
+          :active="queryVisible"
+          @click="handleOpenToggle"
+        ></filter-button>
+      </base-header>
     </div>
 
     <div class="background-medium">
-      <div class="query-box">
-        <div class="query-operations" @click="handleOpenToggle">
-          <div class="query-open">
-            <svg v-if="!queryVisible" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" class="style-scope yt-icon" style="pointer-events: none; display: block; width: 100%; height: 100%;"><g class="style-scope yt-icon"><path d="M15,17h6v1h-6V17z M11,17H3v1h8v2h1v-2v-1v-2h-1V17z M14,8h1V6V5V3h-1v2H3v1h11V8z M18,5v1h3V5H18z M6,14h1v-2v-1V9H6v2H3v1 h3V14z M10,12h11v-1H10V12z" class="style-scope yt-icon"></path></g></svg>
-            <svg v-else viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" class="style-scope yt-icon" style="pointer-events: none; display: block; width: 100%; height: 100%;"><g class="style-scope yt-icon"><path d="M15,17h6v2h-6V17z M11,17H3v2h8v2h2v-6h-2V17z M14,9h2V3h-2v2H3v2h11V9z M18,5v2h3V5H18z M6,15h2V9H6v2H3v2h3V15z M10,13h11 v-2H10V13z" class="style-scope yt-icon"></path></g></svg>
-          </div>
-          <p class="text">Filter</p>
-        </div>
 
-        <div class="query-content" v-show="queryVisible">
-          <query-item
-            :data="sizeList"
-            :activeIndex="sizeIndex"
-            :title="pluginText.size"
-            @change="changeSizeIndex"
-          ></query-item>
-
-          <query-item
-            :data="composingList"
-            :activeIndex="composingIndex"
-            :title="pluginText.composing"
-            selector="title"
-            @change="changeComposingIndex"
-          ></query-item>
-
-          <query-item
-            :data="backgroundGroupList"
-            :activeIndex="groupIndex"
-            :title="pluginText.background_group"
-            selector="name"
-            @change="changeGroup"
-          ></query-item>
-        </div>
+      <!-- 分组 -->
+      <div class="side-navigation-box">
+        <SideNavigation :list="backgroundGroupList" :value="groupIndex" @change="changeGroup"/>
       </div>
 
       <!-- 背景 -->
-      <div class="list-box" >
+      <div class="list-box">
         <div ref="listBox">
           <background-list
             :data="backgroundList"
+            :backgroundImage="data.backgroundImage"
+            :overlayImage="data.overlayImage"
             :size="currentSize"
             :composingList="composingList"
             :composingIndex="composingIndex"
@@ -69,24 +48,46 @@
         </div>
       </div>
     </div>
+
+    <!-- loading -->
+    <div class="loading-box" v-if="loadingVisible">
+      <BaseLoadingDot />
+    </div>
+
+    <!-- 搜索条件 -->
+    <query-bar
+      v-model:visible="queryVisible"
+      :sizeList="sizeList"
+      :sizeIndex="sizeIndex"
+      :changeSizeIndex="changeSizeIndex"
+      :composingList="composingList"
+      :composingIndex="composingIndex"
+      :changeComposingIndex="changeComposingIndex"
+      :backgroundGroupList="backgroundGroupList"
+      :groupIndex="groupIndex"
+      :changeGroup="changeGroup"
+    ></query-bar>
   </div>
 </template>
 
 <script>
-import { inject, ref, watch } from "vue";
+import { inject, ref, watch, computed } from "vue";
 import BaseHeader from "../../../base/BaseHeader.vue";
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
 import BaseNotice from "../../../base/BaseNotice.vue";
 import BaseLoadingDot from "../../../base/BaseLoadingDot.vue";
 
-import QueryItem from "./QueryItem.vue";
-
 import BackgroundList from "./BackgroundList.vue";
+import QueryBar from "./QueryBar.vue";
+import FilterButton from "./FilterButton.vue";
+import SideNavigation from "./SideNavigation.vue";
 
 import useBackground from "../../../composables/useBackground";
 import useComposing from "../../../composables/useComposing";
 import useSize from "../../../composables/useSize";
+
+import ImageAndTextRenderer from "../../../utils/ImageAndTextRenderer";
 
 export default {
   components: {
@@ -96,7 +97,9 @@ export default {
     BaseNotice,
     BaseLoadingDot,
     BackgroundList,
-    QueryItem,
+    QueryBar,
+    FilterButton,
+    SideNavigation
   },
 
   props: {
@@ -130,6 +133,7 @@ export default {
     change: null,
     close: null,
     next: null,
+    saveBgRenderParams: null,
   },
 
   setup(props, context) {
@@ -144,19 +148,17 @@ export default {
       backgroundIndex,
       backgroundName,
       changeBackgroundIndex,
-      getBackgroundImage,
       changeGroup,
     } = useBackground(props);
 
     const listBox = ref(null);
-    watch(() => groupIndex.value, () => {
-      listBox && listBox.value.scrollIntoView({ block: "start", inline: "nearest" });
-    })
-
-    // 选择卡片
-    function handleCardSelect() {
-      alert();
-    }
+    watch(
+      () => groupIndex.value,
+      () => {
+        listBox &&
+          listBox.value.scrollIntoView({ block: "start", inline: "nearest" });
+      }
+    );
 
     // 排版
     const {
@@ -164,12 +166,58 @@ export default {
       composingIndex,
       composingName,
       changeComposingIndex,
-      getComposing,
     } = useComposing(props);
 
     // 尺寸
     const { sizeList, sizeIndex, sizeName, currentSize, changeSizeIndex } =
       useSize(props);
+
+    // 图片文字渲染器
+    const imageAndTextRenderer = new ImageAndTextRenderer("virtualCanvas");
+
+    // 加载层
+    const loadingVisible = ref(false);
+
+    // 选择卡片
+    async function handleCardSelect(params) {
+      // 设置背景渲染参数
+      context.emit("saveBgRenderParams", params);
+
+      // 获取渲染好的背景信息
+      loadingVisible.value = true;
+      const bgInfo = await getBackgroundInfo(params);
+      context.emit("change", bgInfo);
+      loadingVisible.value = false;
+
+      // 前往下一步
+      context.emit("next");
+    }
+
+    // 渲染带背景的预览图
+    function getBackgroundInfo(params) {
+      return new Promise((resolve, reject) => {
+        imageAndTextRenderer.init(params).then(() => {
+          const url = imageAndTextRenderer.toDataURL();
+          resolve({
+            preview: url,
+            params: {
+              size: {
+                index: sizeIndex.value,
+                title: sizeName.value,
+              },
+              background: {
+                index: backgroundIndex.value,
+                title: backgroundName.value,
+              },
+              composing: {
+                index: composingIndex.value,
+                title: composingName.value,
+              },
+            },
+          });
+        });
+      });
+    }
 
     // 关闭
     function handleClose() {
@@ -181,6 +229,11 @@ export default {
     function handleOpenToggle() {
       queryVisible.value = !queryVisible.value;
     }
+
+    // 是否有搜索条件
+    const isExistQueryBar = computed(() => {
+      return sizeList.value.length > 1 || composingList.value.length > 1;
+    })
 
     return {
       pluginText,
@@ -198,10 +251,12 @@ export default {
       composingList,
       composingIndex,
       changeComposingIndex,
+      loadingVisible,
+      handleCardSelect,
+      listBox,
       queryVisible,
       handleOpenToggle,
-      handleCardSelect,
-      listBox
+      isExistQueryBar
     };
   },
 };
@@ -215,37 +270,28 @@ export default {
   @include pos-absolute(0, 0, 0, 0, 1000);
   @include flex-col-sb;
   background-color: #ffffff;
-  -webkit-user-select: none; 
-  -moz-user-select: none; 
+  -webkit-user-select: none;
+  -moz-user-select: none;
+
+  .loading-box {
+    @include pos-absolute(0, 0, 0, 0, 1001);
+    @include flex-row-center;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
 
   .background-top {
     width: 100%;
   }
 
   .background-medium {
-    @include flex-col-sb;
     width: 100%;
     flex: 1;
     overflow: hidden;
-    .query-box {
-      width: 100%;
-      padding: 10px;
-      border-bottom: 10px solid #f2f2f2;
+    display: flex;
 
-      .query-operations {
-        @include flex-row-center;
-        cursor: pointer;
-
-        .text {
-          font-size: 14px;
-          color: #333333;
-          font-weight: 600;
-        }
-      }
-      .query-open {
-        width: 30px;
-        height: 30px;
-      }
+    .side-navigation-box {
+      flex: 0 0 86px;
+      height: 100%;
     }
 
     .list-box {
@@ -253,7 +299,7 @@ export default {
       width: 100%;
       background-color: #f9f9f9;
       box-sizing: border-box;
-      padding: 0 11px;
+      padding: 10px;
       overflow-x: hidden;
       overflow: auto;
 

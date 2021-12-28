@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-13 14:10:03
+ * @LastEditTime: 2021-12-24 13:35:21
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -19,7 +19,7 @@ export default function useIncrement(props) {
     originalProductOptionsValue: {},
     productOptionsValue: {},
     previewWidthBackground: null,
-    textRenderParams: null,
+    bgRenderParams: null,
     queue: [],
     index: -1,
   })
@@ -137,28 +137,24 @@ export default function useIncrement(props) {
   function changeBackground(val) {
     setPreviewWidthBackground(val.preview);
 
-    state.textRenderParams = val.textRenderParams;
-
     // 修改背景
     _changeValue('background', val.params);
 
     // 修改颜色
     _changeProductOptionsValue('Color', val.params.background.title);
-
-    // 只有当尺寸属于SKU中的一个的情况才能修改SKU
-    // const sizeIndex = (config.skuList || []).findIndex(item => item.options.Size === val.params.size.title);
-    // if (sizeIndex > -1) {
-    //   _changeProductOptionsValue('Size', val.params.size.title)
-    // };
   }
   function setPreviewWidthBackground(url) {
     state.previewWidthBackground = url;
+  }
+  // 背景渲染参数
+  function saveBgRenderParams(val) {
+    state.bgRenderParams = val;
   }
   // ===============背景 END===============
 
   // ===============文字===============
   function initText(text) {
-    const {visible, data, value} = text;
+    const { visible, data, value } = text;
     if (text && visible) {
       state.queue.push({
         name: "text",
@@ -268,6 +264,7 @@ export default function useIncrement(props) {
     changeVip,
     changeRelatedProduct,
     changeBackground,
+    saveBgRenderParams,
     setPreviewWidthBackground,
     changeText,
     changePublish,

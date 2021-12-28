@@ -4,11 +4,18 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-23 15:11:40
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-24 10:19:39
+ * @LastEditTime: 2021-12-27 14:40:59
 -->
 <template>
-  <div class="card-box" @click="handleSelectCard">
-    <img class="bg-img" :src="url" alt="" @load="imgLoaded" />
+  <div class="card-box" :style="cardStyle" @click="handleSelectCard">
+    <img
+      class="bg-img"
+      :width="originRenderMap.size.width"
+      :height="originRenderMap.height"
+      :src="url"
+      alt=""
+      @load="imgLoaded"
+    />
     <img
       v-for="(item, index) in position"
       :key="index"
@@ -17,6 +24,13 @@
       :style="getStyle(item)"
       alt=""
     />
+    <img
+      v-if="backgroundImage"
+      class="background-image"
+      :src="backgroundImage"
+      alt=""
+    />
+    <img v-if="overlayImage" class="overlay-image" :src="overlayImage" alt="" />
   </div>
 </template>
 
@@ -49,15 +63,25 @@ export default {
       type: String,
       default: "",
     },
+    // 单独设置的背景图，如果存在，则当前列表的大图为遮盖图
+    backgroundImage: {
+      type: String,
+      default: "",
+    },
+    // 单独设置的遮盖图
+    overlayImage: {
+      type: String,
+      default: "",
+    },
   },
 
   emits: {
-    cardSelect: null
+    cardSelect: null,
   },
 
   setup(props, context) {
     const state = reactive({
-      position: []
+      position: [],
     });
 
     // 背景图，当尺寸存在的时候去取对应的背景图
@@ -71,11 +95,34 @@ export default {
       return "";
     });
 
+    // 渲染信息
+    const originRenderMap = computed(() => {
+      if (props.size) {
+        const curStyle = (props.composingList || [])[props.composingIndex];
+        const curSize = curStyle.list.find((item) => item.name === props.size);
+        return curSize;
+      }
+      return {
+        position: [],
+        size: {},
+      };
+    });
+
+    // 卡片样式
+    const cardStyle = computed(() => {
+      const { size } = originRenderMap.value;
+      if (size.width && size.height) {
+        return {
+          paddingBottom: `${size.height / size.width * 100}%`
+        }
+      } else {
+        return {}
+      }
+    })
+
     // 获取排版信息
     function getComposing(cardWidth) {
-      const curStyle = (props.composingList || [])[props.composingIndex];
-      const curSize = curStyle.list.find((item) => item.name === props.size);
-      const { position, size } = curSize;
+      const { position, size } = originRenderMap.value;
       const originalWidth = size.width || 0;
       const scale = cardWidth / originalWidth;
 
@@ -108,6 +155,7 @@ export default {
         left: `${left}px`,
         top: `${top}px`,
         width: `${width}px`,
+        zIndex: props.backgroundImage ? 97 : 100,
       };
     }
 
@@ -117,7 +165,53 @@ export default {
     }
 
     function handleSelectCard() {
-      context.emit('cardSelect')
+      const params = renderParams();
+      context.emit("cardSelect", params);
+    }
+
+    function renderParams() {
+      const { position, size } = originRenderMap.value;
+
+      const params = {
+        width: size.width,
+        height: size.height,
+        layerList: [],
+      };
+
+      if (props.backgroundImage) {
+        params.backgroundImage = {
+          url: props.backgroundImage,
+        };
+        params.overlayImage = {
+          url: url.value,
+        };
+      } else if (props.overlayImage) {
+        params.backgroundImage = {
+          url: url.value,
+        };
+        params.overlayImage = {
+          url: props.overlayImage,
+        };
+      } else {
+        params.backgroundImage = {
+          url: url.value,
+        };
+      }
+
+      for (const item of position) {
+        if (item.type === "image") {
+          params.layerList.push({
+            ...item,
+            url: props.customBodyPreviewURL,
+          });
+        } else {
+          params.layerList.push({
+            ...item,
+          });
+        }
+      }
+
+      return params;
     }
 
     return {
@@ -125,21 +219,38 @@ export default {
       url,
       getStyle,
       imgLoaded,
-      handleSelectCard
+      handleSelectCard,
+      originRenderMap,
+      cardStyle
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
+@import "src/styles/_variables.scss";
+@import "src/styles/_mixins.scss";
 .card-box {
+  width: 100%;
+  height: 0;
   position: relative;
   overflow: hidden;
+  background-color: #e7e7e7;
   cursor: pointer;
   .bg-img {
     width: 100%;
     display: block;
     line-height: 1;
+    position: relative;
+    z-index: 99;
+  }
+
+  .background-image {
+    @include pos-absolute(0, 0, 0, 0, 96);
+  }
+
+  .overlay-image {
+    @include pos-absolute(0, 0, 0, 0, 106);
   }
 
   .body-img {
@@ -149,7 +260,6 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 999;
     transform-origin: center center;
   }
 }

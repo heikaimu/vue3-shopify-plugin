@@ -4,87 +4,101 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-16 10:37:37
+ * @LastEditTime: 2021-12-27 16:46:10
 -->
 <template>
   <div class="increment-wrapper">
     <div class="increment-blank" @click="handleClose"></div>
+
+    <!-- 文字定制内容 -->
     <div class="increment-text">
       <span class="close-icon">
         <base-icon icon="close" @click="handleClose" />
       </span>
 
-      <div class="text-wrapper">
+      <!-- 文字定制 -->
+      <div class="text-wrapper" v-if="customVisible">
         <div class="text__preview">
           <div class="text-canvas-box">
             <canvas id="textCanvas" v-if="shouldRender"></canvas>
             <img v-else :src="data.url" alt="" srcset="" />
           </div>
+
+          <operations-bar @handle="handleObject"></operations-bar>
         </div>
 
-        <div class="custom-font-board">
-          <p class="desc">{{ data.desc }}</p>
-          <!-- 开关 -->
-          <text-switch
-            v-model:activeValue="activeValue"
-            :price="data.price"
-            :dollarSign="dollarSign"
-          ></text-switch>
-
-          <template v-if="activeValue === 'yes'">
-            <!-- 输入 -->
+        <!-- 定制信息 -->
+        <div class="custom-font-board" v-if="customTextVisible">
+          <!-- 输入 -->
+          <div class="board-item">
             <text-input
               v-model:text="customText.text"
               :size="data.size"
+              @focus="handleFocus"
+              @blur="handleBlur"
             ></text-input>
+          </div>
 
-            <base-tabs v-if="shouldRender" v-model:activeName="activeName">
-              <!-- 字体选择 -->
-              <base-tab-pane :label="pluginText.font_family" name="family">
-                <font-selector
-                  v-model:fontFamily="customText.fontFamily"
-                ></font-selector>
-              </base-tab-pane>
+          <!-- 字体选择 -->
+          <div class="board-item">
+            <font-selector
+              v-model:fontFamily="customText.fontFamily"
+            ></font-selector>
+          </div>
 
-              <!-- 色彩选择 -->
-              <base-tab-pane :label="pluginText.font_color" name="color">
-                <color-selector
-                  v-model:color="customText.color"
-                ></color-selector>
-              </base-tab-pane>
-            </base-tabs>
-          </template>
+          <!-- 色彩选择 -->
+          <div class="board-item">
+            <color-selector v-model:color="customText.color"></color-selector>
+          </div>
+        </div>
+
+        <div class="add-to-cart">
+          <base-button
+            type="primary"
+            size="large"
+            @click="handleSave"
+            id="button_add_to_cart_6"
+            >{{ addToCartText }}</base-button
+          >
         </div>
       </div>
 
-      <div class="add-to-cart">
-        <base-button
-          type="primary"
-          size="large"
-          @click="handleNext(true)"
-          id="button_add_to_cart_6"
-          >{{ addToCartText }}</base-button
-        >
-      </div>
+      <!-- 文字定制询问 -->
+      <confirm-box
+        v-else
+        :data="data"
+        :price="data.price"
+        :dollarSign="dollarSign"
+        @custom="handleCustom"
+      ></confirm-box>
+    </div>
+
+    <!-- loading -->
+    <div class="loading-box" v-if="loadingVisible">
+      <BaseLoadingDot />
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, computed, inject, onMounted, watch } from "vue";
+import { reactive, ref, toRefs, computed, inject, nextTick, watch } from "vue";
 
 import BaseNotice from "../../../base/BaseNotice.vue";
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
 import BaseTabs from "../../../base/BaseTabs.vue";
 import BaseTabPane from "../../../base/BaseTabPane.vue";
+import BaseLoadingDot from "../../../base/BaseLoadingDot.vue";
 import TextSwitch from "./TextSwitch.vue";
 import TextInput from "./TextInput.vue";
 import FontSelector from "./FontSelector.vue";
 import ColorSelector from "./ColorSelector.vue";
+import ConfirmBox from "./ConfirmBox.vue";
+import OperationsBar from "./OperationsBar.vue";
 
-import CanvasRenderer from "../../../utils/canvasRenderer";
-import { debounce } from "lodash";
+import ImageAndTextRenderer from "../../../utils/ImageAndTextRenderer";
+
+const CANVAS_WIDTH = 230;
 
 export default {
   components: {
@@ -93,10 +107,13 @@ export default {
     BaseIcon,
     BaseTabs,
     BaseTabPane,
+    BaseLoadingDot,
     TextSwitch,
     TextInput,
     FontSelector,
     ColorSelector,
+    ConfirmBox,
+    OperationsBar,
   },
 
   props: {
@@ -107,11 +124,8 @@ export default {
     value: {
       type: [Object, String],
     },
-    previewWidthBackground: {
-      type: String,
-      default: "",
-    },
-    textRenderParams: {
+    // 背景渲染信息
+    bgRenderParams: {
       type: Object,
     },
     dollarSign: {
@@ -127,122 +141,104 @@ export default {
   },
 
   setup(props, context) {
-    const { value } = props;
-    const { text, fontFamily, color } = value;
+    // 国际化
+    const pluginText = inject("pluginText");
 
-    // 图片渲染器
+    // 文字信息
+    const { text, fontFamily, color } = props.value;
     const state = reactive({
-      activeValue: text ? "yes" : "no",
       activeName: "",
       customText: {
         text: "",
         fontFamily: fontFamily || "Satisfy",
         color: color || "#111111",
       },
+      customVisible: false,
+      customTextVisible: false,
     });
 
-    // 国际化
-    const pluginText = inject("pluginText");
+    // 渲染器实列
+    let renderInstance = null;
+    let zoomRecord = 1;
 
-    const addToCartText = computed(() => {
-      if (state.activeValue === "yes" && state.customText.text !== "") {
-        return `${pluginText.add_cart} +${props.dollarSign}${props.data.price}`;
-      } else {
-        return `${pluginText.add_cart}`;
+    /**
+     * 开始定制，回填文字
+     * @param {Boolean} flag - 是否显示文字定制信息
+     */
+    async function handleCustom(flag) {
+      // 定制内容显示
+      state.customVisible = true;
+      state.customTextVisible = flag;
+      await nextTick();
+
+      // 文字回填
+      state.customText.text = props.value.text || "";
+
+      // 创建实列
+      if (!renderInstance) {
+        renderInstance = new ImageAndTextRenderer("textCanvas");
       }
-    });
 
-    // 是否需要渲染canvas，只有当选择了背景才渲染
-    const shouldRender = computed(() => {
-      return Boolean(props.textRenderParams);
-    });
+      // 回填图层
+      renderParamsBindText();
+      zoomRecord = CANVAS_WIDTH / props.bgRenderParams.width;
+      renderInstance.init(props.bgRenderParams, zoomRecord);
+    }
 
-    onMounted(() => {
-      // 渲染
-      shouldRender.value && renderer();
-      // 回填文字
-      setTimeout(() => {
-        state.customText.text = props.value.text || '';
-      }, 1000);
-    });
+    // 图层移动
+    function handleObject(command) {
+      const items = renderInstance.getObjects();
+      const image = items.find((item) => item.type === "image");
+      renderInstance.handleObject(image, command);
+    }
 
+    // 给文字渲染层加上文字内容，颜色，字体
+    function renderParamsBindText() {
+      props.bgRenderParams.layerList.forEach((item) => {
+        if (item.type === "text") {
+          item.text = state.customText.text;
+          item.fontFamily = state.customText.fontFamily;
+          item.color = state.customText.color;
+        }
+      });
+    }
+
+    // 文字聚焦
+    function handleFocus() {
+      const items = renderInstance.getObjects();
+      const textItems = items.filter((item) => item.type === "text");
+      const firstText = textItems[0];
+      const x = firstText.left;
+      const y = firstText.top;
+      // const textLength = Math.max(Math.floor(inputMaxSize / 2), text.length);
+      const textWidth = firstText.originalWidth * 1.5;
+      const zoom = CANVAS_WIDTH / textWidth;
+      renderInstance.zoomToPoint(x, y, zoom);
+    }
+
+    // 文字失去焦点
+    function handleBlur() {
+      renderInstance.resetZoom();
+    }
+
+    // 文字及文字属性更新后
     watch(state.customText, () => {
-      shouldRender.value && rendererText();
+      updateText();
       context.emit("change", state.customText);
     });
 
-    watch(
-      () => state.activeValue,
-      (val) => {
-        if (val === "no") {
-          state.customText.text = "";
-        }
-      }
-    );
-
-    // canvas
-    let fabricInstance = null;
-    function setCanvasInstance() {
-      if (!fabricInstance) {
-        const { size } = props.textRenderParams;
-        const currentWidth = 200;
-        const currentHeight = (currentWidth * size.height) / size.width;
-        fabricInstance = new CanvasRenderer("textCanvas", {
-          width: currentWidth,
-          height: currentHeight,
-          scale: currentWidth / size.width,
-        });
-      }
-    }
-
-    // 渲染器
-    const renderer = debounce(function () {
-      setCanvasInstance();
-
-      const { size, layerList } = props.textRenderParams;
-      const backgroundImage = props.previewWidthBackground;
-      const textLayerList = layerList.map((item) => {
-        return {
-          ...item,
-          text: state.customText.text,
-          fontFamily: state.customText.fontFamily,
-          color: state.customText.color,
-          selectable: false,
-          // stroke: "#ffffff",
-          // strokeWidth: 1,
-        };
-      });
-      const layers = [
-        {
-          url: backgroundImage,
-          left: 0,
-          top: 0,
-          ...size,
-          selectable: false,
-          type: "background",
-        },
-        ...textLayerList,
-      ];
-      fabricInstance.render({
-        layers,
-      });
-    }, 300);
-
     // 更新文字
-    const rendererText = debounce(function () {
-      const items = fabricInstance.getObjects();
+    function updateText() {
+      const items = renderInstance.getObjects();
       const textItems = items.filter((item) => item.type === "text");
       const { text, fontFamily, color } = state.customText;
 
       for (const item of textItems) {
         const inputMaxSize = props.data.size ? Number(props.data.size) : 15;
-
         const length = Math.max(Math.floor(inputMaxSize / 2), text.length);
+        const fontSize = (2.5 * item.originalWidth) / length;
 
-        const fontSize =
-          ((2.5 * item.originalWidth) / length) * fabricInstance.scale;
-
-        fabricInstance.update({
+        renderInstance.update({
           layer: item,
           options: {
             fontSize,
@@ -252,6 +248,49 @@ export default {
           },
         });
       }
+    }
+
+    // loading
+    const loadingVisible = ref(false);
+
+    // 保存定制
+    async function handleSave() {
+      if (shouldRender.value) {
+        loadingVisible.value = true;
+        const url = await getOriginalSizePreview();
+        loadingVisible.value = false;
+
+        context.emit("render", url);
+      }
+      handleNext();
+    }
+
+    // 下一步
+    function handleNext() {
+      context.emit("next");
+    }
+
+    // 获取原始尺寸的预览图
+    function getOriginalSizePreview() {
+      return new Promise((resolve, reject) => {
+        renderInstance.savePreview(1).then((url) => {
+          resolve(url);
+        });
+      });
+    }
+
+    // 按钮文字
+    const addToCartText = computed(() => {
+      if (state.customTextVisible && state.customText.text !== "") {
+        return `${pluginText.add_cart} +${props.dollarSign}${props.data.price}`;
+      } else {
+        return `${pluginText.add_cart}`;
+      }
+    });
+
+    // 是否需要渲染canvas，只有当选择了背景才渲染
+    const shouldRender = computed(() => {
+      return Boolean(props.bgRenderParams);
     });
 
     // 关闭
@@ -259,22 +298,19 @@ export default {
       context.emit("close");
     }
 
-    // 前往下一步
-    function handleNext() {
-      if (shouldRender.value) {
-        const url = fabricInstance.toDataURL(600);
-        context.emit("render", url);
-      }
-      context.emit("next");
-    }
-
     return {
       ...toRefs(state),
       pluginText,
       addToCartText,
       shouldRender,
+      loadingVisible,
       handleClose,
+      handleSave,
+      handleFocus,
+      handleBlur,
+      handleCustom,
       handleNext,
+      handleObject,
     };
   },
 };
@@ -286,6 +322,12 @@ export default {
 
 .increment-wrapper {
   @include pos-absolute(0, 0, 0, 0, 1000);
+
+  .loading-box {
+    @include pos-absolute(0, 0, 0, 0, 1002);
+    @include flex-row-center;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
   .increment-blank {
     @include glass;
     @include pos-absolute(0, 0, 0, 0, 1001);
@@ -303,18 +345,18 @@ export default {
     }
 
     .text-wrapper {
-      padding: 0 20px 20px 20px;
+      padding: 0 10px 10px 10px;
       .text__preview {
         @include flex-col-center;
         // @include pos-absolute(-120px, auto, auto, 50%, 1003);
         // transform: translate3d(-50%, 0, 0);
         width: 100%;
-        padding-bottom: 15px;
         .text-canvas-box {
           @include card-shadow-lg;
           margin-top: -50px;
           padding: 5px;
           background-color: #ffffff;
+          line-height: 0;
           // overflow: hidden;
           img {
             display: block;
@@ -336,6 +378,10 @@ export default {
           width: 4px;
         }
 
+        .board-item {
+          margin-top: 10px;
+        }
+
         .desc {
           font-size: 16px;
           color: $title-color;
@@ -346,7 +392,7 @@ export default {
     }
 
     .add-to-cart {
-      padding: 0 20px 20px 20px;
+      margin-top: 20px;
     }
   }
 }

@@ -42,7 +42,7 @@ const sizeMap = {
     fontWeight: props.blod,
   },
   large: {
-    height: "60px",
+    height: "54px",
     borderRadius: "6px",
     fontSize: "18px",
     fontWeight: props.blod,

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-24 11:05:24
+ * @LastEditTime: 2021-12-24 14:02:15
 -->
 <template>
   <!-- 增量服务 -->
@@ -30,6 +30,7 @@
       :dollarSign="dollarSign"
       v-bind="$attrs"
       @change="changeBackground"
+      @saveBgRenderParams="saveBgRenderParams"
       @close="handleClose"
       @next="nextIncrement"
     />
@@ -39,8 +40,7 @@
       v-else-if="textVisible"
       :data="incrementData.data"
       :value="incrementData.value"
-      :previewWidthBackground="previewWidthBackground"
-      :textRenderParams="textRenderParams"
+      :bgRenderParams="bgRenderParams"
       :dollarSign="dollarSign"
       @change="changeText"
       @close="handleClose"
@@ -149,13 +149,13 @@ export default {
     const {
       productOptionsValue,
       previewWidthBackground,
-      textRenderParams,
       queue,
       hasIncrement,
       incrementData,
       slidesVisible,
       publishVisible,
       backgroundVisible,
+      bgRenderParams,
       textVisible,
       relatedProductVisible,
       vipVisible,
@@ -165,6 +165,7 @@ export default {
       changeRelatedProduct,
       setIncrementIndex,
       changeBackground,
+      saveBgRenderParams,
       setPreviewWidthBackground,
       changeText,
       changePublish,
@@ -221,7 +222,6 @@ export default {
     return {
       productOptionsValue,
       previewWidthBackground,
-      textRenderParams,
       queue,
       hasIncrement,
       incrementData,
@@ -238,6 +238,8 @@ export default {
       setIncrementIndex,
       handleClose,
       changeBackground,
+      bgRenderParams,
+      saveBgRenderParams,
       setPreviewWidthBackground,
       changeText,
       changePublish,
