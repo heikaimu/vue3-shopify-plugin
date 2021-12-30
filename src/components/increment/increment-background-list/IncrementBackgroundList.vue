@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 18:09:31
+ * @LastEditTime: 2021-12-30 16:23:15
 -->
 <template>
   <div class="background-wrapper">
@@ -218,18 +218,21 @@ export default {
       if (props.textData) {
         textConfirmVisible.value = true;
       } else {
-        // 前往下一步
-        context.emit("next");
+        toNextStep(false);
       }
     }
 
     // 定制
     function handleCustom(flag) {
+      toNextStep(flag);
+    }
+
+    // 下一步
+    function toNextStep(flag) {
       context.emit("saveBgRenderParams", {
         ...cardInfo,
         customTextVisible: flag,
       });
-      // 前往下一步
       context.emit("next");
     }
 

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 16:41:14
+ * @LastEditTime: 2021-12-30 15:00:16
 -->
 <template>
   <base-glass-dialog :visible="true" @close="handleClose">
@@ -16,25 +16,10 @@
         {{ pluginText.slide_text1 }}<br />{{ pluginText.slide_text2 }}
         <strong>+{{ dollarSign }}5.00</strong>
       </p>
-      <div class="slides-selector">
-        <div
-          v-for="(item, index) in data"
-          :id="`button_slide_${value}`"
-          class="slides-selector__item"
-          :class="{ active: item.value === value }"
-          :key="index"
-          @click="handleSelect(item)"
-        >
-          <span class="text">{{ item.title }}</span>
-          <span class="price" v-if="item.price"
-            >+{{ dollarSign }}{{ item.price }}</span
-          >
-          <span class="icon" v-if="item.active">
-            <base-icon icon="check" color="#ff533a" />
-          </span>
-        </div>
-      </div>
-      <div class="add-to-cart">
+      
+      <base-button-radio :options="list" v-model:value="curValue" @change="handleSelect"></base-button-radio>
+
+      <div class="bottom-button">
         <base-button
           type="primary"
           size="large"
@@ -48,17 +33,17 @@
 </template>
 
 <script>
-import { inject } from "vue";
+import { reactive, toRefs, inject, onMounted, watch } from "vue";
 
+import BaseButtonRadio from "../../../base/BaseButtonRadio.vue";
 import BaseButton from "../../../base/BaseButton.vue";
-import BaseIcon from "../../../base/BaseIcon.vue";
 import BaseGlassDialog from "../../../base/BaseGlassDialog.vue";
 
 export default {
   components: {
+    BaseButtonRadio,
     BaseGlassDialog,
     BaseButton,
-    BaseIcon,
   },
 
   props: {
@@ -93,9 +78,36 @@ export default {
     // 国际化
     const pluginText = inject("pluginText");
 
+    const state = reactive({
+      list: [],
+      curValue: ''
+    })
+
+
+    watch(() => props.value, (val) => {
+      state.curValue = val;
+    }, {
+      immediate: true
+    })
+
+    onMounted(() => {
+      state.list = getList();
+    })
+
     // 选择面
-    function handleSelect(item) {
-      context.emit("change", item.value);
+    function handleSelect(val) {
+      context.emit("change", val);
+    }
+
+    // 获取列表
+    function getList() {
+      return props.data.map(item => {
+        return {
+          label: item.title,
+          value: item.value,
+          price: item.price ? `+${props.dollarSign}${item.price}` : "",
+        }
+      });
     }
 
     // 关闭
@@ -109,6 +121,7 @@ export default {
     }
 
     return {
+      ...toRefs(state),
       pluginText,
       handleSelect,
       handleClose,
@@ -123,6 +136,7 @@ export default {
 @import "src/styles/_mixins.scss";
 
 .increment-slides {
+  padding: 0 20px 20px 20px;
   .preview-image {
     @include flex-row-center;
     width: 100%;
@@ -187,10 +201,6 @@ export default {
         }
       }
     }
-  }
-
-  .add-to-cart {
-    padding: 0 20px 20px 20px;
   }
 }
 </style>

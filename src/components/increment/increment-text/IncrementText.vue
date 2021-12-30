@@ -4,10 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 17:13:28
+ * @LastEditTime: 2021-12-30 16:36:40
 -->
 <template>
-  <base-glass-dialog :visible="true" :loading="loadingVisible" @close="handleClose">
+  <base-glass-dialog
+    :visible="true"
+    :loading="loadingVisible"
+    @close="handleClose"
+  >
     <!-- 文字定制内容 -->
     <div class="increment-text">
       <!-- 文字定制 -->
@@ -125,7 +129,20 @@ export default {
     const pluginText = inject("pluginText");
 
     // 是否显示定制文字
-    const customTextVisible = ref(props.bgRenderParams.customTextVisible);
+    const customTextVisible = computed(() => {
+      if (props.bgRenderParams) {
+        return props.bgRenderParams.customTextVisible;
+      } else {
+        return true;
+      }
+    });
+
+    // 是否需要渲染canvas，只有当选择了背景才渲染，否则直接展示预设的图片
+    const shouldRenderCanvas = computed(() => {
+      return Boolean(props.bgRenderParams);
+    });
+
+    // 是否需要渲染canvas
 
     // 文字信息
     const { text, fontFamily, color } = props.value;
@@ -136,11 +153,6 @@ export default {
         fontFamily: fontFamily || "Satisfy",
         color: color || "#111111",
       },
-    });
-
-    // 是否需要渲染canvas，只有当选择了背景才渲染，否则直接展示预设的图片
-    const shouldRenderCanvas = computed(() => {
-      return Boolean(props.bgRenderParams);
     });
 
     onMounted(() => {
@@ -210,6 +222,10 @@ export default {
 
     // 文字聚焦后放大画布
     function handleFocus() {
+      if (!shouldRenderCanvas.value) {
+        return;
+      }
+
       const items = renderInstance.getObjects();
       const textItems = items.filter((item) => item.type === "text");
       const firstText = textItems[0];
@@ -223,12 +239,19 @@ export default {
 
     // 文字失去焦点还原画布
     function handleBlur() {
+      if (!shouldRenderCanvas.value) {
+        return;
+      }
+
       renderInstance.resetZoom();
     }
 
     // 文字及文字属性更新后
     watch(state.customText, () => {
-      renderText();
+      if (shouldRenderCanvas.value) {
+        renderText();
+      }
+
       updateTextInfo();
     });
 

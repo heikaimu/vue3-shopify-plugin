@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:16:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-27 15:08:07
+ * @LastEditTime: 2021-12-29 17:21:25
 -->
 <template>
   <!-- 输入框 -->
@@ -35,7 +35,7 @@ export default {
       default: "",
     },
     size: {
-      type: String,
+      type: [String, Number],
       default: "15",
     },
   },

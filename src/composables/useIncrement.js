@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 17:10:33
+ * @LastEditTime: 2021-12-30 16:21:36
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -30,12 +30,20 @@ export default function useIncrement(props) {
     // 初始化商品选项
     state.originalProductOptionsValue = { ...config.productOptionsValue || {} };
     state.productOptionsValue = config.productOptionsValue || {};
+
     // 增量
-    const { slides, publish, background, text, relatedProduct, vip } = config.currentProductTypeConfig;
+    const { slides, nightLight, publish, background, text, relatedProduct, vip } = config.currentProductTypeConfig;
+
+    if (!isManagementUse) {
+      // 夜灯底座
+      initNightLight(nightLight);
+    }
+
     // 背景
     initBackground(background);
+
     // 文字
-    initText(text);
+    initText(text, background);
 
     // 如果不是后台使用则添加下面增量
     if (!isManagementUse) {
@@ -73,19 +81,27 @@ export default function useIncrement(props) {
 
   // ===============单双面===============
   function initSlides(slides) {
-    if (slides && slides.visible) {
-      const initSlide = language === 'us' ? 'double' : 'Doppelte';
-      state.queue.push({
-        name: "slides",
-        data: toRaw(slides.data),
-        value: initSlide
-      });
-      changeSlides(initSlide);
+    if (!slides) {
+      return;
     }
+
+    if (!slides.visible) {
+      return;
+    }
+
+    const initSlide = language === 'us' ? 'double' : 'Doppelte';
+    state.queue.push({
+      name: "slides",
+      data: toRaw(slides.data),
+      value: initSlide
+    });
+    changeSlides(initSlide);
   }
+
   const slidesVisible = computed(() => {
     return currentIncrement.value && currentIncrement.value.name === 'slides';
   })
+
   function changeSlides(val) {
     _changeValue('slides', val);
     let typeVal = '';
@@ -101,36 +117,77 @@ export default function useIncrement(props) {
 
   // ===============推荐===============
   function initPublish(publish) {
-    if (publish && publish.visible) {
-      state.queue.push({
-        name: "publish",
-        data: toRaw(publish.data),
-        value: {}
-      });
+    if (!publish) {
+      return;
     }
+
+    if (!publish.visible) {
+      return;
+    }
+
+    state.queue.push({
+      name: "publish",
+      data: toRaw(publish.data),
+      value: {}
+    });
   }
+
   const publishVisible = computed(() => {
     return currentIncrement.value && currentIncrement.value.name === 'publish';
   })
+
   // 修改推荐值如果是尺寸，并且插件内有可选尺寸，需要重新渲染预览图
   function changePublish(data) {
     _changeProductOptionsValue(data.key, data.sku.title);
   }
   // ===============推荐 END===============
 
+  // ===============夜灯底座===============
+  function initNightLight(nightLight) {
+    if (!nightLight) {
+      return;
+    }
+
+    if (!nightLight.visible) {
+      return;
+    }
+
+    state.queue.push({
+      name: 'nightLight',
+      data: toRaw(nightLight.data),
+      value: '7-Color Touch'
+    })
+  }
+
+  const nightLightVisible = computed(() => {
+    return currentIncrement.value && currentIncrement.value.name === 'nightLight';
+  })
+
+  function changeNightLight(val) {
+    _changeValue('nightLight', val);
+  }
+  // ===============夜灯底座 END===============
+
   // ===============背景===============
   function initBackground(background) {
-    if (background && background.visible) {
-      state.queue.push({
-        name: "background",
-        backgroundList: toRaw(background.data),
-        composingList: toRaw(background.composingList),
-        sizeList: toRaw(background.size),
-        overlayImage: background.overlayImage,
-        backgroundImage: background.backgroundImage,
-        value: {}
-      });
+    if (!background) {
+      return;
     }
+
+
+    if (!background.visible) {
+      return;
+    }
+
+    state.queue.push({
+      name: "background",
+      backgroundList: toRaw(background.data),
+      composingList: toRaw(background.composingList),
+      sizeList: toRaw(background.size),
+      overlayImage: background.overlayImage,
+      backgroundImage: background.backgroundImage,
+      value: {}
+    });
   }
   const backgroundVisible = computed(() => {
     return currentIncrement.value && currentIncrement.value.name === 'background';
@@ -154,9 +211,14 @@ export default function useIncrement(props) {
   // ===============背景 END===============
 
   // ===============文字===============
-  function initText(text) {
+  function initText(text, background) {
+    // 如果有背景，添加虚拟文字产品，方便进入背景定制步骤
+    if (!text) {
+      return;
+    }
+
     const { visible, data, value } = text;
-    if (text && visible) {
+    if (visible) {
       state.queue.push({
         name: "text",
         data: toRaw(data),
@@ -167,11 +229,33 @@ export default function useIncrement(props) {
         }
       });
       state.textData = data;
+    } else {
+      if (background && background.visible) {
+        const virtualData = {
+          desc: '',
+          id: '',
+          price: '',
+          url: ''
+        }
+        state.queue.push({
+          name: "text",
+          data: virtualData,
+          value: {
+            color: '',
+            fontFamily: '',
+            text: ''
+          }
+        });
+        // state.textData = virtualData;
+      }
     }
+
   }
+
   const textVisible = computed(() => {
     return currentIncrement.value && currentIncrement.value.name === 'text';
   })
+
   function changeText(val) {
     _changeValue('text', val);
   }
@@ -179,17 +263,25 @@ export default function useIncrement(props) {
 
   // ===============关联产品===============
   function initRelatedProduct(relatedProduct) {
-    if (relatedProduct && relatedProduct.visible) {
-      state.queue.push({
-        name: "relatedProduct",
-        data: toRaw(relatedProduct.data),
-        value: []
-      });
+    if (!relatedProduct) {
+      return;
     }
+
+    if (!relatedProduct.visible) {
+      return;
+    }
+
+    state.queue.push({
+      name: "relatedProduct",
+      data: toRaw(relatedProduct.data),
+      value: []
+    });
   }
+
   const relatedProductVisible = computed(() => {
     return currentIncrement.value && currentIncrement.value.name === 'relatedProduct';
   })
+
   function changeRelatedProduct(val) {
     _changeValue('relatedProduct', val);
   }
@@ -197,17 +289,25 @@ export default function useIncrement(props) {
 
   // ===============VIP===============
   function initVip(vip) {
-    if (vip && vip.visible) {
-      state.queue.push({
-        name: "vip",
-        data: toRaw(vip.data),
-        value: false
-      });
+    if (!vip) {
+      return;
     }
+
+    if (!vip.visible) {
+      return;
+    }
+
+    state.queue.push({
+      name: "vip",
+      data: toRaw(vip.data),
+      value: false
+    });
   }
+
   const vipVisible = computed(() => {
     return currentIncrement.value && currentIncrement.value.name === 'vip';
   })
+
   function changeVip(val) {
     _changeValue('vip', val);
   }
@@ -261,6 +361,7 @@ export default function useIncrement(props) {
     hasIncrement,
     incrementData,
     slidesVisible,
+    nightLightVisible,
     publishVisible,
     backgroundVisible,
     textVisible,
@@ -268,6 +369,7 @@ export default function useIncrement(props) {
     vipVisible,
     isLastIncrement,
     changeSlides,
+    changeNightLight,
     changeVip,
     changeRelatedProduct,
     changeBackground,

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 18:16:20
+ * @LastEditTime: 2021-12-30 13:55:35
 -->
 <template>
   <!-- 增量服务 -->
@@ -19,6 +19,22 @@
       @change="changeSlides"
       @close="handleClose"
       @next="nextIncrement"
+    />
+
+    <!-- 夜灯底座 -->
+    <increment-night-light
+      v-else-if="nightLightVisible"
+      :data="incrementData.data"
+      :value="incrementData.value"
+      :customBodyPreviewURL="previewBody"
+      :sizeList="config.sizeList"
+      :composingList="config.composingList"
+      :backgroundList="config.backgroundList"
+      :dollarSign="dollarSign"
+      @change="changeNightLight"
+      @close="handleClose"
+      @next="nextIncrement"
+      @saveBgRenderParams="saveBgRenderParams"
     />
 
     <!-- 背景图 -->
@@ -93,6 +109,7 @@
 import { watch, toRaw } from "vue";
 
 import IncrementSlides from "./increment-slides/IncrementSlides.vue";
+import IncrementNightLight from "./increment-night-light/IncrementNightLight.vue";
 import IncrementBackgroundList from "./increment-background-list/IncrementBackgroundList.vue";
 import IncrementRelatedProduct from "./increment-related-product/IncrementRelatedProduct.vue";
 import IncrementVip from "./increment-vip/IncrementVip.vue";
@@ -104,6 +121,7 @@ import useIncrement from "../../composables/useIncrement";
 export default {
   components: {
     IncrementSlides,
+    IncrementNightLight,
     IncrementBackgroundList,
     IncrementRelatedProduct,
     IncrementVip,
@@ -170,6 +188,7 @@ export default {
       incrementData,
       textData,
       slidesVisible,
+      nightLightVisible,
       publishVisible,
       backgroundVisible,
       bgRenderParams,
@@ -186,6 +205,7 @@ export default {
       setPreviewWidthBackground,
       changeText,
       changePublish,
+      changeNightLight,
       next,
       back,
     } = useIncrement(props);
@@ -245,6 +265,7 @@ export default {
       incrementData,
       textData,
       slidesVisible,
+      nightLightVisible,
       publishVisible,
       backgroundVisible,
       textVisible,
@@ -262,6 +283,7 @@ export default {
       setPreviewWidthBackground,
       changeText,
       changePublish,
+      changeNightLight,
       next,
       back,
       nextIncrement,
