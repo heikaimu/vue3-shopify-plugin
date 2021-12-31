@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-31 10:46:42
+ * @LastEditTime: 2021-12-31 13:27:31
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -80,6 +80,7 @@ export default function useIncrement(props) {
   })
 
   // ===============单双面===============
+  let slidesKeyName = '';
   function initSlides(slides) {
     if (!slides) {
       return;
@@ -88,6 +89,9 @@ export default function useIncrement(props) {
     if (!slides.visible) {
       return;
     }
+
+    // keyName
+    slidesKeyName = slides.keyName || 'Type';
 
     const initSlide = slides.data[0].value;
     state.queue.push({
@@ -104,7 +108,7 @@ export default function useIncrement(props) {
 
   function changeSlides(val) {
     _changeValue('slides', val);
-    _changeProductOptionsValue('Type', val);
+    _changeProductOptionsValue(slidesKeyName, val);
   }
   // ===============单双面 END===============
 
