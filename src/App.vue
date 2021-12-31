@@ -18,7 +18,7 @@
     <div class="right">
       <MinimePillow
         :config="config"
-        language="us"
+        language="de"
         :isManagementUse="false"
         :sizeActiveName="sizeActiveName"
         :backgroundActiveName="backgroundActiveName"
@@ -42,7 +42,7 @@ import axios from "axios";
 import { configMock } from "./mock/config";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
-const WEBSITE = "M";
+const WEBSITE = "MD";
 
 import products from "../products/index";
 

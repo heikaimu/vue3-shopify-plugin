@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-31 10:52:55
+ * @LastEditTime: 2021-12-31 13:25:18
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -71,6 +71,7 @@ export default function useIncrement(props) {
   })
 
   // ===============单双面===============
+  let slidesKeyName = '';
   function initSlides(slides) {
     if (!slides) {
       return;
@@ -79,6 +80,9 @@ export default function useIncrement(props) {
     if (!slides.visible) {
       return;
     }
+
+    // keyName
+    slidesKeyName = slides.keyName || 'Type';
 
     const initSlide = slides.data[0].value;
     state.queue.push({
@@ -95,7 +99,7 @@ export default function useIncrement(props) {
 
   function changeSlides(val) {
     _changeValue('slides', val);
-    _changeProductOptionsValue('Type', val);
+    _changeProductOptionsValue(slidesKeyName, val);
   }
   // ===============单双面 END===============
 
@@ -147,10 +151,10 @@ export default function useIncrement(props) {
     _changeProductOptionsValue('Color', val.params.background.title);
 
     // 只有当尺寸属于SKU中的一个的情况才能修改SKU
-    // const sizeIndex = (config.skuList || []).findIndex(item => item.options.Size === val.params.size.title);
-    // if (sizeIndex > -1) {
-    //   _changeProductOptionsValue('Size', val.params.size.title)
-    // };
+    const sizeIndex = (config.skuList || []).findIndex(item => item.options.Size === val.params.size.title);
+    if (sizeIndex > -1) {
+      _changeProductOptionsValue('Size', val.params.size.title)
+    };
   }
   function setPreviewWidthBackground(url) {
     state.previewWidthBackground = url;
