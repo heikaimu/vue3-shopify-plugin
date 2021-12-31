@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-30 16:21:36
+ * @LastEditTime: 2021-12-31 10:46:42
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -89,7 +89,7 @@ export default function useIncrement(props) {
       return;
     }
 
-    const initSlide = language === 'us' ? 'double' : 'Doppelte';
+    const initSlide = slides.data[0].value;
     state.queue.push({
       name: "slides",
       data: toRaw(slides.data),
@@ -104,14 +104,7 @@ export default function useIncrement(props) {
 
   function changeSlides(val) {
     _changeValue('slides', val);
-    let typeVal = '';
-    if (language === 'us') {
-      typeVal = val === 'double' ? "Double Side" : "Single Side";
-    }
-    if (language === 'de') {
-      typeVal = val === 'Doppelte' ? "Doppelte Seite" : "Einzelne Seite";
-    }
-    _changeProductOptionsValue('Type', typeVal);
+    _changeProductOptionsValue('Type', val);
   }
   // ===============单双面 END===============
 

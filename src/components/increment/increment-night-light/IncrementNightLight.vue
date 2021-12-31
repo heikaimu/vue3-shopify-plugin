@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-29 14:54:07
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-30 15:00:58
+ * @LastEditTime: 2021-12-31 10:23:49
 -->
 <template>
   <base-glass-dialog :visible="true" @close="handleClose">
@@ -13,7 +13,10 @@
 
       <div class="preview-canvas-box">
         <div class="preview-canvas">
-          <canvas id="nightLightCanvas"></canvas>
+          <img class="gif" :src="backgroundGif" alt="" srcset="">
+          <div class="canvas">
+            <canvas id="nightLightCanvas"></canvas>
+          </div>
         </div>
       </div>
 
@@ -98,6 +101,7 @@ export default {
     const state = reactive({
       list: [],
       curValue: "",
+      backgroundGif: ''
     });
 
     watch(() => props.value, (val) => {
@@ -141,12 +145,13 @@ export default {
 
       // 渲染画布
       const zoomRecord = CANVAS_WIDTH / params.width;
-      renderInstance.init(params, zoomRecord);
+      renderInstance.init(params, zoomRecord, false);
     }
 
     // 获取当前的渲染参数
     function getCurRenderParams() {
       const curItem = state.list.find((item) => item.value === state.curValue);
+      state.backgroundGif = curItem.backgroundGif;
       return curItem ? curItem.renderParams : {};
     }
 
@@ -164,7 +169,7 @@ export default {
           label: item.name,
           value: item.key,
           price: item.price ? `+${props.dollarSign}${item.price}` : "",
-          url: renderParams.backgroundImage.url,
+          url: renderParams.backgroundImage.url
         };
       });
     }
@@ -263,6 +268,18 @@ export default {
     padding: 5px;
     background-color: #ffffff;
     line-height: 0;
+    position: relative;
+
+    .gif {
+      @include pos-absolute(0, 0, 0, 0, 1);
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .canvas {
+      position: relative;
+      z-index: 2;
+    }
   }
 }
 </style>

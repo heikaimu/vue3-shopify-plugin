@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-08 17:30:37
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-30 14:01:23
+ * @LastEditTime: 2021-12-31 10:08:28
  */
 import { fabric } from 'fabric';
 import 'fabric-customise-controls';
@@ -51,9 +51,11 @@ export default class ImageAndTextRenderer {
    * @param {object} params.backgroundImage - 背景图
    * @param {object} params.overlayImage - 遮盖图
    * @param {array} params.layerList - 图层
-   * @param {number} zoomLevel - 缩放倍数
+   * @param {number} [zoomLevel=1] - 缩放倍数
+   * @param {boolean} [drawBackground=true] - 是否绘制背景
+   * @param {boolean} [drawOverlay=true] - 是否绘制遮盖
    */
-  async init({ id, name, width, height, backgroundImage, overlayImage, layerList = [] }, zoomLevel = 1) {
+  async init({ id, name, width, height, backgroundImage, overlayImage, layerList = [] }, zoomLevel = 1, drawBackground = true, drawOverlay = true) {
     this.id = id;
 
     // 清空画布
@@ -82,10 +84,14 @@ export default class ImageAndTextRenderer {
     queue.push(this.renderLayers(layerList));
 
     // 背景
-    backgroundImage && queue.push(this.setBackgroundImage(backgroundImage));
+    if (drawBackground && backgroundImage) {
+      queue.push(this.setBackgroundImage(backgroundImage));
+    }
 
     // 遮盖
-    overlayImage && queue.push(this.setOverlayImage(overlayImage));
+    if (drawOverlay && overlayImage) {
+      queue.push(this.setOverlayImage(overlayImage));
+    }
 
     return new Promise((resolve, reject) => {
       Promise.all(queue).then((res) => {
