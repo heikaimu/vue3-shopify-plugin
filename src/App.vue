@@ -39,7 +39,7 @@ import MinimePillow from "./lib";
 
 import BaseImages from "./base/BaseImages.vue";
 import axios from "axios";
-import { configMock } from "./mock/config";
+// import { configMock } from "./mock/config";
 
 const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
 const WEBSITE = "M";
@@ -80,6 +80,7 @@ export default {
       state.activeType = item.product.type;
       state.config = await getConfig(item.product, item.publishSize);
       state.visible = true;
+      console.log(state.config)
     }
 
     return {
@@ -143,8 +144,8 @@ function getConfig(product, publishSize) {
         config.defaultSkin = "yellow";
         config.skuList = getSKUlist(product);
         config.productOptionsValue = {
-          Size: publishSize,
-          Type: 'Single Side'
+          // Size: publishSize,
+          Style: '7-Color Touch'
         };
         config.productPrice = '$300';
         config.productTitle = product.title;

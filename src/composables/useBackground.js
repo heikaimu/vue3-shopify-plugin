@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 14:27:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-27 14:42:32
+ * @LastEditTime: 2021-12-31 14:46:21
  */
 import { reactive, toRefs, onMounted, nextTick, computed } from "vue";
 import { debounce } from "lodash";
@@ -14,8 +14,8 @@ export default function useBackground(props) {
   const state = reactive({
     groupIndex: 0,
     backgroundGroupList: [],
+    backgroundIndex: -1,
     backgroundList: [],
-    backgroundIndex: -1
   })
 
   // 背景名
@@ -106,7 +106,7 @@ export default function useBackground(props) {
     }
   }
 
-  // 背景修改
+  // 背景修改,加了个防抖
   const changeBackgroundIndex = debounce(function (index) {
     state.backgroundIndex = index;
   }, 300)
@@ -138,14 +138,4 @@ export default function useBackground(props) {
     getBackgroundImage,
     changeGroup
   }
-}
-
-// 获取随机组名
-function randomGroup() {
-  const group = ['动漫', '古风', '抽象', '色彩', '漫威'];
-  return group[getRandomNum(0, 6)];
-}
-
-function getRandomNum(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
 }

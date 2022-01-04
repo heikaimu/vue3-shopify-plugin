@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-30 16:36:40
+ * @LastEditTime: 2022-01-04 10:19:24
 -->
 <template>
   <base-glass-dialog
@@ -151,7 +151,7 @@ export default {
       customText: {
         text: text,
         fontFamily: fontFamily || "Satisfy",
-        color: color || "#111111",
+        color: color || props.data.color,
       },
     });
 

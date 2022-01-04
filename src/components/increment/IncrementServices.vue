@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-30 13:55:35
+ * @LastEditTime: 2021-12-31 14:16:01
 -->
 <template>
   <!-- 增量服务 -->
@@ -40,7 +40,7 @@
     <!-- 背景图 -->
     <increment-background-list
       v-else-if="backgroundVisible"
-      :data="incrementData"
+      :data="incrementData.data"
       :textData="textData"
       :customBodyPreviewURL="previewBody"
       :sizeList="config.sizeList"
