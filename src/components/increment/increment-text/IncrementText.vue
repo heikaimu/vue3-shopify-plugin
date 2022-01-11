@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-04 10:19:24
+ * @LastEditTime: 2022-01-10 13:14:29
 -->
 <template>
   <base-glass-dialog
@@ -80,9 +80,32 @@ import ColorSelector from "./ColorSelector.vue";
 import OperationsBar from "./OperationsBar.vue";
 
 import ImageAndTextRenderer from "../../../utils/ImageAndTextRenderer";
-import { clearImageEdgeBlank } from "../../../utils/image";
 
 const CANVAS_WIDTH = 230;
+
+const defaultRenderParams = {
+  width: 416,
+  height: 300,
+  layerList: [
+    {
+      left: 197.41267485088065,
+      top: 150.6750131535189,
+      type: "text",
+      fontSize: 39.686235901623874,
+      scale: 1,
+      angle: 0,
+      width: 200.46599264482208,
+      active: false,
+      text: "",
+      fontFamily: "Satisfy",
+      color: "#ffffff",
+    },
+  ],
+  backgroundImage: {
+    url: "https://cdn.shopify.com/s/files/1/0343/0275/4948/files/1641547471301.jpg?v=1641547536",
+  },
+  customTextVisible: true,
+};
 
 export default {
   components: {
@@ -128,21 +151,36 @@ export default {
     // 国际化
     const pluginText = inject("pluginText");
 
+    // 如果有文字定制，但是又没有渲染信息，则使用默认的渲染信息
+    const bgRenderParams = computed(() => {
+      if (!props.data.live) {
+        return defaultRenderParams;
+      }
+      return props.bgRenderParams || defaultRenderParams;
+    });
+
     // 是否显示定制文字
     const customTextVisible = computed(() => {
-      if (props.bgRenderParams) {
-        return props.bgRenderParams.customTextVisible;
+      if (bgRenderParams.value) {
+        return bgRenderParams.value.customTextVisible;
       } else {
         return true;
       }
     });
 
-    // 是否需要渲染canvas，只有当选择了背景才渲染，否则直接展示预设的图片
+    // 是否需要渲染canvas，只有当选择了背景才渲染
     const shouldRenderCanvas = computed(() => {
-      return Boolean(props.bgRenderParams);
+      return Boolean(bgRenderParams.value);
     });
 
-    // 是否需要渲染canvas
+    // 是否刷新预览图
+    const shouldReplacePreview = computed(() => {
+      if (props.bgRenderParams && props.data.live) {
+        return true;
+      }
+
+      return false;
+    })
 
     // 文字信息
     const { text, fontFamily, color } = props.value;
@@ -151,7 +189,7 @@ export default {
       customText: {
         text: text,
         fontFamily: fontFamily || "Satisfy",
-        color: color || props.data.color,
+        color: color || props.data.color || '#ffffff',
       },
     });
 
@@ -184,8 +222,12 @@ export default {
 
       // 回填图层
       await recreateLayers();
-      zoomRecord = CANVAS_WIDTH / props.bgRenderParams.width;
-      renderInstance.init(props.bgRenderParams, zoomRecord);
+      zoomRecord = CANVAS_WIDTH / bgRenderParams.value.width;
+      renderInstance.init(bgRenderParams.value, zoomRecord).then(() => {
+        const items = renderInstance.getObjects();
+        const image = items.find((item) => item.type === "image");
+        renderInstance.setActiveObject(image);
+      });
       renderInstance.on("tlClick", () => {
         context.emit("close");
       });
@@ -207,16 +249,16 @@ export default {
 
     // 图层重构，给文字渲染层加上文字内容，颜色，字体，图片去边
     async function recreateLayers() {
-      for (let i = 0; i < props.bgRenderParams.layerList.length; i++) {
-        const item = props.bgRenderParams.layerList[i];
+      for (let i = 0; i < bgRenderParams.value.layerList.length; i++) {
+        const item = bgRenderParams.value.layerList[i];
         if (item.type === "text") {
           item.text = state.customText.text;
           item.fontFamily = state.customText.fontFamily;
           item.color = state.customText.color;
         }
-        if (item.type === "image") {
-          item.url = await clearImageEdgeBlank(item.url);
-        }
+        // if (item.type === "image") {
+        //   item.url = await clearImageEdgeBlank(item.url);
+        // }
       }
     }
 
@@ -288,7 +330,7 @@ export default {
 
     // 保存定制
     async function handleSave() {
-      if (shouldRenderCanvas.value) {
+      if (shouldReplacePreview.value) {
         loadingVisible.value = true;
         const url = await getOriginalSizePreview();
         loadingVisible.value = false;

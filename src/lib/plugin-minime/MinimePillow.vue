@@ -123,7 +123,7 @@ export default {
     修改主定制状态
     */
     async function confirmCustom(url) {
-      setPreview(url);
+      await setPreview(url);
       await nextTick();
       setCustomState(true);
     }

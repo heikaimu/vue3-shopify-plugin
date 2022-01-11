@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 16:55:22
+ * @LastEditTime: 2022-01-06 17:02:44
 -->
 <template>
   <base-glass-dialog :visible="true" @close="handleClose">
@@ -112,6 +112,10 @@ export default {
             props.productOptionsValue,
             item.publishName
           );
+          console.log(props.skuList)
+          console.log(props.productOptionsValue)
+          console.log(item.key)
+          console.log(item.publishName)
           return {
             ...item,
             sku,

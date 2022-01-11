@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-16 10:57:28
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-07 17:21:54
+ * @LastEditTime: 2022-01-10 11:12:30
  */
 import { ref, nextTick } from "vue";
 import CanvasRenderer from "../utils/canvasRenderer";
@@ -13,8 +13,8 @@ import {
   getAnnexList,
   getBody,
   getAvatar,
+  createVirtualBox
 } from "../utils/layers";
-import { getRandomID, loadImage } from "../utils/image";
 
 export default function useMultipleAvatarDIY(props) {
 
@@ -59,25 +59,25 @@ export default function useMultipleAvatarDIY(props) {
     }
 
     // 根据当前头的数量添加虚拟头
-    const avatarList = config.faceList.map((item, index) => {
-      const { left, top, angle, width } = item;
-      return {
-        left,
-        top,
-        angle,
-        width,
-        originX: "center",
-        originY: "bottom",
-        sort: 3,
-        customControls: true,
-        globalCompositeOperation: config.type === "hood" ? "source-atop" : "",
-        type: "vBox",
-        id: getRandomID(),
-        selectable: false,
-        name: `vBox${index}`,
-      };
-    });
+    let avatarList = _createAvatarLayer();
     list.push(...avatarList);
+    return list;
+  }
+
+  function _createAvatarLayer() {
+    const list = [];
+    config.faceList.forEach((item, index) => {
+      const avatarFile = props.selectFiles[index];
+
+      let layer;
+      if (avatarFile) {
+        layer = getAvatar(item, avatarFile.data.avatar, avatarFile.id);
+      } else {
+        layer = createVirtualBox(item);
+      }
+
+      list.push(layer);
+    })
     return list;
   }
 

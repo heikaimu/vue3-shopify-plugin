@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-31 14:16:01
+ * @LastEditTime: 2022-01-07 17:41:15
 -->
 <template>
   <!-- 增量服务 -->
@@ -43,7 +43,6 @@
       :data="incrementData.data"
       :textData="textData"
       :customBodyPreviewURL="previewBody"
-      :sizeList="config.sizeList"
       :dollarSign="dollarSign"
       :backgroundActiveName="backgroundActiveName"
       :composingActiveName="composingActiveName"
@@ -65,7 +64,7 @@
       @close="handleClose"
       @next="nextIncrement"
       @render="setPreviewWidthBackground"
-      @back="back"
+      @back="handleBack"
     />
 
     <!-- 推荐 -->
@@ -196,6 +195,7 @@ export default {
       relatedProductVisible,
       vipVisible,
       isLastIncrement,
+      isFirstIncrement,
       changeSlides,
       changeVip,
       changeRelatedProduct,
@@ -248,6 +248,15 @@ export default {
       context.emit("close", false);
     }
 
+    // 回退
+    function handleBack() {
+      if (isFirstIncrement.value) {
+        context.emit("close", false);
+      } else {
+        back();
+      }
+    }
+
     // 开始上传
     function handleSave() {
       context.emit("save", {
@@ -285,7 +294,7 @@ export default {
       changePublish,
       changeNightLight,
       next,
-      back,
+      handleBack,
       nextIncrement,
     };
   },

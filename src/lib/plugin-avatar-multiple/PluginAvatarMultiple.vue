@@ -95,7 +95,7 @@ export default {
     修改主定制状态
     */
     async function saveCustom({url, config}) {
-      setPreview(url);
+      await setPreview(url);
       setBodyConfig(config);
       await nextTick();
       setCustomState(true);

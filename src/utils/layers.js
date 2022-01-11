@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-24 11:03:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-16 16:51:47
+ * @LastEditTime: 2022-01-10 11:08:09
  */
 import { getRandomID } from './image';
 
@@ -88,6 +88,10 @@ function getAnnexList(config, skin, id) {
  * @returns
  */
 function getAvatarList(config, files) {
+  if (!files) {
+    return [];
+  }
+
   if (files.length === 0) {
     return [];
   }
@@ -125,6 +129,25 @@ function getAvatar(config, avatar, id) {
   };
 }
 
+function createVirtualBox(config) {
+  const { left, top, angle, width, type } = config;
+  return {
+    left,
+    top,
+    angle,
+    width,
+    originX: "center",
+    originY: "bottom",
+    sort: 3,
+    customControls: true,
+    globalCompositeOperation: type === "hood" ? "source-atop" : "",
+    type: "vBox",
+    id: getRandomID(),
+    selectable: false,
+    name: `vBox`,
+  }
+}
+
 /**
  * 获取SVG遮盖
  * @param {Object} config
@@ -150,5 +173,6 @@ export {
   getAnnexList,
   getAvatar,
   getAvatarList,
-  getSVG
+  getSVG,
+  createVirtualBox
 };

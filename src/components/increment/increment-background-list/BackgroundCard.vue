@@ -4,10 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-23 15:11:40
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-27 14:40:59
+ * @LastEditTime: 2022-01-06 17:16:39
 -->
 <template>
-  <div class="card-box" :style="cardStyle" @click="handleSelectCard">
+  <div class="card-box" :style="cardStyle" :id="`${active?'activeCard':''}`" @click="handleSelectCard">
     <img
       class="bg-img"
       :width="originRenderMap.size.width"
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed } from "vue";
+import { reactive, toRefs, computed, onMounted } from "vue";
 import { loadImage } from "../../../utils/image";
 export default {
   props: {

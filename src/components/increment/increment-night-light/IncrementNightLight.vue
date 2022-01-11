@@ -4,16 +4,16 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-29 14:54:07
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-31 14:04:26
+ * @LastEditTime: 2022-01-07 14:01:47
 -->
 <template>
   <base-glass-dialog :visible="true" @close="handleClose">
     <div class="night-light-wrapper">
-      <p class="night-title">night light station</p>
+      <p class="night-title">Choose A Style</p>
 
       <div class="preview-canvas-box">
         <div class="preview-canvas">
-          <img class="gif" :src="backgroundGif" alt="" srcset="">
+          <img class="gif" :src="backgroundGif" alt="" srcset="" />
           <div class="canvas">
             <canvas id="nightLightCanvas"></canvas>
           </div>
@@ -101,26 +101,29 @@ export default {
     const state = reactive({
       list: [],
       curValue: "",
-      backgroundGif: ''
+      backgroundGif: "",
     });
 
-    watch(() => props.value, (val) => {
-      state.curValue = val;
-    }, {
-      immediate: true
-    })
+    watch(
+      () => props.value,
+      (val) => {
+        state.curValue = val;
+      },
+      {
+        immediate: true,
+      }
+    );
 
     let renderInstance = null;
 
     onMounted(async () => {
+      // 获取列表
+      state.list = await getList();
 
       // 创建实列
       if (!renderInstance) {
         renderInstance = new ImageAndTextRenderer("nightLightCanvas", false);
       }
-
-      // 获取列表
-      state.list = await getList();
 
       // 渲染
       renderer();
@@ -128,7 +131,7 @@ export default {
 
     // 手动选择
     function handleChose(val) {
-      context.emit('change', val);
+      context.emit("change", val);
       renderer();
     }
 
@@ -157,19 +160,15 @@ export default {
 
     // 获取底座列表
     async function getList() {
-      const noEdgeBodyURL = await clearImageEdgeBlank(
-        props.customBodyPreviewURL
-      );
-
       return props.data.map((item) => {
-        const renderParams = getParams(item, noEdgeBodyURL);
+        const renderParams = getParams(item, props.customBodyPreviewURL);
         return {
           renderParams,
           ...item,
           label: item.name,
           value: item.key,
           price: item.price ? `+${props.dollarSign}${item.price}` : "",
-          url: renderParams.backgroundImage.url
+          url: item.navImage,
         };
       });
     }

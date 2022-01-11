@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 16:48:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 13:09:18
+ * @LastEditTime: 2022-01-10 09:51:26
  */
 
 /**
@@ -358,10 +358,8 @@ function loadImages(images) {
   const queue = images.map(url => {
     return loadImage(url);
   });
-  return new Promise((resolve) => {
-    Promise.all(queue).then(res => {
-      resolve(res);
-    });
+  return Promise.all(queue).then(res => {
+    return res;
   });
 }
 
@@ -463,6 +461,48 @@ function clearImageEdgeBlank(url, padding = 0) {
   });
 }
 
+/**
+ * 图片翻转
+ * @param {*} file - 图片，blob或者base64或者链接
+ * @param {*} type - 返回的类型，默认base64，可选blob
+ * @returns base64/blob
+ */
+function flipImage(file, type = 'base64') {
+  return new Promise((resolve, reject) => {
+    let url = '';
+
+    if (typeof file === 'object') {
+      url = getObjectUrl(file);
+    } else {
+      url = file;
+    }
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const image = new Image();
+    image.onload = function () {
+      canvas.width = image.width;
+      canvas.height = image.height;
+      ctx.translate(image.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(image, 0, 0, image.width, image.height);
+
+      const base64 = canvas.toDataURL('image/png', 0.9);
+      if (type === 'base64') {
+        resolve(base64);
+      } else {
+        resolve(dataURLtoBlob(base64));
+      }
+    };
+    image.onerror = function () {
+      reject('图片加载失败');
+    };
+    image.src = url;
+    image.crossOrigin = 'Anonymous';
+  });
+}
+
 export {
   getObjectUrl,
   dataURLtoBlob,
@@ -477,5 +517,6 @@ export {
   cropImage,
   loadImage,
   loadImages,
-  clearImageEdgeBlank
+  clearImageEdgeBlank,
+  flipImage
 };

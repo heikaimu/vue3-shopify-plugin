@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-04 10:44:37
+ * @LastEditTime: 2022-01-07 17:39:53
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -107,6 +107,7 @@ export default function useIncrement(props) {
     slidesKeyName = slides.keyName || 'Type';
 
     const initValue = slides.data[0].value;
+    console.log(initValue, 'initValue')
     _enqueue({
       data: toRaw(slides.data),
       initValue,
@@ -327,6 +328,10 @@ export default function useIncrement(props) {
     return state.index === state.queue.length - 1;
   })
 
+  const isFirstIncrement = computed(() => {
+    return state.index === 0;
+  })
+
   // 设置index
   function setIncrementIndex(index) {
     state.index = index;
@@ -403,6 +408,7 @@ export default function useIncrement(props) {
     textVisible,
     relatedProductVisible,
     vipVisible,
+    isFirstIncrement,
     isLastIncrement,
     changeSlides,
     changeNightLight,

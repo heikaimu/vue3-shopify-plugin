@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-08 17:30:37
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-31 10:08:28
+ * @LastEditTime: 2022-01-06 15:16:58
  */
 import { fabric } from 'fabric';
 import 'fabric-customise-controls';
@@ -320,6 +320,14 @@ export default class ImageAndTextRenderer {
   // 获取图层
   getObjects() {
     return this.instance.getObjects();
+  }
+
+  // 激活图层
+  setActiveObject(layer) {
+    if (!layer) {
+      return;
+    }
+    this.instance.setActiveObject(layer).renderAll();
   }
 
   // 更新

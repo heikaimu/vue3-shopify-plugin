@@ -4,10 +4,9 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 14:27:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-31 14:46:21
+ * @LastEditTime: 2022-01-06 17:24:57
  */
 import { reactive, toRefs, onMounted, nextTick, computed } from "vue";
-import { debounce } from "lodash";
 
 export default function useBackground(props) {
 
@@ -94,6 +93,10 @@ export default function useBackground(props) {
 
     // 当前展示的列表
     state.backgroundList = state.backgroundGroupList[state.groupIndex].list;
+
+    // 滚动到当前卡片处
+    await nextTick();
+    document.getElementById('activeCard').scrollIntoView({behavior:'smooth', block: "start", inline: "nearest" });
   })
 
   // 切换组
@@ -107,35 +110,14 @@ export default function useBackground(props) {
   }
 
   // 背景修改,加了个防抖
-  const changeBackgroundIndex = debounce(function (index) {
+  function changeBackgroundIndex(index) {
     state.backgroundIndex = index;
-  }, 300)
-
-  // 获取背景
-  function getBackgroundImage(size) {
-    const curGroup = state.backgroundGroupList[state.groupIndex];
-    if (!curGroup) {
-      return;
-    }
-
-    const curItem = curGroup.list[state.backgroundIndex];
-    if (!curItem) {
-      return;
-    }
-
-    const curImg = curItem.list.find(image => image.size === size);
-    if (!curImg) {
-      return;
-    }
-
-    return curImg.url;
   }
 
   return {
     ...toRefs(state),
     backgroundName,
     changeBackgroundIndex,
-    getBackgroundImage,
     changeGroup
   }
 }

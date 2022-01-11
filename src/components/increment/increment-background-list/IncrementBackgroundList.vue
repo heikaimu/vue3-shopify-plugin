@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-30 16:23:15
+ * @LastEditTime: 2022-01-06 17:19:25
 -->
 <template>
   <div class="background-wrapper">
@@ -40,7 +40,7 @@
             :data="backgroundList"
             :backgroundImage="data.backgroundImage"
             :overlayImage="data.overlayImage"
-            :size="currentSize"
+            :size="sizeName"
             :composingList="composingList"
             :composingIndex="composingIndex"
             :activeIndex="backgroundIndex"
@@ -96,8 +96,6 @@ import SideNavigation from "./SideNavigation.vue";
 import TextConfirmBox from "./TextConfirmBox.vue";
 
 import useBackground from "../../../composables/useBackground";
-import useComposing from "../../../composables/useComposing";
-import useSize from "../../../composables/useSize";
 
 import ImageAndTextRenderer from "../../../utils/ImageAndTextRenderer";
 
@@ -127,10 +125,6 @@ export default {
     customBodyPreviewURL: {
       type: String,
       default: "",
-    },
-    sizeList: {
-      type: Array,
-      default: 0,
     },
     dollarSign: {
       type: String,
@@ -171,6 +165,7 @@ export default {
       changeGroup,
     } = useBackground(props);
 
+    // 切换分组的时候滚动到顶部
     const listBox = ref(null);
     watch(
       () => groupIndex.value,
@@ -180,20 +175,50 @@ export default {
       }
     );
 
-    // 排版
-    const {
-      composingList,
-      composingIndex,
-      composingName,
-      changeComposingIndex,
-    } = useComposing(props);
+    // ================== Composing =================
+    // composing list
+    const composingList = computed(() => {
+      return props.data.composingList;
+    });
+    // composing index
+    const composingIndex = ref(0);
+    // composing name
+    const composingName = computed(() => {
+      if (composingList.value.length === 0) {
+        return "";
+      }
+      return composingList.value[composingIndex.value];
+    });
+    // change composing
+    function changeComposingIndex(index) {
+      composingIndex.value = index;
+    }
+    // ================== Composing End =================
 
-    // 尺寸
-    const { sizeList, sizeIndex, sizeName, currentSize, changeSizeIndex } =
-      useSize(props);
+    // ================== Size =================
+    // size list
+    const sizeList = computed(() => {
+      return props.data.sizeList;
+    });
+    // size index
+    const sizeIndex = ref(0);
+    // size name
+    const sizeName = computed(() => {
+      if (sizeList.value.length === 0) {
+        return "";
+      }
+      return sizeList.value[sizeIndex.value];
+    });
+    // change size
+    function changeSizeIndex(index) {
+      sizeIndex.value = index;
+    }
+    // ================== Size End =================
 
-    // 图片文字渲染器
-    const imageAndTextRenderer = new ImageAndTextRenderer("virtualCanvas");
+    // 是否有搜索条件
+    const isExistQueryBar = computed(() => {
+      return sizeList.value.length > 1 || composingList.value.length > 1;
+    });
 
     // 加载层
     const loadingVisible = ref(false);
@@ -203,6 +228,7 @@ export default {
 
     // 卡片信息
     let cardInfo = null;
+
     // 选择卡片
     async function handleCardSelect(params) {
       // 设置背景渲染参数
@@ -235,6 +261,8 @@ export default {
       });
       context.emit("next");
     }
+    // 图片文字渲染器
+    const imageAndTextRenderer = new ImageAndTextRenderer("virtualCanvas");
 
     // 渲染带背景的预览图
     function getBackgroundInfo(params) {
@@ -273,11 +301,6 @@ export default {
       queryVisible.value = !queryVisible.value;
     }
 
-    // 是否有搜索条件
-    const isExistQueryBar = computed(() => {
-      return sizeList.value.length > 1 || composingList.value.length > 1;
-    });
-
     return {
       pluginText,
       handleClose,
@@ -289,7 +312,7 @@ export default {
       changeBackgroundIndex,
       sizeList,
       sizeIndex,
-      currentSize,
+      sizeName,
       changeSizeIndex,
       composingList,
       composingIndex,

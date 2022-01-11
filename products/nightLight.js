@@ -7,7 +7,7 @@ export const product = {
   "published_at": "2021-08-25T06:55:17-04:00",
   "created_at": "2021-08-25T06:55:21-04:00",
   "vendor": "Makemesurprise",
-  "type": "testNightLight",
+  "type": "Nightlight rectangle",
   "tags": [
     "_pic1",
     "All Available on google ALL",

@@ -4,13 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 14:13:06
+ * @LastEditTime: 2022-01-10 09:59:21
 -->
 <template>
   <div class="custom-list">
     <div class="custom-list__top">
       <base-header icon="arrowLeft" @close="backToFileSelect">
         <skin-selector
+          v-if="showSkin"
           :list="skinList"
           :skin="skin"
           @change="changeSkin"
@@ -61,6 +62,10 @@ export default {
       type: Object,
       deafult: () => {},
     },
+    showSkin: {
+      type: Boolean,
+      default: true
+    }
   },
 
   emits: {

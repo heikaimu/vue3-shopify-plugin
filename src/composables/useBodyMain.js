@@ -4,10 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 17:08:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-16 16:46:34
+ * @LastEditTime: 2022-01-04 16:11:16
  */
 import { reactive, toRefs, onMounted } from "vue";
-import { getRandomID } from '../utils/image'
+import { getRandomID, clearImageEdgeBlank } from '../utils/image'
 
 export default function useBodyMain(props, context) {
   const state = reactive({
@@ -59,8 +59,9 @@ export default function useBodyMain(props, context) {
   }
 
   // 设置预览图
-  function setPreview(url) {
-    state.previewBody = url;
+  async function setPreview(url) {
+    state.previewBody = await clearImageEdgeBlank(url);
+    return Promise.resolve();
   }
 
   // 设置定制状态

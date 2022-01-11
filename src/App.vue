@@ -60,8 +60,8 @@ export default {
       visible: false,
       backgroundActiveIndex: 0,
       composingActiveIndex: 0,
-      sizeActiveName: "",
-      backgroundActiveName: "bg-tanzi-93",
+      sizeActiveName: '30" x 40"',
+      backgroundActiveName: "bg-tanzi-22",
       products: products,
       activeType: "",
       images: [],
@@ -144,8 +144,9 @@ function getConfig(product, publishSize) {
         config.defaultSkin = "yellow";
         config.skuList = getSKUlist(product);
         config.productOptionsValue = {
-          // Size: publishSize,
-          Style: '7-Color Touch'
+          Size: '20cm-8"',
+          Type: 'Single Side'
+          // Style: '7-Color Touch'
         };
         config.productPrice = '$300';
         config.productTitle = product.title;

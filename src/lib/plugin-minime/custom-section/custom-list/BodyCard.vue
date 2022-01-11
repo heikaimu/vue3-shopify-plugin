@@ -4,30 +4,40 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 13:53:19
+ * @LastEditTime: 2022-01-10 10:38:28
 -->
 <template>
   <div class="body-card" @click="handleClick">
-    <!-- normal -->
-    <div class="body-card__box" v-if="config.type === 'normal'">
-      <img class="body-card__img" :src="bodyURL" alt="" @load="bgLoad" />
-      <img
-        v-for="(item, index) in layerList"
-        :key="index"
-        :src="item.url"
-        :style="item.style"
-        :class="[item.type]"
-        class="body-card__avatar-img"
-      />
+    <!-- 带商品预览图 -->
+    <div class="body-card__box" v-if="config.productPrivew">
+      <img class="body-card__img" :src="config.productPrivew" alt="" />
     </div>
-    <!-- hood -->
-    <div class="body-card__box" v-else>
-      <img class="body-card__img" :src="bodyURL" alt="" />
-    </div>
+
+    <!-- 不带商品预览图 -->
+    <template v-else>
+      <!-- normal -->
+      <div class="body-card__box" v-if="config.type === 'normal'">
+        <img class="body-card__img" :src="bodyURL" alt="" @load="bgLoad" />
+        <img
+          v-for="(item, index) in layerList"
+          :key="index"
+          :src="item.url"
+          :style="item.style"
+          :class="[item.type]"
+          class="body-card__avatar-img"
+        />
+      </div>
+      <!-- hood -->
+      <div class="body-card__box" v-else>
+        <img class="body-card__img" :src="bodyURL" alt="" />
+      </div>
+    </template>
+    
     <!-- 标签 -->
     <p class="body-card__edit-tag" :class="{ disabled: loading }">
       {{ pluginText.tap_edit }}
     </p>
+
     <!-- loading -->
     <div class="body-card__loading" v-if="loading">
       <div class="loading-icon">
