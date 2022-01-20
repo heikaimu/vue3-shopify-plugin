@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-10 13:14:29
+ * @LastEditTime: 2022-01-18 16:17:22
 -->
 <template>
   <base-glass-dialog
@@ -13,7 +13,11 @@
     @close="handleClose"
   >
     <!-- 文字定制内容 -->
-    <div class="increment-text">
+    <div class="increment-text" ref="canvasContainer">
+      <div class="design-notice">
+        <base-notice v-if="data.notice">{{ data.notice }}</base-notice>
+      </div>
+
       <!-- 文字定制 -->
       <div class="text-wrapper">
         <div class="text__preview">
@@ -21,7 +25,6 @@
             <canvas id="textCanvas" v-if="shouldRenderCanvas"></canvas>
             <img v-else :src="data.url" alt="" srcset="" />
           </div>
-
           <!-- <operations-bar @handle="handleObject"></operations-bar> -->
         </div>
 
@@ -32,6 +35,8 @@
             <text-input
               v-model:text="customText.text"
               :size="data.size"
+              :dollarSign="dollarSign"
+              :price="data.price"
               @focus="handleFocus"
               @blur="handleBlur"
             ></text-input>
@@ -80,8 +85,6 @@ import ColorSelector from "./ColorSelector.vue";
 import OperationsBar from "./OperationsBar.vue";
 
 import ImageAndTextRenderer from "../../../utils/ImageAndTextRenderer";
-
-const CANVAS_WIDTH = 230;
 
 const defaultRenderParams = {
   width: 416,
@@ -180,7 +183,7 @@ export default {
       }
 
       return false;
-    })
+    });
 
     // 文字信息
     const { text, fontFamily, color } = props.value;
@@ -189,8 +192,9 @@ export default {
       customText: {
         text: text,
         fontFamily: fontFamily || "Satisfy",
-        color: color || props.data.color || '#ffffff',
+        color: color || props.data.color || "#ffffff",
       },
+      canvasWidth: 230,
     });
 
     onMounted(() => {
@@ -202,9 +206,17 @@ export default {
 
       // 只有当展示canvas的时候才渲染
       if (shouldRenderCanvas.value) {
+        state.canvasWidth = setCanvasWidth();
         initTextRender();
       }
     });
+
+    const canvasContainer = ref(null);
+    function setCanvasWidth() {
+      const hwRate = bgRenderParams.value.height / bgRenderParams.value.width;
+      const containerWidth = canvasContainer.value.getBoundingClientRect();
+      return (containerWidth.width * 0.9) / hwRate;
+    }
 
     // 渲染器实列
     let renderInstance = null;
@@ -222,7 +234,7 @@ export default {
 
       // 回填图层
       await recreateLayers();
-      zoomRecord = CANVAS_WIDTH / bgRenderParams.value.width;
+      zoomRecord = state.canvasWidth / bgRenderParams.value.width;
       renderInstance.init(bgRenderParams.value, zoomRecord).then(() => {
         const items = renderInstance.getObjects();
         const image = items.find((item) => item.type === "image");
@@ -256,9 +268,6 @@ export default {
           item.fontFamily = state.customText.fontFamily;
           item.color = state.customText.color;
         }
-        // if (item.type === "image") {
-        //   item.url = await clearImageEdgeBlank(item.url);
-        // }
       }
     }
 
@@ -275,7 +284,7 @@ export default {
       const y = firstText.top;
       // const textLength = Math.max(Math.floor(inputMaxSize / 2), text.length);
       const textWidth = firstText.originalWidth * 1.5;
-      const zoom = CANVAS_WIDTH / textWidth;
+      const zoom = state.canvasWidth / textWidth;
       renderInstance.zoomToPoint(x, y, zoom);
     }
 
@@ -352,9 +361,9 @@ export default {
     // 按钮文字
     const addToCartText = computed(() => {
       if (customTextVisible.value && state.customText.text !== "") {
-        return `${pluginText.add_cart} +${props.dollarSign}${props.data.price}`;
+        return `${pluginText.add_text} + ${props.dollarSign}${props.data.price}`;
       } else {
-        return `${pluginText.add_cart}`;
+        return `${pluginText.without_text}`;
       }
     });
 
@@ -370,6 +379,7 @@ export default {
 
     return {
       ...toRefs(state),
+      canvasContainer,
       pluginText,
       customTextVisible,
       addToCartText,
@@ -391,15 +401,17 @@ export default {
 @import "src/styles/_mixins.scss";
 
 .increment-text {
+  .design-notice {
+    padding: 10px;
+  }
   .text-wrapper {
     padding: 0 10px 10px 10px;
     .text__preview {
       @include flex-col-center;
       width: 100%;
+      background-color: #ffffff;
+      // background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Cg fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.4"%3E%3Cpath opacity=".5" d="M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z"/%3E%3Cpath d="M6 5V0H5v5H0v1h5v94h1V6h94V5H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
       .text-canvas-box {
-        @include card-shadow-lg;
-        padding: 5px;
-        background-color: #ffffff;
         line-height: 0;
         // overflow: hidden;
         img {

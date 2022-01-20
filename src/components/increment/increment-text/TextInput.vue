@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:16:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-29 17:21:25
+ * @LastEditTime: 2022-01-13 14:55:03
 -->
 <template>
   <!-- 输入框 -->
@@ -16,7 +16,7 @@
       type="text"
       class="text-input"
       :maxlength="size"
-      placeholder="custom text"
+      :placeholder="`custom text + ${dollarSign}${price}`"
       v-model="value"
       @input="handleInput"
       @focus="focus"
@@ -38,12 +38,20 @@ export default {
       type: [String, Number],
       default: "15",
     },
+    dollarSign: {
+      type: String,
+      default: "",
+    },
+    price: {
+      type: String,
+      default: "",
+    },
   },
 
   emits: {
     focus: null,
     blur: null,
-    'update:text': null
+    "update:text": null,
   },
 
   setup(props, context) {
@@ -69,12 +77,12 @@ export default {
 
     // 聚焦
     function focus() {
-      context.emit('focus');
+      context.emit("focus");
     }
 
     // 失去焦点
     function blur() {
-      context.emit('blur');
+      context.emit("blur");
     }
 
     return {

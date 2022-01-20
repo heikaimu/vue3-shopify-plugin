@@ -4,9 +4,10 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-24 11:03:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-10 11:08:09
+ * @LastEditTime: 2022-01-18 17:18:35
  */
 import { getRandomID } from './image';
+const VBOX_URL = 'https://cdn.shopifycdn.net/s/files/1/0343/0275/4948/files/vFace.png?v=1634089968';
 
 function getLayers({ config, files, skin }) {
   const layers = [];
@@ -88,17 +89,11 @@ function getAnnexList(config, skin, id) {
  * @returns
  */
 function getAvatarList(config, files) {
-  if (!files) {
-    return [];
-  }
-
-  if (files.length === 0) {
-    return [];
-  }
-
+  files = files || [];
   const list = config.faceList;
   return list.map((item, index) => {
-    const avatar = files[index % files.length].data.avatar;
+    const curFile = files[index % files.length];
+    const avatar = curFile ? curFile.data.avatar : {url: VBOX_URL};
     item.configType = config.type;
     return getAvatar(item, avatar);
   });

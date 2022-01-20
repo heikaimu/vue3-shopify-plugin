@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-06 17:02:44
+ * @LastEditTime: 2022-01-19 12:18:59
 -->
 <template>
   <base-glass-dialog :visible="true" @close="handleClose">
@@ -12,14 +12,14 @@
       <div class="text-wrapper">
         <div class="text__preview">
           <img
-            v-if="currentItem.url"
+            v-if="currentURL"
             class="img"
-            :src="currentItem.url"
+            :src="currentURL"
             alt=""
             srcset=""
           />
         </div>
-        <p class="desc">{{ currentItem.desc }}</p>
+        <p class="desc">{{ currentDesc }}</p>
         <p class="add-price">{{ currentPrice }}</p>
       </div>
       <div class="add-to-cart">
@@ -85,6 +85,10 @@ export default {
     dollarSign: {
       type: String,
     },
+    backgroundData: {
+      type: Object,
+      default: null,
+    },
   },
 
   emits: {
@@ -112,10 +116,10 @@ export default {
             props.productOptionsValue,
             item.publishName
           );
-          console.log(props.skuList)
-          console.log(props.productOptionsValue)
-          console.log(item.key)
-          console.log(item.publishName)
+          // console.log(props.skuList)
+          // console.log(props.productOptionsValue)
+          // console.log(item.key)
+          // console.log(item.publishName)
           return {
             ...item,
             sku,
@@ -144,6 +148,21 @@ export default {
       return state.publishQueue[state.queueIndex] || false;
     });
 
+    // 当前展示的图片
+    const currentURL = computed(() => {
+      if (!currentItem.value) {
+        return "";
+      }
+      
+      if (currentItem.value.publishType === "matching") {
+        const bgName = props.backgroundData.value.background.title || '';
+        const match = currentItem.value.urlList.find(item => item.name === bgName);
+        return match.url || currentItem.value.url;
+      } else {
+        return currentItem.value.url;
+      }
+    });
+
     // 当前价格
     const currentPrice = computed(() => {
       if (!currentItem.value) {
@@ -155,6 +174,15 @@ export default {
         2
       )}`;
     });
+
+    // 描述
+    const currentDesc = computed(() => {
+        if (!currentItem.value) {
+        return "";
+      }
+
+      return currentItem.value.desc;
+    })
 
     // 关闭
     function handleClose() {
@@ -178,7 +206,8 @@ export default {
     return {
       ...toRefs(state),
       pluginText,
-      currentItem,
+      currentURL,
+      currentDesc,
       currentPrice,
       handleClose,
       handleNext,

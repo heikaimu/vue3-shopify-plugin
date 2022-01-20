@@ -4,35 +4,33 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-10 10:38:28
+ * @LastEditTime: 2022-01-18 17:42:58
 -->
 <template>
   <div class="body-card" @click="handleClick">
     <!-- 带商品预览图 -->
-    <div class="body-card__box" v-if="config.productPrivew">
+    <!-- <div class="body-card__box" v-if="config.productPrivew">
       <img class="body-card__img" :src="config.productPrivew" alt="" />
-    </div>
+    </div> -->
 
     <!-- 不带商品预览图 -->
-    <template v-else>
-      <!-- normal -->
-      <div class="body-card__box" v-if="config.type === 'normal'">
-        <img class="body-card__img" :src="bodyURL" alt="" @load="bgLoad" />
-        <img
-          v-for="(item, index) in layerList"
-          :key="index"
-          :src="item.url"
-          :style="item.style"
-          :class="[item.type]"
-          class="body-card__avatar-img"
-        />
-      </div>
-      <!-- hood -->
-      <div class="body-card__box" v-else>
-        <img class="body-card__img" :src="bodyURL" alt="" />
-      </div>
-    </template>
-    
+    <!-- normal -->
+    <div class="body-card__box" v-if="config.type === 'normal'">
+      <img class="body-card__img" :src="bodyURL" alt="" @load="bgLoad" />
+      <img
+        v-for="(item, index) in layerList"
+        :key="index"
+        :src="item.url"
+        :style="item.style"
+        :class="[item.type]"
+        class="body-card__avatar-img"
+      />
+    </div>
+    <!-- hood -->
+    <div class="body-card__box" v-else>
+      <img class="body-card__img" :src="bodyURL" alt="" />
+    </div>
+
     <!-- 标签 -->
     <p class="body-card__edit-tag" :class="{ disabled: loading }">
       {{ pluginText.tap_edit }}
@@ -55,7 +53,6 @@ import BaseIcon from "../../../../base/BaseIcon.vue";
 import { renderer } from "../../../../utils/minimeRenderer";
 import { loadImage } from "../../../../utils/image";
 import { getLayers } from "../../../../utils/layers";
-import { stubTrue } from "lodash";
 
 export default {
   components: {
@@ -64,8 +61,8 @@ export default {
 
   props: {
     selectFiles: {
-      type: Object,
-      deafult: () => {},
+      type: Array,
+      deafult: () => [],
     },
     config: {
       type: Object,
@@ -109,7 +106,7 @@ export default {
       () => {
         renderImage(props.skin);
       },
-      { deep: stubTrue }
+      { deep: true }
     );
 
     // 渲染卡片
@@ -271,7 +268,7 @@ export default {
   }
 }
 .body-card__loading {
-  @include pos-absolute;
+  @include pos-absolute(0, 0, 0, 0, 999);
   @include flex-row-center;
   border-radius: 10px;
   background-color: rgba($color: #000000, $alpha: 0.6);

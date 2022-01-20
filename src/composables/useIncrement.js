@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-07 17:39:53
+ * @LastEditTime: 2022-01-18 14:29:16
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -44,7 +44,7 @@ export default function useIncrement(props) {
 
   // 前端的队列
   function addFrontEndQueue() {
-    const { slides, nightLight, publish, background, text, relatedProduct, vip } = config.currentProductTypeConfig;
+    const { slides, nightLight, publish, background, text, relatedProduct, vip } = config.mainData;
     // 夜灯底座
     initNightLight(nightLight);
     // 背景
@@ -63,7 +63,7 @@ export default function useIncrement(props) {
 
   // 管理端的队列
   function addManagementQueue() {
-    const { background, text } = config.currentProductTypeConfig;
+    const { background, text } = config.mainData;
     // 背景
     initBackground(background);
     // 文字
@@ -106,8 +106,7 @@ export default function useIncrement(props) {
     // keyName
     slidesKeyName = slides.keyName || 'Type';
 
-    const initValue = slides.data[0].value;
-    console.log(initValue, 'initValue')
+    const initValue = slides.data[0] ? slides.data[0].value : '';
     _enqueue({
       data: toRaw(slides.data),
       initValue,
@@ -160,7 +159,7 @@ export default function useIncrement(props) {
 
     // keyName
     nightLightKeyName = nightLight.keyName || 'Style';
-    const initValue = nightLight.data[0].key;
+    const initValue = nightLight.data[0] ? nightLight.data[0].key : '';
     _enqueue({
       data: toRaw(nightLight.data),
       initValue,
@@ -179,6 +178,10 @@ export default function useIncrement(props) {
   // ===============背景===============
   const backgroundVisible = computed(() => {
     return _isActiveItem('background');
+  })
+
+  const backgroundData = computed(() => {
+    return _getQueueData('background');
   })
 
   function initBackground(background) {
@@ -249,27 +252,6 @@ export default function useIncrement(props) {
         name: 'text'
       })
       state.textData = data;
-
-    } else {
-      // 如果没有设置文字，但是设置了背景，也需要进入定制步骤调整图像位置，所以设置一个空的文字对象
-      if (background && background.visible) {
-        const virtualData = {
-          desc: '',
-          id: '',
-          price: '',
-          url: ''
-        }
-        const initValue = {
-          color: '',
-          fontFamily: '',
-          text: ''
-        }
-        _enqueue({
-          data: virtualData,
-          initValue,
-          name: 'text'
-        })
-      }
     }
   }
 
@@ -285,6 +267,10 @@ export default function useIncrement(props) {
 
   function initRelatedProduct(relatedProduct) {
     if (!_shouldEnqueue(relatedProduct)) {
+      return;
+    }
+
+    if (relatedProduct.data.length === 0) {
       return;
     }
 
@@ -397,6 +383,11 @@ export default function useIncrement(props) {
     });
   }
 
+  // 获取队列数据
+  function _getQueueData(name) {
+    return state.queue.find(item => item.name === name);
+  }
+
   return {
     ...toRefs(state),
     hasIncrement,
@@ -405,6 +396,7 @@ export default function useIncrement(props) {
     nightLightVisible,
     publishVisible,
     backgroundVisible,
+    backgroundData,
     textVisible,
     relatedProductVisible,
     vipVisible,

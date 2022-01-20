@@ -4,18 +4,23 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-10 09:59:21
+ * @LastEditTime: 2022-01-20 13:23:10
 -->
 <template>
   <div class="custom-list">
     <div class="custom-list__top">
-      <base-header icon="arrowLeft" @close="backToFileSelect">
+      <base-header icon="arrowLeft" :mediumText="!showSkin?`${pluginText.choose_template}`:''" @close="backToFileSelect" :center="false">
         <skin-selector
           v-if="showSkin"
           :list="skinList"
           :skin="skin"
           @change="changeSkin"
         ></skin-selector>
+        <couple-skin-selector
+          v-else
+          :skin="skin"
+          @change="changeSkin"
+        ></couple-skin-selector>
       </base-header>
     </div>
     <div class="custom-list__medium">
@@ -39,10 +44,11 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, computed, watch } from "vue";
+import { reactive, toRefs, onMounted, computed, watch, inject } from "vue";
 
 import BaseHeader from "../../../../base/BaseHeader.vue";
 import SkinSelector from "./SkinSelector.vue";
+import CoupleSkinSelector from "../../../../components/SkinSelector.vue";
 import SideNavigation from "./SideNavigation.vue";
 import BodyList from "./BodyList.vue";
 
@@ -55,6 +61,7 @@ export default {
     SkinSelector,
     SideNavigation,
     BodyList,
+    CoupleSkinSelector
   },
 
   props: {
@@ -64,24 +71,27 @@ export default {
     },
     showSkin: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
 
   emits: {
     back: null,
     select: null,
-    changeColor: null
+    changeColor: null,
   },
 
   setup(props, context) {
+    // 国际化
+    const pluginText = inject("pluginText");
+
     const { config } = props;
 
     const { skinList, skin, changeSkin } = useSkin(props);
 
-    watch(skin, val => {
-      context.emit('changeColor', val);
-    })
+    watch(skin, (val) => {
+      context.emit("changeColor", val);
+    });
 
     const { currentGroupName, navigation, changeGroupName } =
       useBodyNavigation(props);
@@ -97,7 +107,7 @@ export default {
 
     // 列表
     onMounted(() => {
-      state.list = config.miniMeData;
+      state.list = config.mainData.body.list;
     });
 
     const currentGrouplist = computed(() => {
@@ -122,6 +132,7 @@ export default {
 
     return {
       ...toRefs(state),
+      pluginText,
       skinList,
       skin,
       changeSkin,

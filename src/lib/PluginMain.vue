@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-12 16:20:07
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-02 10:46:44
+ * @LastEditTime: 2022-01-18 15:57:37
 -->
 <template>
   <component
@@ -57,10 +57,11 @@ export default {
     });
 
     function setComp() {
-      if (props.config.miniMeData.length === 0) {
+      const bodyList = props.config.mainData.body.list;
+      if (bodyList.length === 0) {
         state.currentElementComponent = "PluginMinime";
       } else {
-        const firstConfig = props.config.miniMeData[0].images[1];
+        const firstConfig = bodyList[0].images[1];
         if (firstConfig.faceList) {
           const faceLength = firstConfig.faceList.length;
           if (faceLength > 1) {

@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-29 14:54:07
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-07 14:01:47
+ * @LastEditTime: 2022-01-18 14:27:05
 -->
 <template>
   <base-glass-dialog :visible="true" @close="handleClose">
@@ -65,18 +65,6 @@ export default {
     value: {
       type: String,
       default: "",
-    },
-    sizeList: {
-      type: Array,
-      default: () => [],
-    },
-    composingList: {
-      type: Array,
-      default: () => [],
-    },
-    backgroundList: {
-      type: Array,
-      default: () => [],
     },
     customBodyPreviewURL: {
       type: String,
@@ -174,35 +162,18 @@ export default {
     }
 
     function getParams(data, bodyURL) {
-      // size
-      const curSize = props.sizeList.find((item) => item.label === data.size);
-
-      // background
-      const background = props.backgroundList.find(
-        (item) => item.id === data.backgroundID
-      );
-      const bgURLItem = background.list.find(
-        (item) => item.size === curSize.label
-      );
-      const bgURL = bgURLItem ? bgURLItem.url : "";
-
-      // composing
-      const curComposingItem = props.composingList.find(
-        (item) => item.title === data.composing
-      );
-      const renderMap = curComposingItem.list.find((item) => {
-        return (
-          item.size.width === curSize.value.width &&
-          item.size.height === curSize.value.height
-        );
-      });
+      const {size, background} = data;
+      const curBg = background.list.find(item => item.size === size.label);
+      const renderMap = background.composing.list.find(item => {
+        return item.size.width === size.value.width && item.size.height === size.value.height;
+      })
 
       // 构造参数
       const params = {
-        width: curSize.value.width,
-        height: curSize.value.height,
+        width: size.value.width,
+        height: size.value.height,
         backgroundImage: {
-          url: bgURL,
+          url: curBg.url,
         },
         layerList: [],
       };

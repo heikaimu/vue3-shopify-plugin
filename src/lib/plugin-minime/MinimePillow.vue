@@ -171,7 +171,6 @@ export default {
 
     // 文件上传完成
     function completeUpload(res) {
-      console.log(res,'=======')
       const data = {
         files: toRaw(res),
         body: getBodyConfig(),

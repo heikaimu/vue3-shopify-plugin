@@ -4,18 +4,16 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-23 15:11:40
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-06 17:16:39
+ * @LastEditTime: 2022-01-19 12:12:24
 -->
 <template>
-  <div class="card-box" :style="cardStyle" :id="`${active?'activeCard':''}`" @click="handleSelectCard">
-    <img
-      class="bg-img"
-      :width="originRenderMap.size.width"
-      :height="originRenderMap.height"
-      :src="url"
-      alt=""
-      @load="imgLoaded"
-    />
+  <div
+    class="card-box"
+    :style="cardStyle"
+    :id="`${active ? 'activeCard' : ''}`"
+    @click="handleSelectCard"
+  >
+    <img class="bg-img" :src="url" alt="" @load="imgLoaded" />
     <img
       v-for="(item, index) in position"
       :key="index"
@@ -44,20 +42,11 @@ export default {
       default: () => {},
     },
     size: {
-      type: String,
-      default: "",
+      type: Object,
     },
     active: {
       type: Boolean,
       default: false,
-    },
-    composingList: {
-      type: Array,
-      default: () => [],
-    },
-    composingIndex: {
-      type: Number,
-      default: 0,
     },
     customBodyPreviewURL: {
       type: String,
@@ -76,7 +65,7 @@ export default {
   },
 
   emits: {
-    cardSelect: null,
+    cardSelect: null
   },
 
   setup(props, context) {
@@ -84,45 +73,74 @@ export default {
       position: [],
     });
 
-    // 背景图，当尺寸存在的时候去取对应的背景图
+    const curImage = computed(() => {
+      if (props.size.label && props.data.list) {
+        return props.data.list.find((item) => {
+          return item.size === props.size.label;
+        });
+      }
+      return {};
+    });
+
     const url = computed(() => {
-      if (props.size) {
-        return (
-          (props.data.list.find((item) => item.size === props.size) || {})
-            .url || ""
-        );
+      if (curImage.value) {
+        return curImage.value.url || "";
       }
       return "";
     });
 
-    // 渲染信息
-    const originRenderMap = computed(() => {
-      if (props.size) {
-        const curStyle = (props.composingList || [])[props.composingIndex];
-        const curSize = curStyle.list.find((item) => item.name === props.size);
-        return curSize;
+    const curComposing = computed(() => {
+      if (
+        props.size.label &&
+        props.data.composing &&
+        Array.isArray(props.data.composing.list)
+      ) {
+        const curItem = props.data.composing.list.find((item) => {
+          return item.size.width === props.size.value.width && item.size.height === props.size.value.height;
+        });
+        return curItem;
       }
-      return {
-        position: [],
-        size: {},
-      };
+      return {};
     });
 
     // 卡片样式
     const cardStyle = computed(() => {
-      const { size } = originRenderMap.value;
+      if (!curComposing.value) {
+        return;
+      }
+
+      const { size } = curComposing.value;
       if (size.width && size.height) {
         return {
-          paddingBottom: `${size.height / size.width * 100}%`
-        }
-      } else {
-        return {}
+          paddingBottom: `${(size.height / size.width) * 100}%`,
+        };
       }
-    })
+      return {};
+    });
 
-    // 获取排版信息
+    // 获取样式
+    function getStyle(item) {
+      const { angle, left, top, width } = item;
+
+      return {
+        left: `${left}px`,
+        top: `${top}px`,
+        width: `${width}px`,
+        zIndex: props.backgroundImage ? 97 : 100,
+      };
+    }
+
+    // 图片加载完成
+    function imgLoaded(e) {
+      getComposing(e.target.width);
+    }
+
     function getComposing(cardWidth) {
-      const { position, size } = originRenderMap.value;
+      if (!curComposing.value) {
+        return;
+      }
+
+      const { position, size } = curComposing.value;
       const originalWidth = size.width || 0;
       const scale = cardWidth / originalWidth;
 
@@ -147,30 +165,13 @@ export default {
       });
     }
 
-    // 获取样式
-    function getStyle(item) {
-      const { angle, left, top, width } = item;
-
-      return {
-        left: `${left}px`,
-        top: `${top}px`,
-        width: `${width}px`,
-        zIndex: props.backgroundImage ? 97 : 100,
-      };
-    }
-
-    // 图片加载完成
-    function imgLoaded(e) {
-      getComposing(e.target.width);
-    }
-
     function handleSelectCard() {
       const params = renderParams();
       context.emit("cardSelect", params);
     }
 
     function renderParams() {
-      const { position, size } = originRenderMap.value;
+      const { position, size } = curComposing.value;
 
       const params = {
         width: size.width,
@@ -216,12 +217,13 @@ export default {
 
     return {
       ...toRefs(state),
+      curComposing,
+      curImage,
       url,
-      getStyle,
+      cardStyle,
       imgLoaded,
+      getStyle,
       handleSelectCard,
-      originRenderMap,
-      cardStyle
     };
   },
 };

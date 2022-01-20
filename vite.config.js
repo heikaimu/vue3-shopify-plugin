@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 09:42:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-29 10:44:41
+ * @LastEditTime: 2022-01-18 13:10:18
  */
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -18,7 +18,8 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
-        'vue'
+        'vue',
+        'localforage'
       ],
       output: {
         globals: {

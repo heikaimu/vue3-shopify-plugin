@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-06 17:19:25
+ * @LastEditTime: 2022-01-19 12:16:50
 -->
 <template>
   <div class="background-wrapper">
@@ -41,8 +41,6 @@
             :backgroundImage="data.backgroundImage"
             :overlayImage="data.overlayImage"
             :size="sizeName"
-            :composingList="composingList"
-            :composingIndex="composingIndex"
             :activeIndex="backgroundIndex"
             :customBodyPreviewURL="customBodyPreviewURL"
             @change="changeBackgroundIndex"
@@ -63,26 +61,31 @@
       :sizeList="sizeList"
       :sizeIndex="sizeIndex"
       :changeSizeIndex="changeSizeIndex"
-      :composingList="composingList"
-      :composingIndex="composingIndex"
-      :changeComposingIndex="changeComposingIndex"
       :backgroundGroupList="backgroundGroupList"
       :groupIndex="groupIndex"
       :changeGroup="changeGroup"
     ></query-bar>
+
+    <!-- 背景模版调整弹窗 -->
+    <background-custom
+      v-model:visible="customVisible"
+      :data="selectedCardData"
+      @close="handleClose"
+      @save="handleReplacePreview"
+    ></background-custom>
 
     <!-- 文字确认弹窗 -->
     <text-confirm-box
       v-model:visible="textConfirmVisible"
       :data="textData"
       :dollarSign="dollarSign"
-      @custom="handleCustom"
+      @custom="handleCustomText"
     ></text-confirm-box>
   </div>
 </template>
 
 <script>
-import { inject, ref, watch, computed } from "vue";
+import { reactive, toRefs, inject, ref, watch, computed } from "vue";
 import BaseHeader from "../../../base/BaseHeader.vue";
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
@@ -94,6 +97,7 @@ import QueryBar from "./QueryBar.vue";
 import FilterButton from "./FilterButton.vue";
 import SideNavigation from "./SideNavigation.vue";
 import TextConfirmBox from "./TextConfirmBox.vue";
+import BackgroundCustom from "./BackgroundCustom.vue";
 
 import useBackground from "../../../composables/useBackground";
 
@@ -111,6 +115,7 @@ export default {
     FilterButton,
     SideNavigation,
     TextConfirmBox,
+    BackgroundCustom,
   },
 
   props: {
@@ -133,13 +138,13 @@ export default {
       type: String,
       default: "",
     },
-    composingActiveName: {
-      type: String,
-      default: "",
-    },
     sizeActiveName: {
       type: String,
       default: "",
+    },
+    textVisible: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -147,6 +152,7 @@ export default {
     change: null,
     close: null,
     next: null,
+    replacePreview: null,
     saveBgRenderParams: null,
   },
 
@@ -175,26 +181,6 @@ export default {
       }
     );
 
-    // ================== Composing =================
-    // composing list
-    const composingList = computed(() => {
-      return props.data.composingList;
-    });
-    // composing index
-    const composingIndex = ref(0);
-    // composing name
-    const composingName = computed(() => {
-      if (composingList.value.length === 0) {
-        return "";
-      }
-      return composingList.value[composingIndex.value];
-    });
-    // change composing
-    function changeComposingIndex(index) {
-      composingIndex.value = index;
-    }
-    // ================== Composing End =================
-
     // ================== Size =================
     // size list
     const sizeList = computed(() => {
@@ -217,77 +203,70 @@ export default {
 
     // 是否有搜索条件
     const isExistQueryBar = computed(() => {
-      return sizeList.value.length > 1 || composingList.value.length > 1;
+      return sizeList.value.length > 1;
     });
 
-    // 加载层
-    const loadingVisible = ref(false);
+    // 背景信息
+    const state = reactive({
+      // 文字提示
+      textConfirmVisible: false,
+      // 选择的背景信息
+      selectedCardData: {},
+      // 背景定制
+      customVisible: false,
+      // 加载...
+      loadingVisible: false,
+    });
 
-    // 文字确认弹窗
-    const textConfirmVisible = ref(false);
-
-    // 卡片信息
-    let cardInfo = null;
-
-    // 选择卡片
-    async function handleCardSelect(params) {
+    // 选择背景
+    async function handleCardSelect(data, index, item) {
       // 设置背景渲染参数
-      cardInfo = params;
-
-      // 获取渲染好的背景信息
-      loadingVisible.value = true;
-      const bgInfo = await getBackgroundInfo(params);
-      context.emit("change", bgInfo);
-      loadingVisible.value = false;
-
+      state.selectedCardData = data;
+      // 保存当前选择的背景
+      saveCurrentInfo(data, index, item);
       // 如果有文字则出现文字弹窗
       if (props.textData) {
-        textConfirmVisible.value = true;
+        // state.textConfirmVisible = true;
+        handleCustomText(true);
       } else {
-        toNextStep(false);
+        state.customVisible = true;
       }
     }
 
-    // 定制
-    function handleCustom(flag) {
-      toNextStep(flag);
+    // 保存背景信息
+    function saveCurrentInfo(data, index, item) {
+      // 背景信息
+      const backgroundInfo = {
+        params: {
+          size: {
+            index: sizeIndex.value,
+            title: sizeName.value,
+          },
+          background: {
+            index,
+            title: item.title,
+          },
+        },
+      };
+      context.emit("change", backgroundInfo);
     }
 
-    // 下一步
-    function toNextStep(flag) {
+    // 定制
+    function handleCustomText(flag) {
+      // 保存渲染信息
       context.emit("saveBgRenderParams", {
-        ...cardInfo,
+        ...state.selectedCardData,
         customTextVisible: flag,
       });
+
+      // 下一步
       context.emit("next");
     }
-    // 图片文字渲染器
-    const imageAndTextRenderer = new ImageAndTextRenderer("virtualCanvas");
 
-    // 渲染带背景的预览图
-    function getBackgroundInfo(params) {
-      return new Promise((resolve, reject) => {
-        imageAndTextRenderer.init(params).then(() => {
-          const url = imageAndTextRenderer.toDataURL();
-          resolve({
-            preview: url,
-            params: {
-              size: {
-                index: sizeIndex.value,
-                title: sizeName.value,
-              },
-              background: {
-                index: backgroundIndex.value,
-                title: backgroundName.value,
-              },
-              composing: {
-                index: composingIndex.value,
-                title: composingName.value,
-              },
-            },
-          });
-        });
-      });
+    // 保存修改位置后的背景图
+    function handleReplacePreview(url) {
+      context.emit("replacePreview", url);
+      context.emit("next");
     }
 
     // 关闭
@@ -302,6 +281,7 @@ export default {
     }
 
     return {
+      ...toRefs(state),
       pluginText,
       handleClose,
       backgroundGroupList,
@@ -314,17 +294,13 @@ export default {
       sizeIndex,
       sizeName,
       changeSizeIndex,
-      composingList,
-      composingIndex,
-      changeComposingIndex,
-      loadingVisible,
       handleCardSelect,
       listBox,
       queryVisible,
       handleOpenToggle,
       isExistQueryBar,
-      textConfirmVisible,
-      handleCustom,
+      handleCustomText,
+      handleReplacePreview,
     };
   },
 };

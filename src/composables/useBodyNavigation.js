@@ -4,12 +4,13 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 14:27:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-12 14:43:16
+ * @LastEditTime: 2022-01-12 14:03:20
  */
-import { reactive, toRefs, computed, onMounted } from "vue";
-import { debounce } from "lodash";
+import { reactive, toRefs, onMounted } from "vue";
 
 export default function useSkin(props) {
+
+  const bodyList = props.config.mainData.body.list;
 
   const state = reactive({
     currentGroupName: '',
@@ -17,9 +18,9 @@ export default function useSkin(props) {
   })
 
   onMounted(() => {
-    if (props.config.miniMeData && props.config.miniMeData.length > 0) {
-      state.currentGroupName = props.config.miniMeData[0].name;
-      state.navigation = props.config.miniMeData.map((item, index) => {
+    if (bodyList && bodyList.length > 0) {
+      state.currentGroupName = bodyList[0].name;
+      state.navigation = bodyList.map((item, index) => {
         return {
           name: item.name,
           count: item.images.length,

@@ -4,13 +4,17 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-20 10:41:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-07 10:18:52
+ * @LastEditTime: 2022-01-18 17:39:54
 -->
 <template>
   <div class="color-selector-wrapper">
     <p class="color-title" @click="visible = !visible">
       {{ pluginText.skin_color }}
-      <base-icon :icon="visible?'arrowUp':'arrowDown'" :size="10" color="#ffffff"></base-icon>
+      <base-icon
+        :icon="visible ? 'arrowUp' : 'arrowDown'"
+        :size="10"
+        color="#ffffff"
+      ></base-icon>
     </p>
 
     <div class="color-selector" v-if="visible">
@@ -51,16 +55,14 @@
       <div class="color-selector__item">
         <base-button type="primary" @click="handleConfirm">Confirm</base-button>
       </div>
-      
     </div>
-    
   </div>
 </template>
 
 <script>
-import { inject, ref, onMounted } from "vue";
-import BaseIcon from "../../../../base/BaseIcon.vue";
-import BaseButton from "../../../../base/BaseButton.vue";
+import { inject, ref, onMounted, watch } from "vue";
+import BaseIcon from "../base/BaseIcon.vue";
+import BaseButton from "../base/BaseButton.vue";
 
 const SKIN_OPTIONS = [
   {
@@ -80,7 +82,7 @@ const SKIN_OPTIONS = [
 export default {
   components: {
     BaseIcon,
-    BaseButton
+    BaseButton,
   },
 
   props: {
@@ -102,7 +104,9 @@ export default {
     const femaleSkin = ref("");
     const visible = ref(false);
 
-    onMounted(() => {
+    watch(() => props.skin, fullbackSkin, { immediate: true });
+
+    function fullbackSkin() {
       switch (props.skin) {
         case "yellow":
           maleSkin.value = "yellow";
@@ -152,7 +156,7 @@ export default {
         default:
           break;
       }
-    });
+    }
 
     // 修改肤色
     function handleChangeColor(gender, item) {
@@ -165,7 +169,7 @@ export default {
 
     function handleConfirm() {
       const skin = newSkin();
-      context.emit('change', skin);
+      context.emit("change", skin);
       visible.value = false;
     }
 
@@ -184,7 +188,7 @@ export default {
       femaleSkin,
       visible,
       handleChangeColor,
-      handleConfirm
+      handleConfirm,
     };
   },
 };

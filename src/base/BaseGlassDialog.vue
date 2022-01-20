@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-28 13:53:52
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 18:13:36
+ * @LastEditTime: 2022-01-13 14:42:16
 -->
 <template>
   <transition name="slide-bottom-fade">
@@ -16,13 +16,17 @@
             <base-icon icon="close" ></base-icon>
           </div>
         </div>
-        <slot />
+        <div class="content-wrapper">
+          <p v-if="title" class="title">{{title}}</p>
+          <slot />
+        </div>
       </div>
     </div>
   </transition>
 </template>
 
 <script setup>
+import {watch} from "vue";
 import BaseIcon from "./BaseIcon.vue";
 
 const props = defineProps({
@@ -34,11 +38,28 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  title: {
+    type: String,
+    default: ""
+  }
 });
 
 const emits = defineEmits({
   close: null,
+  "opened": null,
   "update:visible": null,
+});
+
+watch(() => props.visible, (val) => {
+  if (val) {
+    setTimeout(() => {
+      emits('opened');
+    }, 400);
+  } else {
+    setTimeout(() => {
+      emits('closed');
+    }, 200);
+  }
 });
 
 // 关闭
@@ -69,6 +90,13 @@ function handleClose() {
         width: 30px;
         height: 30px;
         cursor: pointer;
+      }
+    }
+    .content-wrapper {
+      .title {
+        padding: 10px;
+        font-size: 14px;
+        text-align: center;
       }
     }
   }

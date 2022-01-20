@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:31:51
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-27 14:15:34
+ * @LastEditTime: 2022-01-12 15:00:20
 -->
 <template>
   <div class="anchor">
@@ -13,12 +13,12 @@
         :id="getID(item)"
         class="anchor__item"
         :class="{ active: index === value }"
-        v-for="(item,index) in list"
-        :key="item.name"
+        v-for="(item, index) in list"
+        :key="item.title"
         @click="handleClick(index)"
       >
         <p class="anchor__text">
-          {{ item.name }} <span class="anchor__num">{{ item.count }}</span>
+          {{ item.title }} <span class="anchor__num">{{ item.children.length }}</span>
         </p>
       </li>
     </ul>
@@ -48,13 +48,15 @@ export default {
     }
 
     function getID(item) {
-      const name = item.name.toLowerCase().replace(/\s+/g, '_');
-      return `menu_group_${name}`;
+      if (item) {
+        const title = item.title.toLowerCase().replace(/\s+/g, "_");
+        return `menu_group_${title}`;
+      }
     }
 
     return {
       handleClick,
-      getID
+      getID,
     };
   },
 };

@@ -4,13 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 17:35:23
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-10 10:52:12
+ * @LastEditTime: 2022-01-18 17:28:29
 -->
 <template>
   <div class="body-custom-wrapper">
     <custom-list
       :config="config"
       :showSkin="false"
+      :selectFiles="selectFiles"
       v-bind="$attrs"
       @back="closePlugin"
       @select="selectCard"

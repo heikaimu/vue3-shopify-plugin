@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-28 16:30:39
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-28 16:32:09
+ * @LastEditTime: 2022-01-13 11:06:41
  */
 import { computed } from "vue";
 
@@ -19,7 +19,12 @@ export default function useVisible(props, context) {
     }
   });
 
+  function closeDialog() {
+    context.emit('update:visible', false);
+  }
+
   return {
-    isVisible
+    isVisible,
+    closeDialog
   }
 }

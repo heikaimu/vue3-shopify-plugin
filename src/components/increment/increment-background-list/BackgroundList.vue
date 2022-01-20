@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-29 14:15:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-24 09:58:26
+ * @LastEditTime: 2022-01-19 12:15:13
 -->
 <template>
   <base-row :gutter="10">
@@ -18,6 +18,7 @@
         :data="item"
         :active="index === activeIndex"
         v-bind="$attrs"
+        @cardSelect="data => handleCardSelect(data, index, item)"
       ></background-card>
     </base-col>
   </base-row>
@@ -48,15 +49,20 @@ export default {
   },
 
   emits: {
-    change: null,
+    cardSelect: null,
   },
 
   setup(props, context) {
     // 国际化
     const pluginText = inject("pluginText");
 
+    function handleCardSelect(data, index, item) {
+      context.emit("cardSelect", data, index, item);
+    }
+
     return {
       pluginText,
+      handleCardSelect,
     };
   },
 };

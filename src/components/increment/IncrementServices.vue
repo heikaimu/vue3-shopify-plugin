@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-07 17:41:15
+ * @LastEditTime: 2022-01-20 09:58:39
 -->
 <template>
   <!-- 增量服务 -->
@@ -27,9 +27,6 @@
       :data="incrementData.data"
       :value="incrementData.value"
       :customBodyPreviewURL="previewBody"
-      :sizeList="config.sizeList"
-      :composingList="config.composingList"
-      :backgroundList="config.backgroundList"
       :dollarSign="dollarSign"
       @change="changeNightLight"
       @close="handleClose"
@@ -47,7 +44,9 @@
       :backgroundActiveName="backgroundActiveName"
       :composingActiveName="composingActiveName"
       :sizeActiveName="sizeActiveName"
+      :textVisible="textVisible"
       @change="changeBackground"
+      @replacePreview="setPreviewWidthBackground"
       @saveBgRenderParams="saveBgRenderParams"
       @close="handleClose"
       @next="nextIncrement"
@@ -75,8 +74,9 @@
       :productOptionsValue="productOptionsValue"
       :skuList="config.skuList"
       :dollarSign="dollarSign"
+      :backgroundData="backgroundData"
       @change="changePublish"
-      @close="handleClose"
+      @close="handleBack"
       @next="nextIncrement"
     />
 
@@ -190,6 +190,7 @@ export default {
       nightLightVisible,
       publishVisible,
       backgroundVisible,
+      backgroundData,
       bgRenderParams,
       textVisible,
       relatedProductVisible,
@@ -277,6 +278,7 @@ export default {
       nightLightVisible,
       publishVisible,
       backgroundVisible,
+      backgroundData,
       textVisible,
       relatedProductVisible,
       vipVisible,

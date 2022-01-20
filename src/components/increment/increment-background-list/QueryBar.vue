@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-27 13:25:49
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-27 14:14:55
+ * @LastEditTime: 2022-01-18 15:57:14
 -->
 <template>
   <transition name="slide-right-fade">
@@ -19,7 +19,7 @@
 
       <div class="query-content">
         <query-item
-          :data="sizeList"
+          :data="sizeList.map(item => item.label)"
           :activeIndex="sizeIndex"
           :title="pluginText.size"
           @change="changeSizeIndex"
