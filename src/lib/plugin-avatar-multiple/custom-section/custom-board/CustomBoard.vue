@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-21 13:21:01
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-18 17:35:02
+ * @LastEditTime: 2022-01-20 15:39:18
 -->
 <template>
   <div class="custom-board">
@@ -122,6 +122,7 @@ export default {
   emits: {
     close: null,
     save: null,
+    changeColor: null
   },
 
   setup(props, context) {
@@ -242,6 +243,7 @@ export default {
 
     // 修改肤色
     function handleChangeSkin(val) {
+      context.emit("changeColor", val);
       renderBgAndAnnex(val);
     }
 
