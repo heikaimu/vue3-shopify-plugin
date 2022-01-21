@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-01 10:45:12
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-04 10:01:43
+ * @LastEditTime: 2022-01-21 10:32:41
 -->
 <template>
   <div>
@@ -19,37 +19,19 @@
     </div>
 
     <div class="add-to-cart">
-      <div class="item">
-        <base-button
-          type="primary"
-          size="large"
-          @click="handleSave(true)"
-          id="button_add_to_cart_3"
-          >{{ pluginText.yes_add_cart }}</base-button
-        >
-      </div>
-      <div class="item">
-        <div class="divider">
-          <span class="text">{{ pluginText.or }}</span>
-        </div>
-      </div>
-      <div class="item">
-        <base-button
-          type="primary"
-          size="large"
-          plain
-          @click="handleSave(false)"
-          id="button_add_to_cart_4"
-          >{{ pluginText.no_add_cart }}</base-button
-        >
-      </div>
+      <base-confirm-button-group
+        :confirmText="pluginText.yes_add_cart"
+        :cancelText="pluginText.no_add_cart"
+        @confirm="handleSave(true)"
+        @cancel="handleSave(false)"
+      ></base-confirm-button-group>
     </div>
   </div>
 </template>
 
 <script setup>
 import { nextTick, inject } from "vue";
-
+import BaseConfirmButtonGroup from "../../../base/BaseConfirmButtonGroup.vue";
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
 
@@ -140,30 +122,6 @@ function removeID(newID) {
   }
 }
 .add-to-cart {
-  padding: 20px 20px 20px 20px;
-  .item {
-    & + .item {
-      margin-top: 10px;
-    }
-    .divider {
-      @include flex-row-center;
-      width: 100%;
-      .text {
-        @include flex-row-center;
-        font-size: 14px;
-        font-weight: 600;
-        color: $context-color;
-        &::after,
-        &::before {
-          display: block;
-          content: "";
-          width: 60px;
-          height: 1px;
-          background-color: currentColor;
-          margin: 0 5px;
-        }
-      }
-    }
-  }
+  padding: 20px;
 }
 </style>

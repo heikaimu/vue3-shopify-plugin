@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-24 11:03:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-18 17:18:35
+ * @LastEditTime: 2022-01-21 10:52:02
  */
 import { getRandomID } from './image';
 const VBOX_URL = 'https://cdn.shopifycdn.net/s/files/1/0343/0275/4948/files/vFace.png?v=1634089968';

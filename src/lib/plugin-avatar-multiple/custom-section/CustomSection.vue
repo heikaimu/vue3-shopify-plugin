@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 17:35:23
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-20 15:39:38
+ * @LastEditTime: 2022-01-21 10:57:15
 -->
 <template>
   <div class="body-custom-wrapper">
@@ -15,7 +15,7 @@
       v-bind="$attrs"
       @back="closePlugin"
       @select="selectCard"
-      @changeColor="changeColor"
+      @changeSkin="changeSkin"
     />
     <transition name="slide-up-fade" mode="out-in">
       <custom-board
@@ -25,7 +25,7 @@
         :skin="config.defaultSkin"
         :title="config.productTitle"
         :price="config.productPrice"
-        @changeColor="changeColor"
+        @changeSkin="changeSkin"
         @close="handleCloseBoard"
         @save="handleSave"
       />
@@ -89,7 +89,7 @@ export default {
       state.customBoardVisible = false;
     }
 
-    function changeColor(val) {
+    function changeSkin(val) {
       props.config.defaultSkin = val;
     }
 
@@ -99,7 +99,7 @@ export default {
       handleSave,
       selectCard,
       handleCloseBoard,
-      changeColor,
+      changeSkin,
     };
   },
 };

@@ -4,21 +4,25 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-20 15:37:15
+ * @LastEditTime: 2022-01-21 10:51:04
 -->
 <template>
   <div class="custom-list">
     <div class="custom-list__top">
-      <base-header icon="arrowLeft" :mediumText="!showSkin?`${pluginText.choose_template}`:''" @close="backToFileSelect" :center="false">
+      <base-header
+        icon="arrowLeft"
+        :mediumText="!showSkin ? `${pluginText.choose_template}` : ''"
+        @close="backToFileSelect"
+        :center="false"
+      >
         <skin-selector
           v-if="showSkin"
-          :list="skinList"
-          :skin="skin"
+          :skin="config.defaultSkin"
           @change="changeSkin"
         ></skin-selector>
         <couple-skin-selector
           v-else
-          :skin="skin"
+          :skin="config.defaultSkin"
           @change="changeSkin"
         ></couple-skin-selector>
       </base-header>
@@ -34,7 +38,7 @@
       <div class="body-list-wrapper">
         <body-list
           :list="currentGrouplist"
-          :skin="skin"
+          :skin="config.defaultSkin"
           v-bind="$attrs"
           @select="selectCard"
         />
@@ -52,7 +56,6 @@ import CoupleSkinSelector from "../../../../components/SkinSelector.vue";
 import SideNavigation from "./SideNavigation.vue";
 import BodyList from "./BodyList.vue";
 
-import useSkin from "../../../../composables/useSkin";
 import useBodyNavigation from "../../../../composables/useBodyNavigation";
 
 export default {
@@ -61,7 +64,7 @@ export default {
     SkinSelector,
     SideNavigation,
     BodyList,
-    CoupleSkinSelector
+    CoupleSkinSelector,
   },
 
   props: {
@@ -78,7 +81,7 @@ export default {
   emits: {
     back: null,
     select: null,
-    changeColor: null,
+    changeSkin: null,
   },
 
   setup(props, context) {
@@ -86,12 +89,6 @@ export default {
     const pluginText = inject("pluginText");
 
     const { config } = props;
-
-    const { skinList, skin, changeSkin } = useSkin(props);
-
-    watch(skin, (val) => {
-      context.emit("changeColor", val);
-    });
 
     const { currentGroupName, navigation, changeGroupName } =
       useBodyNavigation(props);
@@ -117,6 +114,10 @@ export default {
       return currentGroup ? currentGroup.images : [];
     });
 
+    function changeSkin(val) {
+      context.emit("changeSkin", val);
+    }
+
     // 卡片选择
     function selectCard(item) {
       context.emit("select", {
@@ -133,8 +134,6 @@ export default {
     return {
       ...toRefs(state),
       pluginText,
-      skinList,
-      skin,
       changeSkin,
       currentGroupName,
       navigation,

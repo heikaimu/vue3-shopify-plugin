@@ -4,20 +4,20 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-20 10:41:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 13:54:16
+ * @LastEditTime: 2022-01-21 10:56:46
 -->
 <template>
   <div class="color-selector-wrapper">
     <p class="color-title">{{ pluginText.skin_color }}:</p>
     <nav class="color-selector">
       <p
-        v-for="(item, index) in list"
+        v-for="(item, index) in skinList"
         :id="`menu_skin_${item.name}`"
         class="color-item"
         :class="{ active: item.name === skin }"
         :key="index"
         :style="{ backgroundColor: `${item.color}` }"
-        @click="handleChangeColor(item)"
+        @click="handleChangeSkin(item)"
       >
         <base-icon icon="check" :size="16" color="#ff533a"></base-icon>
       </p>
@@ -26,20 +26,29 @@
 </template>
 
 <script>
-import { inject } from "vue";
+import { ref, inject } from "vue";
 
 import BaseIcon from "../../../../base/BaseIcon.vue";
-
+const SKIN_OPTIONS = [
+  {
+    name: "white",
+    color: "#faebd5",
+  },
+  {
+    name: "black",
+    color: "#986e59",
+  },
+  {
+    name: "yellow",
+    color: "#f7d8aa",
+  },
+];
 export default {
   components: {
     BaseIcon,
   },
 
   props: {
-    list: {
-      type: Array,
-      deafult: () => [],
-    },
     skin: {
       type: String,
       deafult: "",
@@ -54,14 +63,17 @@ export default {
     // 国际化
     const pluginText = inject("pluginText");
 
+    const skinList = ref(SKIN_OPTIONS);
+
     // 修改肤色
-    function handleChangeColor(item) {
+    function handleChangeSkin(item) {
       context.emit("change", item.name);
     }
 
     return {
       pluginText,
-      handleChangeColor,
+      skinList,
+      handleChangeSkin,
     };
   },
 };

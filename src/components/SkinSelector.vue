@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-20 10:41:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-18 17:39:54
+ * @LastEditTime: 2022-01-21 10:57:01
 -->
 <template>
   <div class="color-selector-wrapper">
@@ -28,7 +28,7 @@
             :class="{ active: item.name === maleSkin }"
             :key="index"
             :style="{ backgroundColor: `${item.color}` }"
-            @click="handleChangeColor('male', item)"
+            @click="handleChangeSkin('male', item)"
           >
             <base-icon icon="check" :size="16" color="#ff533a"></base-icon>
           </p>
@@ -45,7 +45,7 @@
             :class="{ active: item.name === femaleSkin }"
             :key="index"
             :style="{ backgroundColor: `${item.color}` }"
-            @click="handleChangeColor('female', item)"
+            @click="handleChangeSkin('female', item)"
           >
             <base-icon icon="check" :size="16" color="#ff533a"></base-icon>
           </p>
@@ -159,7 +159,7 @@ export default {
     }
 
     // 修改肤色
-    function handleChangeColor(gender, item) {
+    function handleChangeSkin(gender, item) {
       if (gender === "male") {
         maleSkin.value = item.name;
       } else if (gender === "female") {
@@ -187,7 +187,7 @@ export default {
       maleSkin,
       femaleSkin,
       visible,
-      handleChangeColor,
+      handleChangeSkin,
       handleConfirm,
     };
   },

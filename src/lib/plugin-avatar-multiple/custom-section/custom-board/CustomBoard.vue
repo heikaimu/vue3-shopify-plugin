@@ -122,7 +122,7 @@ export default {
   emits: {
     close: null,
     save: null,
-    changeColor: null
+    changeSkin: null
   },
 
   setup(props, context) {
@@ -243,7 +243,7 @@ export default {
 
     // 修改肤色
     function handleChangeSkin(val) {
-      context.emit("changeColor", val);
+      context.emit("changeSkin", val);
       renderBgAndAnnex(val);
     }
 

@@ -4,14 +4,14 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-26 11:22:00
+ * @LastEditTime: 2022-01-21 10:54:04
 -->
 <template>
   <div class="body-custom-wrapper">
     <custom-list
       :config="config"
       v-bind="$attrs"
-      @changeColor="changeColor"
+      @changeSkin="changeSkin"
       @back="backToFileSelect"
       @select="selectCard"
     />
@@ -21,7 +21,7 @@
         :config="currentCardConfig"
         :title="config.productTitle"
         :price="config.productPrice"
-        :skin="skin"
+        :skin="config.defaultSkin"
         v-bind="$attrs"
         @back="customBoardVisible = false"
         @selectFile="selectFile"
@@ -61,7 +61,6 @@ export default {
     const state = reactive({
       customBoardVisible: false,
       currentCardConfig: {},
-      skin: ''
     });
 
     // 返回文件选择
@@ -86,8 +85,8 @@ export default {
       context.emit("confirm", url);
     }
 
-    function changeColor(val) {
-      state.skin = val;
+    function changeSkin(val) {
+      props.config.defaultSkin = val;
     }
 
     return {
@@ -95,7 +94,7 @@ export default {
       selectCard,
       backToFileSelect,
       confirmCustom,
-      changeColor,
+      changeSkin,
       selectFile
     };
   },

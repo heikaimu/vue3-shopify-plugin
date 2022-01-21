@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-18 14:29:16
+ * @LastEditTime: 2022-01-21 09:57:14
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -106,14 +106,14 @@ export default function useIncrement(props) {
     // keyName
     slidesKeyName = slides.keyName || 'Type';
 
-    const initValue = slides.data[0] ? slides.data[0].value : '';
+    // const initValue = slides.data[0] ? slides.data[0].value : '';
     _enqueue({
       data: toRaw(slides.data),
-      initValue,
+      initValue: '',
       name: 'slides'
     })
 
-    changeSlides(initValue);
+    // changeSlides(initValue);
   }
 
   function changeSlides(val) {

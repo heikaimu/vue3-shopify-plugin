@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-19 12:18:59
+ * @LastEditTime: 2022-01-21 10:30:50
 -->
 <template>
   <base-glass-dialog :visible="true" @close="handleClose">
@@ -23,30 +23,12 @@
         <p class="add-price">{{ currentPrice }}</p>
       </div>
       <div class="add-to-cart">
-        <div class="item">
-          <base-button
-            type="primary"
-            size="large"
-            @click="handleNext(true)"
-            id="button_add_to_cart_7"
-            >{{ pluginText.yes_next }}</base-button
-          >
-        </div>
-        <div class="item">
-          <div class="divider">
-            <span class="text">{{ pluginText.or }}</span>
-          </div>
-        </div>
-        <div class="item">
-          <base-button
-            type="primary"
-            size="large"
-            plain
-            @click="handleNext(false)"
-            id="button_add_to_cart_8"
-            >{{ pluginText.no_next }}</base-button
-          >
-        </div>
+        <base-confirm-button-group
+          :confirmText="pluginText.yes_next"
+          :cancelText="pluginText.no_next"
+          @confirm="handleNext(true)"
+          @cancel="handleNext(false)"
+        ></base-confirm-button-group>
       </div>
     </div>
   </base-glass-dialog>
@@ -58,6 +40,7 @@ import { reactive, toRefs, computed, inject, onMounted } from "vue";
 import BaseNotice from "../../../base/BaseNotice.vue";
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseGlassDialog from "../../../base/BaseGlassDialog.vue";
+import BaseConfirmButtonGroup from "../../../base/BaseConfirmButtonGroup.vue";
 
 import { publishSKU } from "../../../utils/productSKU";
 import { number } from "../../../utils/number";
@@ -67,6 +50,7 @@ export default {
     BaseNotice,
     BaseButton,
     BaseGlassDialog,
+    BaseConfirmButtonGroup,
   },
 
   props: {
@@ -153,10 +137,12 @@ export default {
       if (!currentItem.value) {
         return "";
       }
-      
+
       if (currentItem.value.publishType === "matching") {
-        const bgName = props.backgroundData.value.background.title || '';
-        const match = currentItem.value.urlList.find(item => item.name === bgName);
+        const bgName = props.backgroundData.value.background.title || "";
+        const match = currentItem.value.urlList.find(
+          (item) => item.name === bgName
+        );
         return match.url || currentItem.value.url;
       } else {
         return currentItem.value.url;
@@ -177,12 +163,12 @@ export default {
 
     // 描述
     const currentDesc = computed(() => {
-        if (!currentItem.value) {
+      if (!currentItem.value) {
         return "";
       }
 
       return currentItem.value.desc;
-    })
+    });
 
     // 关闭
     function handleClose() {
@@ -259,30 +245,6 @@ export default {
 
   .add-to-cart {
     padding: 0 20px 20px 20px;
-    .item {
-      & + .item {
-        margin-top: 10px;
-      }
-      .divider {
-        @include flex-row-center;
-        width: 100%;
-        .text {
-          @include flex-row-center;
-          font-size: 14px;
-          font-weight: 600;
-          color: $context-color;
-          &::after,
-          &::before {
-            display: block;
-            content: "";
-            width: 60px;
-            height: 1px;
-            background-color: currentColor;
-            margin: 0 5px;
-          }
-        }
-      }
-    }
   }
 }
 </style>
