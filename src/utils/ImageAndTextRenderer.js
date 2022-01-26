@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-12-08 17:30:37
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-06 15:16:58
+ * @LastEditTime: 2022-01-21 14:28:50
  */
 import { fabric } from 'fabric';
 import 'fabric-customise-controls';
@@ -95,6 +95,9 @@ export default class ImageAndTextRenderer {
 
     return new Promise((resolve, reject) => {
       Promise.all(queue).then((res) => {
+        setTimeout(() => {
+          this.instance.renderAll();
+        }, 300);
         resolve();
       });
     });

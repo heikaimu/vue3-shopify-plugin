@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-18 16:17:22
+ * @LastEditTime: 2022-01-21 14:04:50
 -->
 <template>
   <base-glass-dialog
@@ -215,7 +215,7 @@ export default {
     function setCanvasWidth() {
       const hwRate = bgRenderParams.value.height / bgRenderParams.value.width;
       const containerWidth = canvasContainer.value.getBoundingClientRect();
-      return (containerWidth.width * 0.9) / hwRate;
+      return (containerWidth.width * 0.7) / hwRate;
     }
 
     // 渲染器实列

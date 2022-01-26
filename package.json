@@ -28,6 +28,7 @@
     "element-plus": "^1.0.2-beta.55",
     "fabric": "2.7.0",
     "fabric-customise-controls": "^2.0.6-beta",
+    "fastclick": "^1.0.6",
     "filestack-js": "^3.23.1",
     "localforage": "^1.9.0",
     "lodash": "^4.17.21",

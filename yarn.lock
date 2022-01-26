@@ -2318,6 +2318,11 @@ fast-xml-parser@^3.16.0:
   resolved "https://registry.nlark.com/fast-xml-parser/download/fast-xml-parser-3.19.0.tgz#cb637ec3f3999f51406dd8ff0e6fc4d83e520d01"
   integrity sha1-y2N+w/OZn1FAbdj/Dm/E2D5SDQE=
 
+fastclick@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/fastclick/-/fastclick-1.0.6.tgz#161625b27b1a5806405936bda9a2c1926d06be6a"
+  integrity sha1-FhYlsnsaWAZAWTa9qaLBkm0Gvmo=
+
 fb-watchman@^2.0.0:
   version "2.0.1"
   resolved "https://registry.nlark.com/fb-watchman/download/fb-watchman-2.0.1.tgz#fc84fb39d2709cf3ff6d743706157bb5708a8a85"
