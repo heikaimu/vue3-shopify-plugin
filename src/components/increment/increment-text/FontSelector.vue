@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:13:47
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-27 15:04:50
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-26 14:47:19
 -->
 <template>
   <ul class="font__list">
@@ -35,18 +35,18 @@ export default {
   setup(props, context) {
     const state = reactive({
       list: [
-        {
-          value: "Black Ops One",
-          label: "Black Ops One",
-        },
+        // {
+        //   value: "Black Ops One",
+        //   label: "Black Ops One",
+        // },
         {
           value: "Ceviche One",
           label: "Ceviche One",
         },
-        {
-          value: "Creepster",
-          label: "Creepster",
-        },
+        // {
+        //   value: "Creepster",
+        //   label: "Creepster",
+        // },
         {
           value: "Lobster",
           label: "Lobster",
