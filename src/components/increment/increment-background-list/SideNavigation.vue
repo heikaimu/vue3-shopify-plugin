@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:31:51
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-12 15:00:20
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 10:24:41
 -->
 <template>
   <div class="anchor">
@@ -18,7 +18,7 @@
         @click="handleClick(index)"
       >
         <p class="anchor__text">
-          {{ item.title }} <span class="anchor__num">{{ item.children.length }}</span>
+          {{ item.title }} <span class="anchor__num">{{ item.count }}</span>
         </p>
       </li>
     </ul>

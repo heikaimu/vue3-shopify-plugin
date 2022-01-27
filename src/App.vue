@@ -3,11 +3,7 @@
     <div class="left">
       <ul class="nav__list" v-if="!loading">
         <li class="nav__item" v-for="item in products" :key="item.id">
-          <p
-            class="text"
-            :class="{ active: item.product.type === activeType }"
-            @click="openProductPlugin(item)"
-          >
+          <p class="text" :class="{ active: item.product.type === activeType }" @click="openProductPlugin(item)">
             {{ item.product.type }}
           </p>
         </li>
@@ -17,16 +13,7 @@
       <!-- <BaseImages :list="images" /> -->
     </div>
     <div class="right">
-      <MinimePillow
-        :config="config"
-        language="us"
-        :isManagementUse="false"
-        :sizeActiveName="sizeActiveName"
-        :backgroundActiveName="backgroundActiveName"
-        v-if="visible"
-        @close="visible = false"
-        @complete="complete"
-      />
+      <MinimePillow :config="config" language="de" :isManagementUse="false" :sizeActiveName="sizeActiveName" :backgroundActiveName="backgroundActiveName" v-if="visible" @close="visible = false" @complete="complete" />
     </div>
   </div>
 </template>
@@ -73,14 +60,7 @@ export default {
 
     onMounted(() => {
       state.images = getList(3);
-      // fetchConfigList();
     });
-
-    async function fetchConfigList() {
-      state.loading = true;
-      state.configData = await fetchData(PLUGIN_TYPE, WEBSITE);
-      state.loading = false;
-    }
 
     async function openProductPlugin(item) {
       state.config = await getConfig(item.product);
@@ -93,6 +73,7 @@ export default {
     async function getConfig(product) {
       const configData = await fetchData(PLUGIN_TYPE, WEBSITE);
       const curConfig = getProductConfig(configData, product.type);
+      console.log(curConfig)
       if (!curConfig) {
         return;
       }
@@ -246,10 +227,15 @@ function getProductConfig(configData, productType) {
   return config;
 }
 
+// ==========================================
+// ==================提交数据=================
+// ==========================================
 let backgroundList = [];
 let bodyList = [];
 let bodyMap;
+let bodyLanguageMap;
 let backgroundMap;
+let backgroundLanguageMap;
 let composingMap;
 let relatedProductMap;
 let sizeMap;
@@ -259,8 +245,10 @@ function createSubmitData(data, productType) {
   backgroundList = data.configure.backgroundList || [];
   bodyList = data.configure.miniMeData || [];
   bodyMap = createBodyMap(data.configure.miniMeData || []);
+  bodyLanguageMap = createBodyLanguageMap(data.configure.miniMeData || []);
   composingMap = createComposingMap(data.configure.composingList || []);
   backgroundMap = createBackgroundMap();
+  backgroundLanguageMap = createBackgroundLanguageMap();
   relatedProductMap = createRelatedProductMap(
     data.configure.relatedProductsList || []
   );
@@ -289,6 +277,7 @@ function createBodyGroupList(list) {
   const groupList = bodyList.map((item) => ({
     name: item.name,
     id: item.id,
+    language: bodyLanguageMap(item.id),
     images: [],
   }));
   for (const item of list) {
@@ -314,6 +303,7 @@ function createBackgroundGroupList(list) {
   const groupList = backgroundList.map((item) => ({
     title: item.title,
     id: item.id,
+    language: backgroundLanguageMap(item.id),
     children: [],
   }));
   for (const item of list) {
@@ -376,6 +366,17 @@ function createBodyMap() {
   };
 }
 
+function createBodyLanguageMap() {
+    const map = new Map();
+  for (let i = 0; i < bodyList.length; i++) {
+    const group = bodyList[i];
+       map.set(group.id, group.language);
+  }
+  return function getBodyLanguage(index) {
+    return map.get(index);
+  };
+}
+
 // 排版
 function createComposingMap(composingList) {
   const map = new Map();
@@ -403,6 +404,17 @@ function createBackgroundMap() {
     }
   }
   return function getBackground(name) {
+    return map.get(name);
+  };
+}
+
+function createBackgroundLanguageMap() {
+    const map = new Map();
+  for (let i = 0; i < backgroundList.length; i++) {
+    const group = backgroundList[i];
+    map.set(group.id, group.language);
+  }
+  return function getBackgroundLanguage(name) {
     return map.get(name);
   };
 }

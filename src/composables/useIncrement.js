@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-08-05 16:38:05
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-21 09:57:14
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 10:25:15
  */
 
 import { reactive, onMounted, computed, toRefs, toRaw } from "vue";
@@ -13,7 +13,7 @@ const CLOSE_RESET = true;
 
 export default function useIncrement(props) {
 
-  const { config, isManagementUse, language } = props;
+  const { config, isManagementUse } = props;
 
   const state = reactive({
     originalProductOptionsValue: {},

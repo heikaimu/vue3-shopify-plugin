@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-19 12:16:50
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 10:22:00
 -->
 <template>
   <div class="background-wrapper">
@@ -27,7 +27,7 @@
       <!-- 分组 -->
       <div class="side-navigation-box">
         <SideNavigation
-          :list="backgroundGroupList"
+          :list="backgroundGroupNavigationList"
           :value="groupIndex"
           @change="changeGroup"
         />
@@ -61,7 +61,7 @@
       :sizeList="sizeList"
       :sizeIndex="sizeIndex"
       :changeSizeIndex="changeSizeIndex"
-      :backgroundGroupList="backgroundGroupList"
+      :backgroundGroupNavigationList="backgroundGroupNavigationList"
       :groupIndex="groupIndex"
       :changeGroup="changeGroup"
     ></query-bar>
@@ -163,7 +163,7 @@ export default {
     // 背景
     const {
       groupIndex,
-      backgroundGroupList,
+      backgroundGroupNavigationList,
       backgroundList,
       backgroundIndex,
       backgroundName,
@@ -284,7 +284,7 @@ export default {
       ...toRefs(state),
       pluginText,
       handleClose,
-      backgroundGroupList,
+      backgroundGroupNavigationList,
       groupIndex,
       backgroundList,
       backgroundIndex,

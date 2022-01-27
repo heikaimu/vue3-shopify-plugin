@@ -3,17 +3,34 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-08-04 14:27:42
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-19 13:01:45
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 10:24:36
  */
-import { reactive, toRefs, onMounted, nextTick, computed } from "vue";
+import { reactive, toRefs, onMounted, nextTick, computed, inject } from "vue";
 
 export default function useBackground(props) {
+
+  const language = inject('language');
 
   const state = reactive({
     groupIndex: 0,
     backgroundGroupList: [],
     backgroundIndex: 0,
+  })
+
+  const backgroundGroupNavigationList = computed(() => {
+    return props.data.backgroundList.map(item => {
+      let title;
+      if (item.language) {
+        title = item.language[language] || item.title;
+      } else {
+        title = item.title;
+      }
+      return {
+        title,
+        count: item.children.length,
+      };
+    })
   })
 
   // 当前展示组数据
@@ -67,6 +84,7 @@ export default function useBackground(props) {
   return {
     ...toRefs(state),
     backgroundList,
+    backgroundGroupNavigationList,
     backgroundName,
     changeBackgroundIndex,
     changeGroup

@@ -3,15 +3,14 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-10-12 16:20:07
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-18 15:57:37
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 09:56:35
 -->
 <template>
   <component
     v-bind="$attrs"
     :config="config"
     :dollarSign="dollarSign"
-    :language="language"
     :is="currentElementComponent"
   />
 </template>
@@ -50,6 +49,7 @@ export default {
     });
 
     // 国际化
+    provide("language", props.language);
     provide("pluginText", pluginText(props.language));
 
     onMounted(() => {

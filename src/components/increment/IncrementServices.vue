@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-20 09:58:39
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 09:57:30
 -->
 <template>
   <!-- 增量服务 -->
@@ -152,11 +152,6 @@ export default {
     isManagementUse: {
       type: Boolean,
       default: false,
-    },
-    // 语言
-    language: {
-      type: String,
-      default: "us",
     },
     backgroundActiveName: {
       type: String,
