@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-21 10:51:04
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 17:52:01
 -->
 <template>
   <div class="custom-list">
@@ -31,8 +31,8 @@
       <div class="side-navigation-wrapper">
         <side-navigation
           :list="navigation"
-          :value="currentGroupName"
-          @change="changeGroupName"
+          :value="currentGroupId"
+          @change="changeGroup"
         />
       </div>
       <div class="body-list-wrapper">
@@ -90,7 +90,7 @@ export default {
 
     const { config } = props;
 
-    const { currentGroupName, navigation, changeGroupName } =
+    const { currentGroupId, currentGroupName, navigation, changeGroup } =
       useBodyNavigation(props);
 
     const state = reactive({
@@ -109,7 +109,7 @@ export default {
 
     const currentGrouplist = computed(() => {
       const currentGroup = (state.list || []).find(
-        (group) => group.name === currentGroupName.value
+        (group) => group.id === currentGroupId.value
       );
       return currentGroup ? currentGroup.images : [];
     });
@@ -137,10 +137,11 @@ export default {
       changeSkin,
       currentGroupName,
       navigation,
-      changeGroupName,
+      changeGroup,
       currentGrouplist,
       backToFileSelect,
       selectCard,
+      currentGroupId
     };
   },
 };
