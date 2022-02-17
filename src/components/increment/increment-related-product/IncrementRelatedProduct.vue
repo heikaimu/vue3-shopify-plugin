@@ -4,18 +4,11 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-25 16:36:22
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-29 17:59:16
+ * @LastEditTime: 2022-01-12 18:14:00
 -->
 <template>
-  <div class="increment-wrapper">
-    <div class="increment-blank" @click="handleClose"></div>
-
+  <base-glass-dialog :visible="true" @close="handleClose">
     <div class="increment-related-product">
-      
-      <span class="close-icon">
-        <base-icon icon="close" @click="handleClose" />
-      </span>
-      
       <!-- 单个产品 -->
       <product-single
         v-if="data.length === 1"
@@ -37,7 +30,7 @@
       <!-- 没有产品 -->
       <p v-else>empty</p>
     </div>
-  </div>
+  </base-glass-dialog>
 </template>
 
 <script setup>
@@ -46,6 +39,7 @@ import { onMounted, ref, watch } from "vue";
 import ProductSingle from "./ProductSingle.vue";
 import ProductMultiple from "./ProductMultiple.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
+import BaseGlassDialog from "../../../base/BaseGlassDialog.vue";
 
 const props = defineProps({
   data: {
@@ -53,14 +47,16 @@ const props = defineProps({
     default: () => [],
   },
   dollarSign: {
-    type: String
-  }
+    type: String,
+  },
 });
 
 const emit = defineEmits(["change", "close", "next"]);
 
 // 已选产品
-const checkedList = ref(props.data && props.data.length > 1 ? [props.data[0].id] : []);
+const checkedList = ref(
+  props.data && props.data.length > 1 ? [props.data[0].id] : []
+);
 
 // 勾选内容变化时出发修改函数
 watch(
@@ -86,24 +82,4 @@ function handleNext() {
 <style lang="scss" scoped>
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
-
-.increment-wrapper {
-  @include pos-absolute(0, 0, 0, 0, 1000);
-  .increment-blank {
-    @include glass;
-    @include pos-absolute(0, 0, 0, 0, 1001);
-    cursor: pointer;
-  }
-
-  .increment-related-product {
-    @include pos-absolute(auto, 0, 0, 0, 1002);
-    border-radius: 10px 10px 0 0;
-    background-color: #ffffff;
-
-    .close-icon {
-      @include pos-absolute(20px, auto, auto, 20px, 1004);
-      cursor: pointer;
-    }
-  }
-}
 </style>

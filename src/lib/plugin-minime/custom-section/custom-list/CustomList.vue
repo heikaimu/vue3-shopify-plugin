@@ -3,32 +3,42 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 15:49:33
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 14:13:06
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 17:52:01
 -->
 <template>
   <div class="custom-list">
     <div class="custom-list__top">
-      <base-header icon="arrowLeft" @close="backToFileSelect">
+      <base-header
+        icon="arrowLeft"
+        :mediumText="!showSkin ? `${pluginText.choose_template}` : ''"
+        @close="backToFileSelect"
+        :center="false"
+      >
         <skin-selector
-          :list="skinList"
-          :skin="skin"
+          v-if="showSkin"
+          :skin="config.defaultSkin"
           @change="changeSkin"
         ></skin-selector>
+        <couple-skin-selector
+          v-else
+          :skin="config.defaultSkin"
+          @change="changeSkin"
+        ></couple-skin-selector>
       </base-header>
     </div>
     <div class="custom-list__medium">
       <div class="side-navigation-wrapper">
         <side-navigation
           :list="navigation"
-          :value="currentGroupName"
-          @change="changeGroupName"
+          :value="currentGroupId"
+          @change="changeGroup"
         />
       </div>
       <div class="body-list-wrapper">
         <body-list
           :list="currentGrouplist"
-          :skin="skin"
+          :skin="config.defaultSkin"
           v-bind="$attrs"
           @select="selectCard"
         />
@@ -38,14 +48,14 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, computed, watch } from "vue";
+import { reactive, toRefs, onMounted, computed, watch, inject } from "vue";
 
 import BaseHeader from "../../../../base/BaseHeader.vue";
 import SkinSelector from "./SkinSelector.vue";
+import CoupleSkinSelector from "../../../../components/SkinSelector.vue";
 import SideNavigation from "./SideNavigation.vue";
 import BodyList from "./BodyList.vue";
 
-import useSkin from "../../../../composables/useSkin";
 import useBodyNavigation from "../../../../composables/useBodyNavigation";
 
 export default {
@@ -54,6 +64,7 @@ export default {
     SkinSelector,
     SideNavigation,
     BodyList,
+    CoupleSkinSelector,
   },
 
   props: {
@@ -61,24 +72,25 @@ export default {
       type: Object,
       deafult: () => {},
     },
+    showSkin: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   emits: {
     back: null,
     select: null,
-    changeColor: null
+    changeSkin: null,
   },
 
   setup(props, context) {
+    // 国际化
+    const pluginText = inject("pluginText");
+
     const { config } = props;
 
-    const { skinList, skin, changeSkin } = useSkin(props);
-
-    watch(skin, val => {
-      context.emit('changeColor', val);
-    })
-
-    const { currentGroupName, navigation, changeGroupName } =
+    const { currentGroupId, currentGroupName, navigation, changeGroup } =
       useBodyNavigation(props);
 
     const state = reactive({
@@ -92,15 +104,19 @@ export default {
 
     // 列表
     onMounted(() => {
-      state.list = config.miniMeData;
+      state.list = config.mainData.body.list;
     });
 
     const currentGrouplist = computed(() => {
       const currentGroup = (state.list || []).find(
-        (group) => group.name === currentGroupName.value
+        (group) => group.id === currentGroupId.value
       );
       return currentGroup ? currentGroup.images : [];
     });
+
+    function changeSkin(val) {
+      context.emit("changeSkin", val);
+    }
 
     // 卡片选择
     function selectCard(item) {
@@ -117,15 +133,15 @@ export default {
 
     return {
       ...toRefs(state),
-      skinList,
-      skin,
+      pluginText,
       changeSkin,
       currentGroupName,
       navigation,
-      changeGroupName,
+      changeGroup,
       currentGrouplist,
       backToFileSelect,
       selectCard,
+      currentGroupId
     };
   },
 };

@@ -9,44 +9,44 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed } from 'vue';
 
 const props = defineProps({
   type: {
     type: String,
-    default: "info",
+    default: 'info'
   },
   plain: {
     type: Boolean,
-    default: false,
+    default: false
   },
   size: {
     type: String,
-    default: "normal",
+    default: 'normal'
   },
   full: {
     type: Boolean,
-    default: false,
+    default: false
   },
   blod: {
     type: Number,
-    default: 400,
-  },
+    default: 400
+  }
 });
 
 const sizeMap = {
   normal: {
-    height: "36px",
-    borderRadius: "4px",
-    fontSize: "14px",
-    fontWeight: props.blod,
+    height: '36px',
+    borderRadius: '4px',
+    fontSize: '14px',
+    fontWeight: props.blod
   },
   large: {
-    height: "60px",
-    borderRadius: "6px",
-    fontSize: "18px",
-    fontWeight: props.blod,
-  },
+    height: '54px',
+    borderRadius: '6px',
+    fontSize: '18px',
+    fontWeight: props.blod
+  }
 };
 
 const sizeStyle = computed(() => {

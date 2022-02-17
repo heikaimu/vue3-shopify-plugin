@@ -1,12 +1,12 @@
 /**
  * 获取商品的所有变体
- * @param {Object} product 
- * @returns {Array} 
+ * @param {Object} product
+ * @returns {Array}
  */
 export function getSKUList(product) {
   const typeKeys = product.options.map((key) => {
     const arr = key.split(/[\:\?]/);
-    return arr[0] ? arr[0] : "";
+    return arr[0] ? arr[0] : '';
   });
   const list = [];
   for (const variant of product.variants) {
@@ -41,23 +41,23 @@ export function publishSKU(list, optionKey, options, publishName) {
     if (key !== optionKey) {
       other[key] = options[key];
     }
-  })
+  });
 
   let otherList = list.filter(item => {
     return _isInclude(item.options, other);
-  })
+  });
   otherList = _unique(otherList, 'price');
   const sortList = otherList.sort((a, b) => {
-    return a.price - b.price
-  })
+    return a.price - b.price;
+  });
 
   // 获取推荐
   const currentIndex = sortList.findIndex(item => {
     const isInclude = _isInclude(item.options, options);
     return isInclude;
-  })
+  });
   const currentItem = sortList[currentIndex];
-  
+
   let publishItem;
   const publishByName = sortList.find(item => item.options[optionKey] === publishName);
   if (publishName && publishByName && currentItem) {
@@ -79,17 +79,17 @@ export function publishSKU(list, optionKey, options, publishName) {
   return {
     title: publishItem.options[optionKey],
     addPrice: publishItem.price - currentItem.price
-  }
+  };
 }
 
 /**
  * 前者包含后者
- * @param {Object} a 
- * @param {Object} b 
+ * @param {Object} a
+ * @param {Object} b
  * @returns {Boolean}
  */
 function _isInclude(a, b) {
-  for (let key in b) {
+  for (const key in b) {
     if (a[key] !== b[key]) {
       return false;
     }
@@ -109,9 +109,9 @@ function _unique(arr, key) {
   const newArr = [];
   for (let i = 0; i < arr.length; i++) {
     if (!obj[arr[i][key]]) {
-      obj[arr[i][key]] = 1
-      newArr.push(arr[i])
+      obj[arr[i][key]] = 1;
+      newArr.push(arr[i]);
     }
   }
-  return newArr
+  return newArr;
 }

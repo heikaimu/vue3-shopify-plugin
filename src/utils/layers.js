@@ -1,12 +1,13 @@
 /*
- * @Description: 
+ * @Description:
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-09-24 11:03:45
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-16 16:51:47
+ * @LastEditTime: 2022-02-16 15:23:16
  */
 import { getRandomID } from './image';
+const VBOX_URL = 'https://cdn.shopifycdn.net/s/files/1/0343/0275/4948/files/vFace.png?v=1634089968';
 
 function getLayers({ config, files, skin }) {
   const layers = [];
@@ -88,13 +89,11 @@ function getAnnexList(config, skin, id) {
  * @returns
  */
 function getAvatarList(config, files) {
-  if (files.length === 0) {
-    return [];
-  }
-
+  files = files || [];
   const list = config.faceList;
   return list.map((item, index) => {
-    const avatar = files[index % files.length].data.avatar;
+    const curFile = files[index % files.length];
+    const avatar = curFile ? curFile.data.avatar : { url: VBOX_URL };
     item.configType = config.type;
     return getAvatar(item, avatar);
   });
@@ -125,6 +124,25 @@ function getAvatar(config, avatar, id) {
   };
 }
 
+function createVirtualBox(config) {
+  const { left, top, angle, width, type } = config;
+  return {
+    left,
+    top,
+    angle,
+    width,
+    originX: 'center',
+    originY: 'bottom',
+    sort: 3,
+    customControls: true,
+    globalCompositeOperation: type === 'hood' ? 'source-atop' : '',
+    type: 'vBox',
+    id: getRandomID(),
+    selectable: false,
+    name: `vBox`
+  };
+}
+
 /**
  * 获取SVG遮盖
  * @param {Object} config
@@ -150,5 +168,6 @@ export {
   getAnnexList,
   getAvatar,
   getAvatarList,
-  getSVG
+  getSVG,
+  createVirtualBox
 };

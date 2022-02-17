@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:00
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-11 14:13:46
+ * @LastEditTime: 2022-01-18 16:23:03
 -->
 <template>
   <div class="body-wrapper" ref="bodyContainer">
@@ -120,7 +120,7 @@ export default {
     // 初始化列表数据
     function initList() {
       // 容器初始化
-      bodyContent && bodyContent.value.scrollIntoView({ block: "start", inline: "nearest" });
+      bodyContent.value && bodyContent.value.scrollIntoView({ block: "start", inline: "nearest" });
 
       // 渲染器初始化
       clearRenderer();

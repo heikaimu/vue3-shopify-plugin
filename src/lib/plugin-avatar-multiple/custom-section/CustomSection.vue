@@ -4,32 +4,44 @@
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 17:35:23
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-10 16:11:19
+ * @LastEditTime: 2022-01-21 10:57:15
 -->
 <template>
-  <div>
-    <custom-board
-      v-if="currentConfig"
-      :config="currentConfig"
+  <div class="body-custom-wrapper">
+    <custom-list
+      :config="config"
+      :showSkin="false"
       :selectFiles="selectFiles"
-      :skin="config.defaultSkin"
-      :title="config.productTitle"
-      :price="config.productPrice"
-      @close="closePlugin"
-      @save="handleSave"
+      v-bind="$attrs"
+      @back="closePlugin"
+      @select="selectCard"
+      @changeSkin="changeSkin"
     />
+    <transition name="slide-up-fade" mode="out-in">
+      <custom-board
+        v-if="customBoardVisible"
+        :config="currentCardConfig"
+        :selectFiles="selectFiles"
+        :skin="config.defaultSkin"
+        :title="config.productTitle"
+        :price="config.productPrice"
+        @changeSkin="changeSkin"
+        @close="handleCloseBoard"
+        @save="handleSave"
+      />
+    </transition>
   </div>
 </template>
 
 <script>
-import { reactive, ref, toRefs, onMounted, watch } from "vue";
+import { reactive, toRefs } from "vue";
 
+import CustomList from "../../plugin-minime/custom-section/custom-list/CustomList.vue";
 import CustomBoard from "./custom-board/CustomBoard.vue";
-
-import { cloneDeep } from "lodash";
 
 export default {
   components: {
+    CustomList,
     CustomBoard,
   },
 
@@ -47,38 +59,14 @@ export default {
   emits: {
     close: null,
     save: null,
+    selectBody: null,
   },
 
   setup(props, context) {
     const state = reactive({
-      currentIndex: 0,
-      currentConfig: null,
-      faceList: []
+      customBoardVisible: false,
+      currentCardConfig: {},
     });
-
-    onMounted(() => {
-      setCurrentConfig();
-    });
-
-    watch(
-      () => state.currentIndex,
-      () => {
-        setCurrentConfig();
-      }
-    );
-
-    // 获取当前的配置
-    function setCurrentConfig() {
-      const groupList = props.config.miniMeData;
-      if (groupList && groupList.length > 0) {
-        let firstConfig = groupList[0].images[state.currentIndex];
-        if (!firstConfig.id) {
-          firstConfig = groupList[0].images[state.currentIndex + 1];
-        }
-        state.currentConfig = firstConfig;
-        state.faceList = cloneDeep(state.currentConfig.faceList);
-      }
-    }
 
     // 关闭插件
     function closePlugin() {
@@ -90,14 +78,58 @@ export default {
       context.emit("save", url);
     }
 
+    // 卡片选择
+    function selectCard(item) {
+      state.customBoardVisible = true;
+      state.currentCardConfig = item;
+      context.emit("selectBody", item);
+    }
+
+    function handleCloseBoard() {
+      state.customBoardVisible = false;
+    }
+
+    function changeSkin(val) {
+      props.config.defaultSkin = val;
+    }
+
     return {
       ...toRefs(state),
       closePlugin,
       handleSave,
+      selectCard,
+      handleCloseBoard,
+      changeSkin,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
+@import "src/styles/_variables.scss";
+@import "src/styles/_mixins.scss";
+
+.body-custom-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+// 下方
+.slide-up-fade-enter-from,
+.slide-up-fade-leave-to {
+  transform: translate3d(0, 50px, 0);
+  opacity: 0;
+}
+.slide-up-fade-leave-from,
+.slide-up-fade-enter-to {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+.slide-up-fade-enter-active {
+  transition: all 0.3s ease-in-out;
+}
+.slide-up-fade-leave-active {
+  transition: all 0.1s ease;
+}
 </style>

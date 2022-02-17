@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-11-01 10:45:38
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-23 17:53:57
+ * @LastEditTime: 2022-01-04 10:01:53
 -->
 <template>
   <div>
@@ -231,7 +231,7 @@ async function handleSave(flag) {
   }
 }
 .add-to-cart {
-  padding: 0 20px 20px 20px;
+  padding: 20px 20px 20px 20px;
   .item {
     & + .item {
       margin-top: 10px;

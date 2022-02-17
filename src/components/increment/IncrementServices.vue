@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-10-08 10:35:48
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-24 11:05:24
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 09:57:30
 -->
 <template>
   <!-- 增量服务 -->
@@ -21,15 +21,33 @@
       @next="nextIncrement"
     />
 
+    <!-- 夜灯底座 -->
+    <increment-night-light
+      v-else-if="nightLightVisible"
+      :data="incrementData.data"
+      :value="incrementData.value"
+      :customBodyPreviewURL="previewBody"
+      :dollarSign="dollarSign"
+      @change="changeNightLight"
+      @close="handleClose"
+      @next="nextIncrement"
+      @saveBgRenderParams="saveBgRenderParams"
+    />
+
     <!-- 背景图 -->
     <increment-background-list
       v-else-if="backgroundVisible"
-      :data="incrementData"
+      :data="incrementData.data"
+      :textData="textData"
       :customBodyPreviewURL="previewBody"
-      :sizeList="config.sizeList"
       :dollarSign="dollarSign"
-      v-bind="$attrs"
+      :backgroundActiveName="backgroundActiveName"
+      :composingActiveName="composingActiveName"
+      :sizeActiveName="sizeActiveName"
+      :textVisible="textVisible"
       @change="changeBackground"
+      @replacePreview="setPreviewWidthBackground"
+      @saveBgRenderParams="saveBgRenderParams"
       @close="handleClose"
       @next="nextIncrement"
     />
@@ -39,13 +57,13 @@
       v-else-if="textVisible"
       :data="incrementData.data"
       :value="incrementData.value"
-      :previewWidthBackground="previewWidthBackground"
-      :textRenderParams="textRenderParams"
+      :bgRenderParams="bgRenderParams"
       :dollarSign="dollarSign"
       @change="changeText"
       @close="handleClose"
       @next="nextIncrement"
       @render="setPreviewWidthBackground"
+      @back="handleBack"
     />
 
     <!-- 推荐 -->
@@ -56,8 +74,9 @@
       :productOptionsValue="productOptionsValue"
       :skuList="config.skuList"
       :dollarSign="dollarSign"
+      :backgroundData="backgroundData"
       @change="changePublish"
-      @close="handleClose"
+      @close="handleBack"
       @next="nextIncrement"
     />
 
@@ -89,6 +108,7 @@
 import { watch, toRaw } from "vue";
 
 import IncrementSlides from "./increment-slides/IncrementSlides.vue";
+import IncrementNightLight from "./increment-night-light/IncrementNightLight.vue";
 import IncrementBackgroundList from "./increment-background-list/IncrementBackgroundList.vue";
 import IncrementRelatedProduct from "./increment-related-product/IncrementRelatedProduct.vue";
 import IncrementVip from "./increment-vip/IncrementVip.vue";
@@ -100,6 +120,7 @@ import useIncrement from "../../composables/useIncrement";
 export default {
   components: {
     IncrementSlides,
+    IncrementNightLight,
     IncrementBackgroundList,
     IncrementRelatedProduct,
     IncrementVip,
@@ -132,11 +153,18 @@ export default {
       type: Boolean,
       default: false,
     },
-    // 语言
-    language: {
+    backgroundActiveName: {
       type: String,
-      default: 'us'
-    }
+      default: "",
+    },
+    composingActiveName: {
+      type: String,
+      default: "",
+    },
+    sizeActiveName: {
+      type: String,
+      default: "",
+    },
   },
 
   emits: {
@@ -149,26 +177,33 @@ export default {
     const {
       productOptionsValue,
       previewWidthBackground,
-      textRenderParams,
       queue,
       hasIncrement,
       incrementData,
+      textData,
       slidesVisible,
+      nightLightVisible,
       publishVisible,
       backgroundVisible,
+      backgroundData,
+      bgRenderParams,
       textVisible,
       relatedProductVisible,
       vipVisible,
       isLastIncrement,
+      isFirstIncrement,
       changeSlides,
       changeVip,
       changeRelatedProduct,
       setIncrementIndex,
       changeBackground,
+      saveBgRenderParams,
       setPreviewWidthBackground,
       changeText,
       changePublish,
+      changeNightLight,
       next,
+      back,
     } = useIncrement(props);
 
     /* 
@@ -209,6 +244,15 @@ export default {
       context.emit("close", false);
     }
 
+    // 回退
+    function handleBack() {
+      if (isFirstIncrement.value) {
+        context.emit("close", false);
+      } else {
+        back();
+      }
+    }
+
     // 开始上传
     function handleSave() {
       context.emit("save", {
@@ -221,13 +265,15 @@ export default {
     return {
       productOptionsValue,
       previewWidthBackground,
-      textRenderParams,
       queue,
       hasIncrement,
       incrementData,
+      textData,
       slidesVisible,
+      nightLightVisible,
       publishVisible,
       backgroundVisible,
+      backgroundData,
       textVisible,
       relatedProductVisible,
       vipVisible,
@@ -238,10 +284,14 @@ export default {
       setIncrementIndex,
       handleClose,
       changeBackground,
+      bgRenderParams,
+      saveBgRenderParams,
       setPreviewWidthBackground,
       changeText,
       changePublish,
+      changeNightLight,
       next,
+      handleBack,
       nextIncrement,
     };
   },

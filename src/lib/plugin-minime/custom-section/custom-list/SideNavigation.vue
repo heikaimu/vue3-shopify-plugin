@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:31:51
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-01 11:02:46
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 17:52:22
 -->
 <template>
   <div class="anchor">
@@ -12,7 +12,7 @@
       <li
         :id="getID(item)"
         class="anchor__item"
-        :class="{ active: item.name === value }"
+        :class="{ active: item.id === value }"
         v-for="item in list"
         :key="item.name"
         @click="handleClick(item)"
@@ -44,7 +44,7 @@ export default {
 
   setup(props, context) {
     function handleClick(item) {
-      context.emit("change", item.name);
+      context.emit("change", item.id);
     }
 
     function getID(item) {

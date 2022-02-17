@@ -34,7 +34,7 @@ function Minime(canvasID, size) {
 
 // 发布订阅模式
 // 订阅
-Minime.prototype.on = function (eventType, fn) {
+Minime.prototype.on = function(eventType, fn) {
   if (!this.eventObj[eventType]) {
     this.eventObj[eventType] = [];
   }
@@ -42,7 +42,7 @@ Minime.prototype.on = function (eventType, fn) {
 };
 
 // 发布
-Minime.prototype.emit = function () {
+Minime.prototype.emit = function() {
   const eventType = Array.prototype.shift.call(arguments);
   const arr = this.eventObj[eventType];
   if (!arr) {
@@ -55,7 +55,7 @@ Minime.prototype.emit = function () {
 };
 
 // 创建画布
-Minime.prototype.createCanvas = function () {
+Minime.prototype.createCanvas = function() {
   this.canvas = new fabric.Canvas(this.canvasID, {
     width: this.size.width || 600,
     height: this.size.height || 600,
@@ -65,12 +65,12 @@ Minime.prototype.createCanvas = function () {
 };
 
 // 通过插件设置控制器样式
-Minime.prototype.customControlsPlugin = function (params) {
+Minime.prototype.customControlsPlugin = function(params) {
   const _this = this;
   // 事件
   fabric.Canvas.prototype.customiseControls({
     tl: {
-      action: function (e, target) {
+      action: function(e, target) {
         if (typeof _this.replacePhoto === 'function') {
           _this.replacePhoto();
         }
@@ -86,7 +86,7 @@ Minime.prototype.customControlsPlugin = function (params) {
       cursor: 'pointer'
     },
     bl: {
-      action: function (e, target) {
+      action: function(e, target) {
         const scaleX = target.scaleX;
         target.set({
           scaleX: -Math.abs(scaleX)
@@ -104,7 +104,7 @@ Minime.prototype.customControlsPlugin = function (params) {
 * @param {Object} option - 配置
 * @returns
 */
-Minime.prototype.setOption = function ({ avatar, chin, option, skin, success, replacePhoto }) {
+Minime.prototype.setOption = function({ avatar, chin, option, skin, success, replacePhoto }) {
   this.skin = skin || 'white';
 
   if (!option) {
@@ -136,7 +136,7 @@ Minime.prototype.setOption = function ({ avatar, chin, option, skin, success, re
 };
 
 // normal类型
-Minime.prototype.renderNormal = function () {
+Minime.prototype.renderNormal = function() {
   this.renderBody().then(() => {
     this.renderAvatar().then((avatar) => {
       // this.canvas.setActiveObject(avatar);
@@ -152,7 +152,7 @@ Minime.prototype.renderNormal = function () {
 };
 
 // hood类型
-Minime.prototype.renderHood = function () {
+Minime.prototype.renderHood = function() {
   this.renderMask().then(() => {
     this.renderAvatar('source-atop').then((avatar) => {
       // this.canvas.setActiveObject(avatar);
@@ -164,7 +164,7 @@ Minime.prototype.renderHood = function () {
 };
 
 // 渲染成功
-Minime.prototype.renderSuccess = function () {
+Minime.prototype.renderSuccess = function() {
   if (this.cb) {
     this.cb(this.canvas);
   }
@@ -176,7 +176,7 @@ Minime.prototype.renderSuccess = function () {
 * @param {String} globalCompositeOperation - 叠加模式
 * @returns {Promise}
 */
-Minime.prototype.renderBody = function (level, globalCompositeOperation) {
+Minime.prototype.renderBody = function(level, globalCompositeOperation) {
   level = level || 'background';
   globalCompositeOperation = globalCompositeOperation || 'source-over';
   const item = this.option.images.find(item => item.color === this.skin);
@@ -206,7 +206,7 @@ Minime.prototype.renderBody = function (level, globalCompositeOperation) {
 * 渲染遮盖svg
 * @returns {Promise}
 */
-Minime.prototype.renderMask = function () {
+Minime.prototype.renderMask = function() {
   const url = this.option.avatar.path;
 
   return new Promise((resolve, reject) => {
@@ -230,7 +230,7 @@ Minime.prototype.renderMask = function () {
 * @param {String} globalCompositeOperation - 叠加模式
 * @returns {Promise}
 */
-Minime.prototype.renderAvatar = function (globalCompositeOperation) {
+Minime.prototype.renderAvatar = function(globalCompositeOperation) {
   globalCompositeOperation = globalCompositeOperation || 'source-over';
   const avatarOption = this.option.face;
 
@@ -300,7 +300,7 @@ Minime.prototype.renderAvatar = function (globalCompositeOperation) {
   });
 };
 
-Minime.prototype.avatarObject = function (avatarOption) {
+Minime.prototype.avatarObject = function(avatarOption) {
   // avatarResource
   return new Promise((resolve, reject) => {
     if (!this.avatarResource) {
@@ -349,7 +349,7 @@ Minime.prototype.avatarObject = function (avatarOption) {
 * 渲染附件集合
 * @returns {Promise}
 */
-Minime.prototype.renderAnnexList = function () {
+Minime.prototype.renderAnnexList = function() {
   return new Promise((resolve, reject) => {
     const annexList = this.option.annex || [];
     const promiseAnnexList = annexList.map((annex, index) => {
@@ -367,7 +367,7 @@ Minime.prototype.renderAnnexList = function () {
 * @param {Object} data
 * @returns {Promise}
 */
-Minime.prototype.renderAnnexItem = function (data, index) {
+Minime.prototype.renderAnnexItem = function(data, index) {
   return new Promise((resolve, reject) => {
     const url = data.images.find(item => item.color === this.skin).url;
     fabric.Image.fromURL(url, img => {
@@ -432,7 +432,7 @@ Minime.prototype.renderAnnexItem = function (data, index) {
 * 获取尺寸信息
 * @param {Number} val - 尺寸
 */
-Minime.prototype.getSize = function (val) {
+Minime.prototype.getSize = function(val) {
   if (isNaN(Number(val))) {
     return 0;
   }
@@ -444,7 +444,7 @@ Minime.prototype.getSize = function (val) {
 * 设置尺寸信息
 * @param {Number} val - 尺寸
 */
-Minime.prototype.setSize = function (val) {
+Minime.prototype.setSize = function(val) {
   if (isNaN(Number(val))) {
     return 0;
   }
@@ -457,7 +457,7 @@ Minime.prototype.setSize = function (val) {
 * @param {*} obj - 对象
 * @param {*} e
 */
-Minime.prototype.updateSize = function (obj, e, avatar) {
+Minime.prototype.updateSize = function(obj, e, avatar) {
   const target = e.transform.target;
   const { left, top, width, height, scaleX, scaleY, angle } = target;
   obj.left = this.setSize(left);
@@ -475,19 +475,19 @@ Minime.prototype.updateSize = function (obj, e, avatar) {
 };
 
 // 获取当前配置项
-Minime.prototype.getOption = function () {
+Minime.prototype.getOption = function() {
   return JSON.parse(JSON.stringify(this.option));
 };
 
 // 生产最终数据
-Minime.prototype.toDataURL = function () {
+Minime.prototype.toDataURL = function() {
   return this.canvas.toDataURL({
     format: 'png',
     quality: 1
   });
 };
 
-Minime.prototype.destroy = function () {
+Minime.prototype.destroy = function() {
   this.canvas.width = 0;
   this.canvas.height = 0;
   this.canvas.clear();

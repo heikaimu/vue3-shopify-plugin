@@ -4,9 +4,9 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-26 09:36:56
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-07-26 09:40:59
+ * @LastEditTime: 2022-02-16 15:23:54
  */
-import { addTicker, removeTicker } from "./ticker";
+import { addTicker, removeTicker } from './ticker';
 
 /**
  * @param {Number} parts - 总任务数
@@ -22,8 +22,8 @@ export default class Progress {
     this._completeParts = 0;
     this._percent = 0;
     this._speed = speed;
-    this._onProgress = onProgress ? onProgress : null;
-    this._onComplete = onComplete ? onComplete : null;
+    this._onProgress = onProgress || null;
+    this._onComplete = onComplete || null;
   }
 
   start() {

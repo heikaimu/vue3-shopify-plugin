@@ -1,10 +1,10 @@
 /*
- * @Description: 
+ * @Description:
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-08-02 15:51:31
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-09 15:12:24
+ * @LastEditTime: 2022-02-16 15:23:34
  */
 import RequestDecorator from './requestDecorator';
 import Minime from './canvasRenderer';
@@ -12,7 +12,7 @@ import Minime from './canvasRenderer';
 const COUNT = 10;
 const minimeList = [];
 for (let i = 0; i < COUNT; i++) {
-  const renderer = new Minime("", {
+  const renderer = new Minime('', {
     width: 500,
     height: 650,
     scale: 500 / 3100
@@ -21,7 +21,7 @@ for (let i = 0; i < COUNT; i++) {
   minimeList.push({
     renderer,
     free: true
-  })
+  });
 }
 
 // 空闲的
@@ -55,7 +55,7 @@ function renderImage(layers) {
     } else {
       resolve('');
     }
-  })
+  });
 }
 
 // 清空所有渲染器队列

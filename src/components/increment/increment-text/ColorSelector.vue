@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-09-28 10:13:55
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-30 10:33:24
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-26 14:46:48
 -->
 <template>
   <ul class="color__list">
@@ -49,13 +49,10 @@ export default {
         { label: "White", value: "#ffffff" },
         { label: "Black", value: "#111111" },
         { label: "Pink", value: "#D92FBB" },
-        { label: "Green", value: "#0FDA16" },
-        { label: "Purple", value: "#760360" },
-        { label: "Golden", value: "#5D4A0C" },
-        { label: "Silver", value: "#606060" },
-        { label: "Red", value: "#B51506" },
-        { label: "Blue", value: "#057ABC" },
-        { label: "Lakeblue", value: "#067D97" },
+        { label: "Green", value: "#0DE9B3" },
+        { label: "Blue", value: "#209AE1" },
+        { label: "Red", value: "#E42F33" },
+        { label: "Yellow", value: "#F2E406" },
       ],
       value: "",
     });
@@ -93,7 +90,7 @@ export default {
   .color__item {
     flex: 1;
     box-sizing: border-box;
-    padding: 4px;
+    padding: 0 4px;
     .color__text {
       @include flex-row-center;
       height: 30px;

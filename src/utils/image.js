@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 16:48:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-08-03 17:49:37
+ * @LastEditTime: 2022-02-16 15:23:00
  */
 
 /**
@@ -47,7 +47,7 @@ function blobToDataURL(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
-    reader.onload = function (e) {
+    reader.onload = function(e) {
       resolve(e.target.result);
     };
   });
@@ -55,16 +55,16 @@ function blobToDataURL(blob) {
 
 /**
  * 获取文件大小
- * @param {*} url 
+ * @param {*} url
  */
 function getFileSize(url) {
   return new Promise((resolve) => {
     fetch(url)
       .then(response => response.blob())
       .then(res => {
-        resolve(res.size)
-      })
-  })
+        resolve(res.size);
+      });
+  });
 }
 
 /**
@@ -278,7 +278,7 @@ function colorMatrix(url, option) {
 function debounce(fn, delay) {
   let timer = null;
 
-  return function () {
+  return function() {
     const _this = this;
     const args = arguments;
     if (timer) {
@@ -301,8 +301,8 @@ function throttle(fn, delay, atleast) {
   let timer = null;
   let previous = null;
 
-  return function () {
-    let now = +new Date();
+  return function() {
+    const now = +new Date();
 
     if (!previous) previous = now;
     if (atleast && now - previous > atleast) {
@@ -312,12 +312,12 @@ function throttle(fn, delay, atleast) {
       clearTimeout(timer);
     } else {
       clearTimeout(timer);
-      timer = setTimeout(function () {
+      timer = setTimeout(function() {
         fn();
         previous = null;
       }, delay);
     }
-  }
+  };
 }
 
 /**
@@ -346,22 +346,159 @@ function cropImage(image, x, y, width, height) {
 function loadImage(url) {
   return new Promise((resolve) => {
     const image = new Image();
-    image.onload = function () {
+    image.onload = function() {
       resolve(image);
     };
     image.crossOrigin = 'Anonymous'; // 支持跨域图片
     image.src = url;
   });
-};
+}
 
 function loadImages(images) {
   const queue = images.map(url => {
     return loadImage(url);
   });
-  return new Promise((resolve) => {
-    Promise.all(queue).then(res => {
-      resolve(res);
-    });
+  return Promise.all(queue).then(res => {
+    return res;
+  });
+}
+
+/**
+ * 清楚图片周围空白区域
+ * @param {string} url - 图片地址或base64
+ * @param {number} [padding=0] - 内边距
+ * @return {string} base64 - 裁剪后的图片字符串
+ */
+function clearImageEdgeBlank(url, padding = 0) {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const image = new Image();
+    image.onload = function() {
+      canvas.width = image.width;
+      canvas.height = image.height;
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      const { data, width, height } = imageData;
+
+      // 裁剪需要的起点和终点,初始值为画布左上和右下点互换设置成极限值。
+      let startX = width;
+      let startY = height;
+      let endX = 0;
+      let endY = 0;
+
+      /*
+      col为列，row为行，两层循环构造每一个网格，
+      便利所有网格的像素，如果有色彩则设置裁剪的起点和终点
+      */
+      for (let col = 0; col < width; col++) {
+        for (let row = 0; row < height; row++) {
+          // 网格索引
+          const pxStartIndex = (row * width + col) * 4;
+
+          // 网格的实际像素RGBA
+          const pxData = {
+            r: data[pxStartIndex],
+            g: data[pxStartIndex + 1],
+            b: data[pxStartIndex + 2],
+            a: data[pxStartIndex + 3]
+          };
+
+          // 存在色彩：不透明
+          const colorExist = pxData.a !== 0;
+
+          /*
+          如果当前像素点有色彩
+          startX坐标取当前col和startX的最小值
+          endX坐标取当前col和endX的最大值
+          startY坐标取当前row和startY的最小值
+          endY坐标取当前row和endY的最大值
+          */
+          if (colorExist) {
+            startX = Math.min(col, startX);
+            endX = Math.max(col, startX);
+            startY = Math.min(row, startY);
+            endY = Math.max(row, endY);
+          }
+        }
+      }
+
+      // 右下坐标需要扩展1px,才能完整的截取到图像
+      endX += 1;
+      endY += 1;
+
+      // 加上padding
+      startX -= padding;
+      startY -= padding;
+      endX += padding;
+      endY += padding;
+
+      // 根据计算的起点终点进行裁剪
+      const cropCanvas = document.createElement('canvas');
+      const cropCtx = cropCanvas.getContext('2d');
+      cropCanvas.width = endX - startX;
+      cropCanvas.height = endY - startY;
+      cropCtx.drawImage(
+        image,
+        startX,
+        startY,
+        cropCanvas.width,
+        cropCanvas.height,
+        0,
+        0,
+        cropCanvas.width,
+        cropCanvas.height
+      );
+
+      // rosolve裁剪后的图像字符串
+      resolve(cropCanvas.toDataURL());
+    };
+
+    image.src = url;
+    image.crossOrigin = 'Anonymous';
+  });
+}
+
+/**
+ * 图片翻转
+ * @param {*} file - 图片，blob或者base64或者链接
+ * @param {*} type - 返回的类型，默认base64，可选blob
+ * @returns base64/blob
+ */
+function flipImage(file, type = 'base64') {
+  return new Promise((resolve, reject) => {
+    let url = '';
+
+    if (typeof file === 'object') {
+      url = getObjectUrl(file);
+    } else {
+      url = file;
+    }
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const image = new Image();
+    image.onload = function() {
+      canvas.width = image.width;
+      canvas.height = image.height;
+      ctx.translate(image.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(image, 0, 0, image.width, image.height);
+
+      const base64 = canvas.toDataURL('image/png', 0.9);
+      if (type === 'base64') {
+        resolve(base64);
+      } else {
+        resolve(dataURLtoBlob(base64));
+      }
+    };
+    image.onerror = function() {
+      reject('图片加载失败');
+    };
+    image.src = url;
+    image.crossOrigin = 'Anonymous';
   });
 }
 
@@ -378,5 +515,7 @@ export {
   throttle,
   cropImage,
   loadImage,
-  loadImages
+  loadImages,
+  clearImageEdgeBlank,
+  flipImage
 };

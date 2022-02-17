@@ -4,10 +4,16 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-19 16:32:06
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-11-22 13:53:19
+ * @LastEditTime: 2022-01-21 11:00:52
 -->
 <template>
   <div class="body-card" @click="handleClick">
+    <!-- 带商品预览图 -->
+    <!-- <div class="body-card__box" v-if="config.productPrivew">
+      <img class="body-card__img" :src="config.productPrivew" alt="" />
+    </div> -->
+
+    <!-- 不带商品预览图 -->
     <!-- normal -->
     <div class="body-card__box" v-if="config.type === 'normal'">
       <img class="body-card__img" :src="bodyURL" alt="" @load="bgLoad" />
@@ -24,10 +30,12 @@
     <div class="body-card__box" v-else>
       <img class="body-card__img" :src="bodyURL" alt="" />
     </div>
+
     <!-- 标签 -->
     <p class="body-card__edit-tag" :class="{ disabled: loading }">
       {{ pluginText.tap_edit }}
     </p>
+
     <!-- loading -->
     <div class="body-card__loading" v-if="loading">
       <div class="loading-icon">
@@ -45,7 +53,6 @@ import BaseIcon from "../../../../base/BaseIcon.vue";
 import { renderer } from "../../../../utils/minimeRenderer";
 import { loadImage } from "../../../../utils/image";
 import { getLayers } from "../../../../utils/layers";
-import { stubTrue } from "lodash";
 
 export default {
   components: {
@@ -54,8 +61,8 @@ export default {
 
   props: {
     selectFiles: {
-      type: Object,
-      deafult: () => {},
+      type: Array,
+      deafult: () => [],
     },
     config: {
       type: Object,
@@ -99,7 +106,7 @@ export default {
       () => {
         renderImage(props.skin);
       },
-      { deep: stubTrue }
+      { deep: true }
     );
 
     // 渲染卡片
@@ -261,7 +268,7 @@ export default {
   }
 }
 .body-card__loading {
-  @include pos-absolute;
+  @include pos-absolute(0, 0, 0, 0, 999);
   @include flex-row-center;
   border-radius: 10px;
   background-color: rgba($color: #000000, $alpha: 0.6);

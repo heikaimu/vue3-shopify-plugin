@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-16 14:28:55
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-10-28 16:38:46
+ * @LastEditTime: 2022-01-20 13:23:04
 -->
 <template>
   <div class="base-header">
@@ -18,6 +18,7 @@
     <div class="base-header__title" :class="{ center: center }">
       <p class="main-text">{{ mainText }}</p>
       <p class="sub-text">{{ subText }}</p>
+      <p class="medium-text">{{ mediumText }}</p>
     </div>
     <div class="slot-wrapper">
       <slot />
@@ -34,6 +35,10 @@ const props = defineProps({
     default: "",
   },
   subText: {
+    type: String,
+    default: "",
+  },
+  mediumText: {
     type: String,
     default: "",
   },
@@ -93,6 +98,16 @@ const props = defineProps({
     font-size: 12px;
     color: #a1a1a1;
     line-height: 1.3;
+    margin-bottom: 0;
+  }
+
+  .medium-text {
+    @include omits(1);
+    font-size: 14px;
+    color: #333333;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 0;
   }
 }
 

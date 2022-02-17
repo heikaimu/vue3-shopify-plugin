@@ -3,137 +3,119 @@
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
- * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-21 17:05:06
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-27 10:22:00
 -->
 <template>
-  <div class="increment-wrapper">
-    <div class="increment-blank" @click="handleClose"></div>
-    <div class="increment-background">
-      <span class="close-icon">
-        <base-icon icon="close" @click="handleClose" />
-      </span>
+  <div class="background-wrapper">
+    <div class="background-top">
+      <base-header
+        :center="false"
+        mainText="Background Chose"
+        icon="arrowLeft"
+        @close="handleClose"
+      >
+        <filter-button
+          v-if="isExistQueryBar"
+          :active="queryVisible"
+          @click="handleOpenToggle"
+        ></filter-button>
+      </base-header>
+    </div>
 
-      <div class="preview-image">
-        <!-- <base-loading-dot/> -->
-        <canvas id="bgCombineCanvas"></canvas>
+    <div class="background-medium">
+      <!-- 分组 -->
+      <div class="side-navigation-box">
+        <SideNavigation
+          :list="backgroundGroupNavigationList"
+          :value="groupIndex"
+          @change="changeGroup"
+        />
       </div>
-
-      <div class="canvas-handler" v-if="hasHandler">
-        <ul class="operations">
-          <li class="item">
-            <div class="card" @click="handleLayer('zoomUp')" id="icon_zoom_up">
-              <base-icon icon="zoomUp" color="#ff533a" />
-            </div>
-          </li>
-          <li class="item">
-            <div
-              class="card"
-              @click="handleLayer('zoomDown')"
-              id="icon_zoom_down"
-            >
-              <base-icon icon="zoomDown" color="#ff533a" />
-            </div>
-          </li>
-          <li class="item">
-            <div
-              class="card"
-              @click="handleLayer('rotateLeft')"
-              id="icon_rotate_left"
-            >
-              <base-icon icon="rotateLeft" color="#ff533a" />
-            </div>
-          </li>
-          <li class="item">
-            <div
-              class="card"
-              @click="handleLayer('rotateRight')"
-              id="icon_rotate_right"
-            >
-              <base-icon icon="rotateRight" color="#ff533a" />
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <base-notice class="bg-notice">{{
-        pluginText.bg_note_content
-      }}</base-notice>
-
-      <!-- 尺寸 -->
-      <swiper-size
-        v-if="sizeList.length > 1"
-        :data="sizeList"
-        :activeIndex="sizeIndex"
-        @change="changeSizeIndex"
-      ></swiper-size>
-
-      <!-- 排版 -->
-      <swiper-composing
-        v-if="composingList.length > 1"
-        :data="composingList"
-        :activeIndex="composingIndex"
-        @change="changeComposingIndex"
-      ></swiper-composing>
-
-      <!-- 背景分组 -->
-      <swiper-background-group
-        v-if="backgroundGroupList.length > 1"
-        :data="backgroundGroupList"
-        :activeIndex="groupIndex"
-        @change="changeGroup"
-      ></swiper-background-group>
 
       <!-- 背景 -->
-      <swiper-background
-        :data="backgroundList"
-        :size="currentSize"
-        :activeIndex="backgroundIndex"
-        @change="changeBackgroundIndex"
-      ></swiper-background>
-
-      <div class="add-to-cart">
-        <base-button
-          type="primary"
-          size="large"
-          @click="handleNext"
-          id="button_add_to_cart_2"
-          >{{ pluginText.add_cart }}</base-button
-        >
+      <div class="list-box">
+        <div ref="listBox">
+          <background-list
+            :data="backgroundList"
+            :backgroundImage="data.backgroundImage"
+            :overlayImage="data.overlayImage"
+            :size="sizeName"
+            :activeIndex="backgroundIndex"
+            :customBodyPreviewURL="customBodyPreviewURL"
+            @change="changeBackgroundIndex"
+            @cardSelect="handleCardSelect"
+          ></background-list>
+        </div>
       </div>
     </div>
+
+    <!-- loading -->
+    <div class="loading-box" v-if="loadingVisible">
+      <BaseLoadingDot />
+    </div>
+
+    <!-- 搜索条件 -->
+    <query-bar
+      v-model:visible="queryVisible"
+      :sizeList="sizeList"
+      :sizeIndex="sizeIndex"
+      :changeSizeIndex="changeSizeIndex"
+      :backgroundGroupNavigationList="backgroundGroupNavigationList"
+      :groupIndex="groupIndex"
+      :changeGroup="changeGroup"
+    ></query-bar>
+
+    <!-- 背景模版调整弹窗 -->
+    <background-custom
+      v-model:visible="customVisible"
+      :data="selectedCardData"
+      @close="handleClose"
+      @save="handleReplacePreview"
+    ></background-custom>
+
+    <!-- 文字确认弹窗 -->
+    <text-confirm-box
+      v-model:visible="textConfirmVisible"
+      :data="textData"
+      :dollarSign="dollarSign"
+      @custom="handleCustomText"
+    ></text-confirm-box>
   </div>
 </template>
 
 <script>
-import { watch, toRaw, ref, inject, computed } from "vue";
-
+import { reactive, toRefs, inject, ref, watch, computed } from "vue";
+import BaseHeader from "../../../base/BaseHeader.vue";
 import BaseButton from "../../../base/BaseButton.vue";
 import BaseIcon from "../../../base/BaseIcon.vue";
 import BaseNotice from "../../../base/BaseNotice.vue";
 import BaseLoadingDot from "../../../base/BaseLoadingDot.vue";
-import SwiperSize from "./SwiperSize.vue";
-import SwiperBackgroundGroup from "./SwiperBackgroundGroup.vue";
-import SwiperBackground from "./SwiperBackground.vue";
-import SwiperComposing from "./SwiperComposing.vue";
 
-import useCombineImage from "../../../composables/useCombineImage";
+import BackgroundList from "./BackgroundList.vue";
+import QueryBar from "./QueryBar.vue";
+import FilterButton from "./FilterButton.vue";
+import SideNavigation from "./SideNavigation.vue";
+import TextConfirmBox from "./TextConfirmBox.vue";
+import BackgroundCustom from "./BackgroundCustom.vue";
+
 import useBackground from "../../../composables/useBackground";
-import useComposing from "../../../composables/useComposing";
-import useSize from "../../../composables/useSize";
 
-import { debounce } from "lodash";
+import ImageAndTextRenderer from "../../../utils/ImageAndTextRenderer";
 
 export default {
   components: {
+    BaseHeader,
     BaseButton,
     BaseIcon,
     BaseNotice,
     BaseLoadingDot,
-    SwiperSize,
-    SwiperBackgroundGroup,
-    SwiperBackground,
-    SwiperComposing,
+    BackgroundList,
+    QueryBar,
+    FilterButton,
+    SideNavigation,
+    TextConfirmBox,
+    BackgroundCustom,
   },
 
   props: {
@@ -141,15 +123,18 @@ export default {
       type: Object,
       default: () => {},
     },
+    textData: {
+      type: Object,
+      default: () => {},
+    },
     customBodyPreviewURL: {
       type: String,
       default: "",
     },
-    backgroundActiveName: {
+    dollarSign: {
       type: String,
-      default: "",
     },
-    composingActiveName: {
+    backgroundActiveName: {
       type: String,
       default: "",
     },
@@ -157,9 +142,9 @@ export default {
       type: String,
       default: "",
     },
-    sizeList: {
-      type: Array,
-      default: 0,
+    textVisible: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -167,6 +152,8 @@ export default {
     change: null,
     close: null,
     next: null,
+    replacePreview: null,
+    saveBgRenderParams: null,
   },
 
   setup(props, context) {
@@ -176,107 +163,110 @@ export default {
     // 背景
     const {
       groupIndex,
-      backgroundGroupList,
+      backgroundGroupNavigationList,
       backgroundList,
       backgroundIndex,
       backgroundName,
       changeBackgroundIndex,
-      getBackgroundImage,
       changeGroup,
     } = useBackground(props);
 
-    // 排版
-    const {
-      composingList,
-      composingIndex,
-      composingName,
-      changeComposingIndex,
-      getComposing,
-    } = useComposing(props);
+    // 切换分组的时候滚动到顶部
+    const listBox = ref(null);
+    watch(
+      () => groupIndex.value,
+      () => {
+        listBox &&
+          listBox.value.scrollIntoView({ block: "start", inline: "nearest" });
+      }
+    );
 
-    // 尺寸
-    const { sizeList, sizeIndex, sizeName, currentSize, changeSizeIndex } =
-      useSize(props);
+    // ================== Size =================
+    // size list
+    const sizeList = computed(() => {
+      return props.data.sizeList;
+    });
+    // size index
+    const sizeIndex = ref(0);
+    // size name
+    const sizeName = computed(() => {
+      if (sizeList.value.length === 0) {
+        return "";
+      }
+      return sizeList.value[sizeIndex.value];
+    });
+    // change size
+    function changeSizeIndex(index) {
+      sizeIndex.value = index;
+    }
+    // ================== Size End =================
 
-    // 图片渲染器
-    const { loading, hasHandler, renderPreview, getPreviewURL, handleLayer } =
-      useCombineImage(props);
-
-    // 如果是尺寸和排版变更了，则全部重新渲染
-    watch([composingIndex, sizeIndex], () => {
-      renderNow(true);
+    // 是否有搜索条件
+    const isExistQueryBar = computed(() => {
+      return sizeList.value.length > 1;
     });
 
-    // 如果只是背景切换了，则修改背景
-    watch([backgroundIndex], () => {
-      renderNow(false);
+    // 背景信息
+    const state = reactive({
+      // 文字提示
+      textConfirmVisible: false,
+      // 选择的背景信息
+      selectedCardData: {},
+      // 背景定制
+      customVisible: false,
+      // 加载...
+      loadingVisible: false,
     });
 
-    // 立刻渲染
-    const renderNow = debounce((renderAll = true) => {
-      const params = getRenderParams();
-
-      if (!params) {
-        return;
+    // 选择背景
+    async function handleCardSelect(data, index, item) {
+      // 设置背景渲染参数
+      state.selectedCardData = data;
+      // 保存当前选择的背景
+      saveCurrentInfo(data, index, item);
+      // 如果有文字则出现文字弹窗
+      if (props.textData) {
+        // state.textConfirmVisible = true;
+        handleCustomText(true);
+      } else {
+        state.customVisible = true;
       }
-
-      if (!params.backgroundImage) {
-        return;
-      }
-
-      renderPreview(params, renderAll);
-    }, 100);
-
-    let textRenderParams = {};
-
-    // 获取渲染参数
-    function getRenderParams() {
-      if (!currentSize.value) {
-        return;
-      }
-
-      const size = props.sizeList.find(
-        (item) => item.label === currentSize.value
-      ).value;
-      const backgroundImage = getBackgroundImage(currentSize.value);
-      const layerList = getComposing(currentSize.value);
-      textRenderParams = {
-        size: toRaw(size),
-        layerList: layerList.filter((item) => item.type === "text"),
-      };
-      return {
-        size: toRaw(size),
-        backgroundImage,
-        layerList: layerList.filter((item) => item.type !== "text"),
-        layerImage: props.customBodyPreviewURL,
-      };
     }
 
-    // 更新背景图
-    function updatePreviewInfo() {
-      return new Promise((resolve) => {
-        getPreviewURL().then((url) => {
-          context.emit("change", {
-            preview: url,
-            params: {
-              size: {
-                index: sizeIndex.value,
-                title: sizeName.value,
-              },
-              background: {
-                index: backgroundIndex.value,
-                title: backgroundName.value,
-              },
-              composing: {
-                index: composingIndex.value,
-                title: composingName.value,
-              },
-            },
-            textRenderParams,
-          });
-          resolve();
-        });
+    // 保存背景信息
+    function saveCurrentInfo(data, index, item) {
+      // 背景信息
+      const backgroundInfo = {
+        params: {
+          size: {
+            index: sizeIndex.value,
+            title: sizeName.value,
+          },
+          background: {
+            index,
+            title: item.title,
+          },
+        },
+      };
+      context.emit("change", backgroundInfo);
+    }
+
+    // 定制
+    function handleCustomText(flag) {
+      // 保存渲染信息
+      context.emit("saveBgRenderParams", {
+        ...state.selectedCardData,
+        customTextVisible: flag,
       });
+
+      // 下一步
+      context.emit("next");
+    }
+
+    // 保存修改位置后的背景图
+    function handleReplacePreview(url) {
+      context.emit("replacePreview", url);
+      context.emit("next");
     }
 
     // 关闭
@@ -284,17 +274,17 @@ export default {
       context.emit("close");
     }
 
-    // 前往下一步
-    async function handleNext() {
-      await updatePreviewInfo();
-      context.emit("next");
+    // 显示隐藏搜索条件
+    const queryVisible = ref(false);
+    function handleOpenToggle() {
+      queryVisible.value = !queryVisible.value;
     }
 
     return {
+      ...toRefs(state),
       pluginText,
       handleClose,
-      handleNext,
-      backgroundGroupList,
+      backgroundGroupNavigationList,
       groupIndex,
       backgroundList,
       backgroundIndex,
@@ -302,14 +292,15 @@ export default {
       changeBackgroundIndex,
       sizeList,
       sizeIndex,
-      currentSize,
+      sizeName,
       changeSizeIndex,
-      composingList,
-      composingIndex,
-      changeComposingIndex,
-      loading,
-      hasHandler,
-      handleLayer,
+      handleCardSelect,
+      listBox,
+      queryVisible,
+      handleOpenToggle,
+      isExistQueryBar,
+      handleCustomText,
+      handleReplacePreview,
     };
   },
 };
@@ -319,73 +310,62 @@ export default {
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
 
-.increment-wrapper {
+.background-wrapper {
   @include pos-absolute(0, 0, 0, 0, 1000);
-  .increment-blank {
-    @include glass;
+  @include flex-col-sb;
+  background-color: #ffffff;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+
+  .loading-box {
     @include pos-absolute(0, 0, 0, 0, 1001);
-    cursor: pointer;
+    @include flex-row-center;
+    background-color: rgba(255, 255, 255, 0.9);
   }
 
-  .increment-background {
-    @include pos-absolute(auto, 0, 0, 0, 1002);
-    border-radius: 10px 10px 0 0;
-    background-color: #ffffff;
+  .background-top {
+    width: 100%;
+  }
 
-    .close-icon {
-      @include pos-absolute(20px, auto, auto, 20px, 1003);
-      cursor: pointer;
+  .background-medium {
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+
+    .side-navigation-box {
+      flex: 0 0 86px;
+      height: 100%;
     }
 
-    .preview-image {
-      @include flex-row-center;
+    .list-box {
+      flex: 1;
       width: 100%;
-      padding-top: 20px;
-      padding-bottom: 10px;
-      .img {
-        @include card-shadow-lg;
-        width: auto;
-        height: 225px;
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center center;
-        transition: 0.3s;
+      background-color: #f9f9f9;
+      box-sizing: border-box;
+      padding: 10px;
+      overflow-x: hidden;
+      overflow: auto;
+
+      /*解决ios上滑动不流畅*/
+      -webkit-overflow-scrolling: touch;
+      &::-webkit-scrollbar {
+        // 滚动条
+        // display: none;
+        width: 4px;
       }
-    }
-
-    .canvas-handler {
-      @include flex-row-center;
-      padding-bottom: 10px;
-      .operations {
-        @include flex-row-center;
-        .item {
-          .card {
-            display: flex;
-            margin: 0 5px;
-            padding: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            cursor: pointer;
-            position: relative;
-          }
-        }
+      &::-webkit-scrollbar-thumb {
+        /*滚动条里面小方块*/
+        border-radius: 2px;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        background: #535353;
       }
-    }
-
-    .bg-notice {
-      padding-bottom: 10px;
-    }
-
-    .custom-title {
-      padding-bottom: 20px;
-      text-align: center;
-      font-size: 16px;
-      color: $theme-color;
-      margin-bottom: 0;
-    }
-
-    .add-to-cart {
-      padding: 0 20px 20px 20px;
+      &::-webkit-scrollbar-track {
+        /*滚动条里面轨道*/
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        border-radius: 2px;
+        background: #ededed;
+      }
     }
   }
 }

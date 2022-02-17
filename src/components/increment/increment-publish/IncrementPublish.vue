@@ -4,57 +4,34 @@
  * @Author: Yaowen Liu
  * @Date: 2021-07-22 17:48:57
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-13 14:10:07
+ * @LastEditTime: 2022-01-21 10:30:50
 -->
 <template>
-  <div class="increment-wrapper">
-    <div class="increment-blank" @click="handleClose"></div>
+  <base-glass-dialog :visible="true" @close="handleClose">
     <div class="increment-publish">
-      <span class="close-icon">
-        <base-icon icon="close" @click="handleClose" />
-      </span>
-
       <div class="text-wrapper">
         <div class="text__preview">
           <img
-            v-if="currentItem.url"
+            v-if="currentURL"
             class="img"
-            :src="currentItem.url"
+            :src="currentURL"
             alt=""
             srcset=""
           />
         </div>
-        <p class="desc">{{ currentItem.desc }}</p>
+        <p class="desc">{{ currentDesc }}</p>
         <p class="add-price">{{ currentPrice }}</p>
       </div>
       <div class="add-to-cart">
-        <div class="item">
-          <base-button
-            type="primary"
-            size="large"
-            @click="handleNext(true)"
-            id="button_add_to_cart_7"
-            >{{ pluginText.yes_next }}</base-button
-          >
-        </div>
-        <div class="item">
-          <div class="divider">
-            <span class="text">{{ pluginText.or }}</span>
-          </div>
-        </div>
-        <div class="item">
-          <base-button
-            type="primary"
-            size="large"
-            plain
-            @click="handleNext(false)"
-            id="button_add_to_cart_8"
-            >{{ pluginText.no_next }}</base-button
-          >
-        </div>
+        <base-confirm-button-group
+          :confirmText="pluginText.yes_next"
+          :cancelText="pluginText.no_next"
+          @confirm="handleNext(true)"
+          @cancel="handleNext(false)"
+        ></base-confirm-button-group>
       </div>
     </div>
-  </div>
+  </base-glass-dialog>
 </template>
 
 <script>
@@ -62,7 +39,8 @@ import { reactive, toRefs, computed, inject, onMounted } from "vue";
 
 import BaseNotice from "../../../base/BaseNotice.vue";
 import BaseButton from "../../../base/BaseButton.vue";
-import BaseIcon from "../../../base/BaseIcon.vue";
+import BaseGlassDialog from "../../../base/BaseGlassDialog.vue";
+import BaseConfirmButtonGroup from "../../../base/BaseConfirmButtonGroup.vue";
 
 import { publishSKU } from "../../../utils/productSKU";
 import { number } from "../../../utils/number";
@@ -71,7 +49,8 @@ export default {
   components: {
     BaseNotice,
     BaseButton,
-    BaseIcon,
+    BaseGlassDialog,
+    BaseConfirmButtonGroup,
   },
 
   props: {
@@ -89,6 +68,10 @@ export default {
     },
     dollarSign: {
       type: String,
+    },
+    backgroundData: {
+      type: Object,
+      default: null,
     },
   },
 
@@ -117,6 +100,10 @@ export default {
             props.productOptionsValue,
             item.publishName
           );
+          // console.log(props.skuList)
+          // console.log(props.productOptionsValue)
+          // console.log(item.key)
+          // console.log(item.publishName)
           return {
             ...item,
             sku,
@@ -145,6 +132,23 @@ export default {
       return state.publishQueue[state.queueIndex] || false;
     });
 
+    // 当前展示的图片
+    const currentURL = computed(() => {
+      if (!currentItem.value) {
+        return "";
+      }
+
+      if (currentItem.value.publishType === "matching") {
+        const bgName = props.backgroundData.value.background.title || "";
+        const match = currentItem.value.urlList.find(
+          (item) => item.name === bgName
+        );
+        return match.url || currentItem.value.url;
+      } else {
+        return currentItem.value.url;
+      }
+    });
+
     // 当前价格
     const currentPrice = computed(() => {
       if (!currentItem.value) {
@@ -155,6 +159,15 @@ export default {
         currentItem.value.sku.addPrice / 100,
         2
       )}`;
+    });
+
+    // 描述
+    const currentDesc = computed(() => {
+      if (!currentItem.value) {
+        return "";
+      }
+
+      return currentItem.value.desc;
     });
 
     // 关闭
@@ -179,7 +192,8 @@ export default {
     return {
       ...toRefs(state),
       pluginText,
-      currentItem,
+      currentURL,
+      currentDesc,
       currentPrice,
       handleClose,
       handleNext,
@@ -192,87 +206,45 @@ export default {
 @import "src/styles/_variables.scss";
 @import "src/styles/_mixins.scss";
 
-.increment-wrapper {
-  @include pos-absolute(0, 0, 0, 0, 1000);
-  .increment-blank {
-    @include glass;
-    @include pos-absolute(0, 0, 0, 0, 1001);
-    cursor: pointer;
+.increment-publish {
+  .text-wrapper {
+    padding: 20px 20px 20px 20px;
+    .text__preview {
+      @include flex-row-center;
+      // @include pos-absolute(-120px, auto, auto, 50%, 1003);
+      // transform: translate3d(-50%, 0, 0);
+      padding-bottom: 20px;
+      width: 100%;
+      .img {
+        @include card-shadow-lg;
+        display: block;
+        width: 240px;
+        height: 240px;
+        object-fit: contain;
+        padding: 2px;
+        background: #fff;
+        border-radius: 10px;
+      }
+    }
+    .add-price {
+      width: 100%;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: $theme-color;
+    }
+    .desc {
+      padding: 0 20px 10px 20px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: $title-color;
+      text-align: center;
+      margin-bottom: 0;
+    }
   }
 
-  .increment-publish {
-    @include pos-absolute(auto, 0, 0, 0, 1002);
-    border-radius: 10px 10px 0 0;
-    background-color: #ffffff;
-
-    .close-icon {
-      @include pos-absolute(20px, auto, auto, 20px, 1004);
-      cursor: pointer;
-    }
-
-    .text-wrapper {
-      padding: 140px 20px 20px 20px;
-      .text__preview {
-        @include flex-col-center;
-        @include pos-absolute(-120px, auto, auto, 50%, 1003);
-        transform: translate3d(-50%, 0, 0);
-        width: 100%;
-        height: 240px;
-        .img {
-          @include card-shadow-lg;
-          display: block;
-          width: 240px;
-          height: 240px;
-          object-fit: contain;
-          padding: 2px;
-          background: #fff;
-          border-radius: 10px;
-        }
-      }
-      .add-price {
-        width: 100%;
-        text-align: center;
-        font-size: 16px;
-        font-weight: 700;
-        color: $theme-color;
-      }
-      .desc {
-        padding: 0 20px 10px 20px;
-        font-size: 18px;
-        line-height: 1.6;
-        color: $title-color;
-        text-align: center;
-        margin-bottom: 0;
-      }
-    }
-
-    .add-to-cart {
-      padding: 0 20px 20px 20px;
-      .item {
-        & + .item {
-          margin-top: 10px;
-        }
-        .divider {
-          @include flex-row-center;
-          width: 100%;
-          .text {
-            @include flex-row-center;
-            font-size: 14px;
-            font-weight: 600;
-            color: $context-color;
-            &::after,
-            &::before {
-              display: block;
-              content: "";
-              width: 60px;
-              height: 1px;
-              background-color: currentColor;
-              margin: 0 5px;
-            }
-          }
-        }
-      }
-    }
+  .add-to-cart {
+    padding: 0 20px 20px 20px;
   }
 }
 </style>
