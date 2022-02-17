@@ -19,28 +19,28 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted } from "vue";
+import { reactive, toRefs, onMounted } from 'vue';
 
-import MinimePillow from "./lib";
+import MinimePillow from './lib';
 // import MinimePillow from "minime-pillow";
 // import "minime-pillow/dist/style.css";
 
-import BaseImages from "./base/BaseImages.vue";
-import axios from "axios";
+import BaseImages from './base/BaseImages.vue';
+import axios from 'axios';
 // import { configMock } from "./mock/config";
 
 // const PLUGIN_TYPE = "PLUG_BODY_CUSTOM";
-const PLUGIN_TYPE = "TEST";
-const WEBSITE = "M";
+const PLUGIN_TYPE = 'TEST';
+const WEBSITE = 'M';
 
-import products from "../products/index";
+import products from '../products/index';
 
-import { getList } from "./api/images";
+import { getList } from './api/images';
 
 export default {
   components: {
     MinimePillow,
-    BaseImages,
+    BaseImages
   },
 
   setup() {
@@ -51,11 +51,11 @@ export default {
       backgroundActiveIndex: 0,
       composingActiveIndex: 0,
       sizeActiveName: '30" x 40"',
-      backgroundActiveName: "bg-tanzi-22",
+      backgroundActiveName: 'bg-tanzi-22',
       products: products,
-      activeType: "",
+      activeType: '',
       images: [],
-      loading: false,
+      loading: false
     });
 
     onMounted(() => {
@@ -73,7 +73,7 @@ export default {
     async function getConfig(product) {
       const configData = await fetchData(PLUGIN_TYPE, WEBSITE);
       const curConfig = getProductConfig(configData, product.type);
-      console.log(curConfig)
+      console.log(curConfig);
       if (!curConfig) {
         return;
       }
@@ -83,15 +83,15 @@ export default {
       return {
         mainData: curConfig,
         website: WEBSITE,
-        defaultSkin: "yellow",
+        defaultSkin: 'yellow',
         skuList: getSKUlist(product),
         productOptionsValue: {
-          Size: "S",
+          Size: 'S'
           // Type: "Single Side",
           // Style: '7-Color Touch'
         },
-        productPrice: "$300",
-        productTitle: product.title,
+        productPrice: '$300',
+        productTitle: product.title
       };
     }
 
@@ -103,16 +103,16 @@ export default {
     return {
       ...toRefs(state),
       complete,
-      openProductPlugin,
+      openProductPlugin
     };
-  },
+  }
 };
 
 // 获取SKU list
 function getSKUlist(product) {
   const typeKeys = product.options.map((key) => {
     const arr = key.split(/[\:\?]/);
-    return arr[0] ? arr[0] : "";
+    return arr[0] ? arr[0] : '';
   });
   const list = [];
   for (const variant of product.variants) {
@@ -122,7 +122,7 @@ function getSKUlist(product) {
       price,
       id,
       sku,
-      options: {},
+      options: {}
     };
 
     for (let i = 0; i < typeKeys.length; i++) {
@@ -151,8 +151,8 @@ function topBodyCard(data) {
 function getTagID() {
   var tags = "{{ product.tags | join:',' }}";
   var optionResult = tags.match(/mini-me-default-\d+/);
-  var _number = optionResult && Number(optionResult[0].split("-").pop());
-  return isNaN(_number) ? "" : _number;
+  var _number = optionResult && Number(optionResult[0].split('-').pop());
+  return isNaN(_number) ? '' : _number;
 }
 
 // ==========================================
@@ -182,31 +182,31 @@ const timer = new Timer();
 function fetchData(PLUGIN_TYPE, WEBSITE) {
   const fetchConfig = (type) => {
     let url;
-    if (type === "current") {
+    if (type === 'current') {
       url = `https://sback.globalhot.shop/plugins/api/v1/configure?webSite=${WEBSITE}&plugType=${PLUGIN_TYPE}`;
-    } else if (type === "public") {
+    } else if (type === 'public') {
       url = `https://sback.globalhot.shop/plugins/api/v1/configure?id=40`;
     }
     return new Promise((resolve, reject) => {
       $.ajax(url, {
         success(res) {
           const { status, data } = res;
-          if (status === "0" && data[0]) {
+          if (status === '0' && data[0]) {
             resolve(data[0]);
           } else {
-            reject("配置错误");
+            reject('配置错误');
           }
         },
         error: () => {
           reject();
-        },
+        }
       });
     });
   };
-  timer.set("fetch");
+  timer.set('fetch');
   return Promise.all([fetchConfig('public'), fetchConfig('current')]).then(
     ([data1, data2]) => {
-      console.log(`数据请求耗时：${timer.get("fetch") / 1000}秒`);
+      console.log(`数据请求耗时：${timer.get('fetch') / 1000}秒`);
       data1.configure = JSON.parse(data1.configure);
       data2.configure = JSON.parse(data2.configure);
       data2.configure.miniMeData = data1.configure.miniMeData;
@@ -221,9 +221,9 @@ function fetchData(PLUGIN_TYPE, WEBSITE) {
 
 // 获取产品对应的配置
 function getProductConfig(configData, productType) {
-  timer.set("deal");
+  timer.set('deal');
   const config = createSubmitData(configData, productType);
-  console.log(`数据处理完成，耗时：${timer.get("deal") / 1000}秒`);
+  console.log(`数据处理完成，耗时：${timer.get('deal') / 1000}秒`);
   return config;
 }
 
@@ -267,9 +267,9 @@ function createSubmitData(data, productType) {
 
 // 身体
 function dealSubmitBody(body) {
-  timer.set("body");
+  timer.set('body');
   const bodyCardList = body.list.map(bodyMap).filter((item) => item);
-  console.log(`处理身体需要用时：${timer.get("body") / 1000}s`);
+  console.log(`处理身体需要用时：${timer.get('body') / 1000}s`);
   body.list = createBodyGroupList(bodyCardList);
 }
 
@@ -278,7 +278,7 @@ function createBodyGroupList(list) {
     name: item.name,
     id: item.id,
     language: bodyLanguageMap(item.id),
-    images: [],
+    images: []
   }));
   for (const item of list) {
     for (const group of groupList) {
@@ -304,7 +304,7 @@ function createBackgroundGroupList(list) {
     title: item.title,
     id: item.id,
     language: backgroundLanguageMap(item.id),
-    children: [],
+    children: []
   }));
   for (const item of list) {
     for (const group of groupList) {
@@ -340,7 +340,7 @@ function dealSubmitNightLight(nightLight) {
       return {
         ...item,
         background: backgroundMap(item.backgroundID),
-        size: sizeMap(item.size),
+        size: sizeMap(item.size)
       };
     });
   }
@@ -357,7 +357,7 @@ function createBodyMap() {
       const item = group.images[j];
       map.set(item.index, {
         ...item,
-        pid: group.id,
+        pid: group.id
       });
     }
   }
@@ -367,10 +367,10 @@ function createBodyMap() {
 }
 
 function createBodyLanguageMap() {
-    const map = new Map();
+  const map = new Map();
   for (let i = 0; i < bodyList.length; i++) {
     const group = bodyList[i];
-       map.set(group.id, group.language);
+    map.set(group.id, group.language);
   }
   return function getBodyLanguage(index) {
     return map.get(index);
@@ -399,7 +399,7 @@ function createBackgroundMap() {
       item.composing = composingMap(item.composing);
       map.set(item.title, {
         ...item,
-        pid: group.id,
+        pid: group.id
       });
     }
   }
@@ -409,7 +409,7 @@ function createBackgroundMap() {
 }
 
 function createBackgroundLanguageMap() {
-    const map = new Map();
+  const map = new Map();
   for (let i = 0; i < backgroundList.length; i++) {
     const group = backgroundList[i];
     map.set(group.id, group.language);

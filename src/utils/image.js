@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-05-07 16:48:42
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2022-01-10 09:51:26
+ * @LastEditTime: 2022-02-16 15:23:00
  */
 
 /**
@@ -47,7 +47,7 @@ function blobToDataURL(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
-    reader.onload = function (e) {
+    reader.onload = function(e) {
       resolve(e.target.result);
     };
   });
@@ -55,16 +55,16 @@ function blobToDataURL(blob) {
 
 /**
  * 获取文件大小
- * @param {*} url 
+ * @param {*} url
  */
 function getFileSize(url) {
   return new Promise((resolve) => {
     fetch(url)
       .then(response => response.blob())
       .then(res => {
-        resolve(res.size)
-      })
-  })
+        resolve(res.size);
+      });
+  });
 }
 
 /**
@@ -278,7 +278,7 @@ function colorMatrix(url, option) {
 function debounce(fn, delay) {
   let timer = null;
 
-  return function () {
+  return function() {
     const _this = this;
     const args = arguments;
     if (timer) {
@@ -301,8 +301,8 @@ function throttle(fn, delay, atleast) {
   let timer = null;
   let previous = null;
 
-  return function () {
-    let now = +new Date();
+  return function() {
+    const now = +new Date();
 
     if (!previous) previous = now;
     if (atleast && now - previous > atleast) {
@@ -312,12 +312,12 @@ function throttle(fn, delay, atleast) {
       clearTimeout(timer);
     } else {
       clearTimeout(timer);
-      timer = setTimeout(function () {
+      timer = setTimeout(function() {
         fn();
         previous = null;
       }, delay);
     }
-  }
+  };
 }
 
 /**
@@ -346,13 +346,13 @@ function cropImage(image, x, y, width, height) {
 function loadImage(url) {
   return new Promise((resolve) => {
     const image = new Image();
-    image.onload = function () {
+    image.onload = function() {
       resolve(image);
     };
     image.crossOrigin = 'Anonymous'; // 支持跨域图片
     image.src = url;
   });
-};
+}
 
 function loadImages(images) {
   const queue = images.map(url => {
@@ -371,10 +371,10 @@ function loadImages(images) {
  */
 function clearImageEdgeBlank(url, padding = 0) {
   return new Promise((resolve, reject) => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
     const image = new Image();
-    image.onload = function () {
+    image.onload = function() {
       canvas.width = image.width;
       canvas.height = image.height;
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -383,10 +383,10 @@ function clearImageEdgeBlank(url, padding = 0) {
       const { data, width, height } = imageData;
 
       // 裁剪需要的起点和终点,初始值为画布左上和右下点互换设置成极限值。
-      let startX = width,
-        startY = height,
-        endX = 0,
-        endY = 0;
+      let startX = width;
+      let startY = height;
+      let endX = 0;
+      let endY = 0;
 
       /*
       col为列，row为行，两层循环构造每一个网格，
@@ -394,7 +394,6 @@ function clearImageEdgeBlank(url, padding = 0) {
       */
       for (let col = 0; col < width; col++) {
         for (let row = 0; row < height; row++) {
-
           // 网格索引
           const pxStartIndex = (row * width + col) * 4;
 
@@ -436,8 +435,8 @@ function clearImageEdgeBlank(url, padding = 0) {
       endY += padding;
 
       // 根据计算的起点终点进行裁剪
-      const cropCanvas = document.createElement("canvas");
-      const cropCtx = cropCanvas.getContext("2d");
+      const cropCanvas = document.createElement('canvas');
+      const cropCtx = cropCanvas.getContext('2d');
       cropCanvas.width = endX - startX;
       cropCanvas.height = endY - startY;
       cropCtx.drawImage(
@@ -457,7 +456,7 @@ function clearImageEdgeBlank(url, padding = 0) {
     };
 
     image.src = url;
-    image.crossOrigin = "Anonymous";
+    image.crossOrigin = 'Anonymous';
   });
 }
 
@@ -481,7 +480,7 @@ function flipImage(file, type = 'base64') {
     const ctx = canvas.getContext('2d');
 
     const image = new Image();
-    image.onload = function () {
+    image.onload = function() {
       canvas.width = image.width;
       canvas.height = image.height;
       ctx.translate(image.width, 0);
@@ -495,7 +494,7 @@ function flipImage(file, type = 'base64') {
         resolve(dataURLtoBlob(base64));
       }
     };
-    image.onerror = function () {
+    image.onerror = function() {
       reject('图片加载失败');
     };
     image.src = url;

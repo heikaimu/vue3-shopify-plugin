@@ -4,7 +4,7 @@
  * @Author: Yaowen Liu
  * @Date: 2021-09-23 13:24:29
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-12-16 10:37:53
+ * @LastEditTime: 2022-02-16 15:19:11
  */
 
 import { fabric } from 'fabric';
@@ -19,7 +19,7 @@ const ICON_DELETE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAA
 
 export default class CanvasRenderer {
   constructor(id, { width, height, scale }) {
-    this.canvasSize = { width, height }
+    this.canvasSize = { width, height };
     this.fabricInstance = this._instanceFabric(id, { width, height });
     this.scale = scale || 1;
     this.layers = [];
@@ -31,7 +31,7 @@ export default class CanvasRenderer {
     const instance = new fabric.Canvas(id, {
       width: width,
       height: height,
-      selection: false,
+      selection: false
     });
     instance.preserveObjectStacking = true;
     return instance;
@@ -118,7 +118,7 @@ export default class CanvasRenderer {
     typeof replacePhoto === 'function' ? this.replacePhoto = replacePhoto : null;
     // 单次点击
     typeof singleClick === 'function' ? this.singleClick = singleClick : null;
-    //清空画布
+    // 清空画布
     this._clear();
     // 加载资源
     await this._loadResource();
@@ -136,7 +136,7 @@ export default class CanvasRenderer {
   async _addLayers(list) {
     list = list.sort((a, b) => {
       return a.sort - b.sort;
-    })
+    });
     for (let i = 0; i < list.length; i++) {
       const item = list[i];
       await this._addLayerItem(item);
@@ -172,8 +172,7 @@ export default class CanvasRenderer {
           this._addNormalImage(item, resolve, active);
           break;
       }
-
-    })
+    });
   }
 
   // 添加SVG
@@ -233,7 +232,7 @@ export default class CanvasRenderer {
         selectable,
         name: name || type,
         globalCompositeOperation,
-        type: "vBox",
+        type: 'vBox',
         id
       });
 
@@ -242,12 +241,11 @@ export default class CanvasRenderer {
           layer: img,
           config: config
         });
-      })
+      });
 
       this.fabricInstance.add(img);
       resolve();
-    })
-
+    });
   }
 
   // 背景
@@ -260,12 +258,12 @@ export default class CanvasRenderer {
         left: 0,
         top: 0,
         globalCompositeOperation
-      })
+      });
       this.fabricInstance.setBackgroundImage(img, this.fabricInstance.renderAll.bind(this.fabricInstance));
       resolve();
     }, {
       crossOrigin: 'Anonymous'
-    })
+    });
   }
 
   // 背景
@@ -278,12 +276,12 @@ export default class CanvasRenderer {
         left: 0,
         top: 0,
         globalCompositeOperation
-      })
+      });
       this.fabricInstance.setOverlayImage(img, this.fabricInstance.renderAll.bind(this.fabricInstance));
       resolve();
     }, {
       crossOrigin: 'Anonymous'
-    })
+    });
   }
 
   /**
@@ -293,13 +291,11 @@ export default class CanvasRenderer {
    * @param {*} active - 是否设置激活状态
    */
   _addNormalImage(config, resolve, active) {
-
     const { url, id, type, name, top, left, width, angle = 0, offset, originX = 'left', originY = 'top', selectable = true, customControls = false, globalCompositeOperation } = config;
     fabric.Image.fromURL(url, img => {
-
       const targetWidth = width * this.scale;
       const scale = targetWidth / img.width;
-      let offsetX = 0;
+      const offsetX = 0;
       let offsetY = 0;
       if (offset) {
         // const chinLeft = offset[0] * scale;
@@ -325,14 +321,14 @@ export default class CanvasRenderer {
         name: name || type,
         type,
         id
-      })
+      });
 
       img.on('mousedown', () => {
         typeof this.singleClick === 'function' && this.singleClick({
           layer: img,
           config: config
         });
-      })
+      });
 
       // 是否自定义控制器
       if (customControls) {
@@ -349,7 +345,7 @@ export default class CanvasRenderer {
       resolve();
     }, {
       crossOrigin: 'Anonymous'
-    })
+    });
   }
 
   /**
@@ -422,10 +418,10 @@ export default class CanvasRenderer {
    * 添加图层
    * @param {*} item - 新增的图层信息
    * @param {*} active - 是否设置新增的图层为激活状态
-   * @returns 
+   * @returns
    */
   add(item, active = false, refresh = true) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
       if (!item) {
         reject();
       } else {
@@ -433,7 +429,7 @@ export default class CanvasRenderer {
         refresh && this.fabricInstance.renderAll();
         resolve();
       }
-    })
+    });
   }
 
   // 更新
@@ -461,7 +457,6 @@ export default class CanvasRenderer {
 
   // 删除图层
   remove({ name, type, layer }) {
-
     if (layer) {
       this.fabricInstance.remove(layer);
     } else {

@@ -1,10 +1,10 @@
 /*
- * @Description: 
+ * @Description:
  * @Version: 2.0
  * @Author: Yaowen Liu
  * @Date: 2021-08-16 11:03:11
  * @LastEditors: Yaowen Liu
- * @LastEditTime: 2021-09-10 13:06:39
+ * @LastEditTime: 2022-02-16 15:23:37
  */
 export function number(val, inscriber = 2) {
   val = val.toFixed(inscriber); // 数字转换为字符
@@ -16,6 +16,6 @@ export function number(val, inscriber = 2) {
   while (rgx.test(x1)) { // 正则式匹配
     x1 = x1.replace(rgx, '$1' + ',' + '$2'); // 正则式替换
   }
-  
+
   return x1 + x2.substr(0, inscriber + 1);
 }

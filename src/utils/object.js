@@ -1,8 +1,8 @@
 /**
  * 获取对象的值
- * @param {Object} form 
- * @param  {...any} selectors 
- * @returns 
+ * @param {Object} form
+ * @param  {...any} selectors
+ * @returns
  */
 export function getValue(form, ...selectors) {
   const res = selectors.map(s => {
@@ -12,6 +12,6 @@ export function getValue(form, ...selectors) {
       .reduce((prev, cur) => {
         return prev && prev[cur];
       }, form);
-  })
+  });
   return res;
 }
